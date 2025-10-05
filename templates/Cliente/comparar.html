@@ -7,29 +7,125 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h2 class="text-center text-success mb-4">Comparar Productos</h2>
+  <h2 class="mb-4 text-center text-success">Comparar Productos</h2>
 
-    {% if productos|length != 2 %}
-        <p class="text-center text-muted">Selecciona exactamente 2 productos para comparar.</p>
-        <div class="text-center mt-3">
-            <a href="{{ url_for('catalogo') }}" class="btn btn-primary">Volver al catálogo</a>
+  <!-- Productos disponibles para selección -->
+  <div class="row" id="productos-container">
+    {% for producto in productos %}
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm text-center">
+        <img src="{{ url_for('static', filename=producto.ImagenPrincipal or 'img/catalogo.png') }}" class="card-img-top" style="height:200px; object-fit:cover;">
+        <div class="card-body">
+          <h5 class="card-title">{{ producto.NombreProducto }}</h5>
+          <p class="card-text precio">${{ '%.2f'|format(producto.PrecioUnidad) }}</p>
+          <button class="btn btn-outline-info btn-select-compare" data-id="{{ producto.ID_Producto }}">
+            Seleccionar
+          </button>
         </div>
-    {% else %}
-        <div class="row g-4">
-            {% for producto in productos %}
-            <div class="col-md-6">
-                <div class="card h-100 shadow-sm">
-                    <img src="{{ url_for('static', filename=producto.ImagenPrincipal or 'img/catalogo.png') }}"
-                         class="card-img-top" alt="{{ producto.NombreProducto }}">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ producto.NombreProducto }}</h5>
-                        <p class="card-text"><strong>Precio:</strong> ${{ '%.2f'|format(producto.PrecioUnidad) }}</p>
-                        <p class="card-text"><strong>Descripción:</strong> {{ producto.Descripcion or 'Sin descripción' }}</p>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Cuadro comparativo -->
+  <div id="comparativa" class="mt-5" style="display:none;">
+    <h3 class="text-center mb-4">Cuadro Comparativo</h3>
+    <div class="row" id="cuadro-comparativo"></div>
+  </div>
 </div>
+
+<!-- Botón flotante para comparar -->
+<a href="#" id="btn-comparar" class="btn btn-warning shadow-lg position-fixed rounded-pill px-4 py-2"
+   style="bottom: 30px; right: 30px; z-index: 1050; display:none;">
+   Comparar Productos
+</a>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  let comparar = []; // productos seleccionados
+  const btnComparar = document.getElementById('btn-comparar');
+  const cuadro = document.getElementById('cuadro-comparativo');
+  const contenedorComparativa = document.getElementById('comparativa');
+
+  // Función para actualizar el estado de los botones de selección
+  const actualizarBotones = () => {
+    document.querySelectorAll('.btn-select-compare').forEach(btn => {
+      const id = btn.dataset.id;
+      if(comparar.includes(id)){
+        btn.classList.add('active');
+        btn.style.backgroundColor = '#0dcaf0';
+        btn.style.color = '#fff';
+        btn.textContent = 'Seleccionado';
+      } else {
+        btn.classList.remove('active');
+        btn.style.backgroundColor = '';
+        btn.style.color = '';
+        btn.textContent = 'Seleccionar';
+      }
+    });
+  };
+
+  // Mostrar/ocultar botón flotante
+  const actualizarBotonFlotante = () => {
+    btnComparar.style.display = comparar.length > 0 ? 'inline-block' : 'none';
+  };
+
+  // Selección de productos
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-select-compare');
+    if(!btn) return;
+
+    const id = btn.dataset.id;
+    if(comparar.includes(id)){
+      comparar = comparar.filter(x => x !== id);
+    } else {
+      if(comparar.length >= 2){
+        alert("Solo puedes comparar 2 productos.");
+        return;
+      }
+      comparar.push(id);
+    }
+
+    actualizarBotones();
+    actualizarBotonFlotante();
+  });
+
+  // Mostrar cuadro comparativo
+  btnComparar.addEventListener('click', () => {
+    if(comparar.length < 2){
+      alert("Selecciona 2 productos para comparar.");
+      return;
+    }
+
+    cuadro.innerHTML = '';
+
+    comparar.forEach(id => {
+      const prodCard = document.querySelector(`.btn-select-compare[data-id='${id}']`).closest('.card');
+      const img = prodCard.querySelector('img').src;
+      const nombre = prodCard.querySelector('.card-title').textContent;
+      const precio = prodCard.querySelector('.precio').textContent;
+
+      const div = document.createElement('div');
+      div.className = 'col-md-6 mb-3';
+      div.innerHTML = `
+        <div class="card h-100 shadow-sm text-center">
+          <img src="${img}" class="card-img-top" style="height:200px; object-fit:cover;">
+          <div class="card-body">
+            <h5 class="card-title">${nombre}</h5>
+            <p class="card-text">${precio}</p>
+          </div>
+        </div>
+      `;
+      cuadro.appendChild(div);
+    });
+
+    contenedorComparativa.style.display = 'block';
+    window.scrollTo({ top: contenedorComparativa.offsetTop - 20, behavior: 'smooth' });
+  });
+
+});
+</script>
 {% endblock %}
