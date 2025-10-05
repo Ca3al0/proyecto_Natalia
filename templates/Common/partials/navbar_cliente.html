@@ -1,5 +1,4 @@
 {% block navbar %}
-
 <nav class="navbar navbar-expand-lg fixed-top bg-light shadow-sm">
   <div class="container-fluid px-4">
     <!-- Logo -->
@@ -38,7 +37,6 @@
           </a>
 
           {% if current_user.is_authenticated %}
-          <!-- Menú si el usuario está logueado -->
           <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 250px;">
             <li class="d-flex align-items-center mb-3">
               <div class="rounded-circle bg-light border text-dark fw-bold d-flex align-items-center justify-content-center me-2"
@@ -47,7 +45,6 @@
               </div>
               <strong class="text-uppercase">{{ current_user.Nombre }} {{ current_user.Apellido }}</strong>
             </li>
-
             <li><a class="dropdown-item" href="{{ url_for('cliente.actualizacion_datos') }}">👤 Perfil</a></li>
             <li><a class="dropdown-item" href="#">📦 Mis pedidos</a></li>
             <li><a class="dropdown-item" href="#">⭐ Reseñas</a></li>
@@ -57,7 +54,6 @@
             </li>
           </ul>
           {% else %}
-          <!-- Menú si NO está logueado -->
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" href="{{ url_for('auth.login') }}">Iniciar sesión</a></li>
             <li><a class="dropdown-item" href="{{ url_for('auth.register') }}">Registrarse</a></li>
@@ -78,172 +74,104 @@
   </div>
 </nav>
 
-{% endblock %}
-
-<!-- Modal Favoritos (Bootstrap puro) -->
-<div class="modal fade" id="favoritosModal" tabindex="-1" aria-labelledby="favoritosModalLabel" aria-hidden="true">
+<!-- Modal Favoritos -->
+<div class="modal fade" id="favoritosModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title text-success fw-bold" id="favoritosModalLabel">Tus productos favoritos</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <h5 class="modal-title text-success fw-bold">Tus productos favoritos</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body" id="favoritosContent">
         <p>Cargando...</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>
 </div>
-
-<!-- Modal del Carrito (mantiene estilo personalizado) -->
-<div id="modalCarrito" class="custom-modal" style="display: none;">
-  <div class="custom-modal-content">
-    <span class="close-button" onclick="cerrarModalCarrito()">&times;</span>
-    <h4 class="mb-3">Productos en el carrito</h4>
-    <div id="carritoContenido">
-      <p>Cargando...</p>
-    </div>
-  </div>
-</div>
-
-<style>
-/* Solo estilos del modal personalizado del carrito */
-.custom-modal {
-  position: fixed;
-  z-index: 1050;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: none;
-  background-color: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-}
-
-.custom-modal-content {
-  background-color: #fff;
-  padding: 25px 30px;
-  border-radius: 12px;
-  max-width: 700px;
-  width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-}
-.close-button {
-  position: absolute;
-  top: 15px;
-  right: 20px;
-  font-size: 28px;
-  color: #777;
-  cursor: pointer;
-}
-.close-button:hover {
-  color: #d9534f;
-}
-</style>
+{% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  function obtenerFavoritos() {
-    try {
-      const fav = JSON.parse(localStorage.getItem('favoritos'));
-      return Array.isArray(fav) ? fav : [];
-    } catch {
-      return [];
-    }
-  }
+  // --- FAVORITOS ---
+  let favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]').map(String);
 
-  function actualizarContadorFavoritos() {
-    const favoritos = obtenerFavoritos();
+  const actualizarContadorFavoritos = () => {
     const contador = document.getElementById('contador-favoritos');
-    if (favoritos.length > 0) {
-      contador.style.display = 'inline-block';
-      contador.textContent = favoritos.length;
-    } else {
-      contador.style.display = 'none';
-      contador.textContent = '0';
-    }
-  }
+    if (!contador) return;
+    contador.textContent = favoritos.length;
+    contador.style.display = favoritos.length > 0 ? 'inline-block' : 'none';
+  };
 
-  function mostrarFavoritos() {
-    const favoritos = obtenerFavoritos();
+  const actualizarIconoFavorito = (button, agregado) => {
+    const icon = button.querySelector('i');
+    if (!icon) return;
+    if (agregado) {
+      icon.classList.remove('bi-heart');
+      icon.classList.add('bi-heart-fill', 'text-danger');
+    } else {
+      icon.classList.add('bi-heart');
+      icon.classList.remove('bi-heart-fill', 'text-danger');
+    }
+  };
+
+  const toggleFavorito = (id) => {
+    id = id.toString();
+    let agregado = false;
+    const index = favoritos.indexOf(id);
+    if (index === -1) {
+      favoritos.push(id);
+      agregado = true;
+    } else {
+      favoritos.splice(index, 1);
+    }
+    localStorage.setItem('favoritos', JSON.stringify(favoritos));
+    actualizarContadorFavoritos();
+    return agregado;
+  };
+
+  // Inicializar botones de productos
+  document.querySelectorAll('.btn-favorite').forEach(btn => {
+    const id = btn.dataset.id;
+    if (!id) return;
+    actualizarIconoFavorito(btn, favoritos.includes(id));
+    btn.addEventListener('click', () => {
+      const agregado = toggleFavorito(id);
+      actualizarIconoFavorito(btn, agregado);
+    });
+  });
+
+  // Mostrar modal de favoritos
+  const btnFavModal = document.getElementById('btn-favoritos');
+  btnFavModal?.addEventListener('click', () => {
     const modalEl = document.getElementById('favoritosModal');
     const modal = new bootstrap.Modal(modalEl);
+    const container = document.getElementById('favoritosContent');
 
     if (favoritos.length === 0) {
-      document.getElementById('favoritosContent').innerHTML = '<p>No tienes productos favoritos aún.</p>';
+      container.innerHTML = '<p>No tienes productos favoritos aún.</p>';
       modal.show();
       return;
     }
 
-    fetch('/favoritos', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ ids: favoritos })
-    })
-    .then(res => res.ok ? res.json() : Promise.reject())
-    .then(data => {
-      document.getElementById('favoritosContent').innerHTML = data.html || '<p>No se encontraron productos.</p>';
-      modal.show();
-    })
-    .catch(() => {
-      document.getElementById('favoritosContent').innerHTML = '<p>Error al cargar favoritos.</p>';
-      modal.show();
+    // Construye HTML del modal con los mismos cards
+    let html = '<div class="row g-3">';
+    favoritos.forEach(id => {
+      const productoEl = document.querySelector(`.btn-favorite[data-id='${id}']`);
+      if (productoEl) {
+        const card = productoEl.closest('.card');
+        html += `<div class="col-6 col-md-4">${card.outerHTML}</div>`;
+      }
     });
-  }
-
-  document.getElementById('btn-favoritos')?.addEventListener('click', e => {
-    e.preventDefault();
-    mostrarFavoritos();
+    html += '</div>';
+    container.innerHTML = html;
+    modal.show();
   });
 
   actualizarContadorFavoritos();
-
-  window.addEventListener('storage', e => {
-    if (e.key === 'favoritos') actualizarContadorFavoritos();
-  });
 });
-
-// Carrito
-function toggleCart() {
-  const modal = document.getElementById("modalCarrito");
-  modal.style.display = "flex";
-
-  let ids = [];
-  try {
-    ids = JSON.parse(localStorage.getItem('carrito')) || [];
-  } catch { ids = []; }
-
-  fetch('/carrito', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ ids })
-  })
-  .then(res => res.json())
-  .then(data => {
-    document.getElementById('carritoContenido').innerHTML = data.html;
-  })
-  .catch(() => {
-    document.getElementById('carritoContenido').innerHTML = '<p>Error al cargar carrito.</p>';
-  });
-}
-
-function cerrarModalCarrito() {
-  document.getElementById("modalCarrito").style.display = "none";
-}
-
-window.onclick = e => {
-  const modal = document.getElementById("modalCarrito");
-  if (e.target === modal) modal.style.display = "none";
-};
 </script>
 {% endblock %}
