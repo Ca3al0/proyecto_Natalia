@@ -15,13 +15,12 @@
     <div class="col-md-4 mb-4">
       <div class="card h-100 shadow-sm text-center" data-id="{{ producto.ID_Producto }}">
         <img src="{{ url_for('static', filename=producto.ImagenPrincipal or 'img/catalogo.png') }}" 
-             class="card-img-top" style="height:200px; object-fit:cover;">
+             class="card-img-top" style="height:200px; object-fit:cover; border-radius:10px 10px 0 0;">
         <div class="card-body">
           <h5 class="card-title">{{ producto.NombreProducto }}</h5>
           <p class="card-text precio">${{ '%.2f'|format(producto.PrecioUnidad) }}</p>
           {% if producto.Color %}<p class="card-text color">Color: {{ producto.Color }}</p>{% endif %}
-          {% if producto.Categoria %}<p class="card-text categoria">Categoría: {{ producto.Categoria }}</p>{% endif %}
-          <button class="btn btn-success btn-select-compare" data-id="{{ producto.ID_Producto }}">
+          <button class="btn btn-success rounded-pill btn-select-compare px-4 py-2" data-id="{{ producto.ID_Producto }}">
             Seleccionar
           </button>
         </div>
@@ -32,10 +31,10 @@
 
   <!-- Cuadro comparativo tipo tabla -->
   <div id="comparativa" class="mt-5" style="display:none;">
-    <h3 class="text-center mb-4 text-success">Cuadro Comparativo</h3>
+    <h3 class="text-center mb-4 text-success">Comparacion</h3>
     <div class="table-responsive">
-      <table class="table table-bordered text-center align-middle" id="tabla-comparativa" style="background:#f8f9fa;">
-        <thead class="table-success text-center">
+      <table class="table table-bordered text-center align-middle" id="tabla-comparativa" style="background:#f9f9f9; border-radius:10px; overflow:hidden;">
+        <thead class="bg-success text-white">
           <tr>
             <th>Característica</th>
             <th>Producto 1</th>
@@ -43,30 +42,25 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="table-light">
+          <tr>
             <td><strong>Imagen</strong></td>
             <td id="img1"></td>
             <td id="img2"></td>
           </tr>
-          <tr class="table-light">
+          <tr>
             <td><strong>Nombre</strong></td>
             <td id="nombre1"></td>
             <td id="nombre2"></td>
           </tr>
-          <tr class="table-light">
+          <tr>
             <td><strong>Precio</strong></td>
             <td id="precio1"></td>
             <td id="precio2"></td>
           </tr>
-          <tr class="table-light">
+          <tr>
             <td><strong>Color</strong></td>
             <td id="color1"></td>
             <td id="color2"></td>
-          </tr>
-          <tr class="table-light">
-            <td><strong>Categoría</strong></td>
-            <td id="categoria1"></td>
-            <td id="categoria2"></td>
           </tr>
         </tbody>
       </table>
@@ -75,10 +69,23 @@
 </div>
 
 <!-- Botón flotante -->
-<a href="#" id="btn-comparar" class="btn btn-success shadow-lg position-fixed rounded-pill px-4 py-2"
+<a href="#" id="btn-comparar" 
+   class="btn btn-success shadow-lg position-fixed rounded-pill px-4 py-2"
    style="bottom: 30px; right: 30px; z-index: 1050; display:none;">
    Comparar Productos
 </a>
+
+<!-- Modal límite productos -->
+<div class="modal fade" id="modalLimite" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-success">
+      <div class="modal-body text-center py-4" style="font-size:1.1rem;">
+        <div>Solo puedes seleccionar 2 productos para comparar</div>
+        <button type="button" class="btn btn-success mt-3 px-4 py-2 rounded-pill" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -87,8 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let comparar = [];
   const btnComparar = document.getElementById('btn-comparar');
   const comparativa = document.getElementById('comparativa');
+  const modalLimite = new bootstrap.Modal(document.getElementById('modalLimite'));
 
-  // Actualizar botones de selección
   function actualizarBotones() {
     document.querySelectorAll('.btn-select-compare').forEach(btn => {
       const id = btn.getAttribute('data-id');
@@ -107,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
     btnComparar.style.display = comparar.length > 0 ? 'inline-block' : 'none';
   }
 
-  // Click en productos
   document.querySelectorAll('.btn-select-compare').forEach(btn => {
     btn.addEventListener('click', function() {
       const id = this.getAttribute('data-id');
@@ -115,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         comparar = comparar.filter(x => x !== id);
       } else {
         if(comparar.length >= 2){
-          alert("Solo puedes seleccionar 2 productos.");
+          modalLimite.show();
           return;
         }
         comparar.push(id);
@@ -124,29 +130,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Click en botón flotante
   btnComparar.addEventListener('click', function(e){
     e.preventDefault();
     if(comparar.length < 2){
-      alert("Selecciona 2 productos.");
+      modalLimite.show();
       return;
     }
 
-    // Tomar los datos de los productos
     comparar.forEach((id, index) => {
       const prodCard = document.querySelector(`.card[data-id='${id}']`);
       const img = prodCard.querySelector('img').src;
       const nombre = prodCard.querySelector('.card-title').textContent;
       const precio = prodCard.querySelector('.precio').textContent;
       const color = prodCard.querySelector('.color') ? prodCard.querySelector('.color').textContent.replace('Color: ','') : '-';
-      const categoria = prodCard.querySelector('.categoria') ? prodCard.querySelector('.categoria').textContent.replace('Categoría: ','') : '-';
 
-      // Rellenar tabla
-      document.getElementById('img'+(index+1)).innerHTML = `<img src="${img}" style="height:100px; object-fit:cover; border-radius:5px;">`;
+      document.getElementById('img'+(index+1)).innerHTML = `<img src="${img}" style="height:100px; object-fit:cover; border-radius:8px;">`;
       document.getElementById('nombre'+(index+1)).textContent = nombre;
       document.getElementById('precio'+(index+1)).textContent = precio;
       document.getElementById('color'+(index+1)).textContent = color;
-      document.getElementById('categoria'+(index+1)).textContent = categoria;
     });
 
     comparativa.style.display = 'block';
