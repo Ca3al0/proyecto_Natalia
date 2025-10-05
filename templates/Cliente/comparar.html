@@ -9,11 +9,11 @@
 <div class="container mt-5">
   <h2 class="mb-4 text-center text-success">Comparar Productos</h2>
 
-  <!-- Productos disponibles para selección -->
+  <!-- Productos disponibles -->
   <div class="row" id="productos-container">
     {% for producto in productos %}
     <div class="col-md-4 mb-4">
-      <div class="card h-100 shadow-sm text-center">
+      <div class="card h-100 shadow-sm text-center" data-id="{{ producto.ID_Producto }}">
         <img src="{{ url_for('static', filename=producto.ImagenPrincipal or 'img/catalogo.png') }}" class="card-img-top" style="height:200px; object-fit:cover;">
         <div class="card-body">
           <h5 class="card-title">{{ producto.NombreProducto }}</h5>
@@ -34,7 +34,7 @@
   </div>
 </div>
 
-<!-- Botón flotante para comparar -->
+<!-- Botón flotante -->
 <a href="#" id="btn-comparar" class="btn btn-warning shadow-lg position-fixed rounded-pill px-4 py-2"
    style="bottom: 30px; right: 30px; z-index: 1050; display:none;">
    Comparar Productos
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const cuadro = document.getElementById('cuadro-comparativo');
   const contenedorComparativa = document.getElementById('comparativa');
 
-  // Función para actualizar el estado de los botones de selección
+  // Función para actualizar visualmente los botones
   const actualizarBotones = () => {
     document.querySelectorAll('.btn-select-compare').forEach(btn => {
       const id = btn.dataset.id;
@@ -103,7 +103,9 @@ document.addEventListener('DOMContentLoaded', () => {
     cuadro.innerHTML = '';
 
     comparar.forEach(id => {
-      const prodCard = document.querySelector(`.btn-select-compare[data-id='${id}']`).closest('.card');
+      const prodCard = document.querySelector(`.card[data-id='${id}']`);
+      if(!prodCard) return;
+
       const img = prodCard.querySelector('img').src;
       const nombre = prodCard.querySelector('.card-title').textContent;
       const precio = prodCard.querySelector('.precio').textContent;
