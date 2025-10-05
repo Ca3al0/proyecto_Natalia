@@ -24,12 +24,13 @@
   {% endif %}
 {% endwith %}
 
-<a href="{{ url_for('cliente.comparar') }}" id="btn-comparar" 
-   class="btn btn-warning shadow-lg position-fixed"
-   style="bottom: 20px; right: 20px; z-index: 1050; display:inline-block;">
+<!-- Botón flotante de comparar -->
+<a href="#" id="btn-comparar"
+   class="btn btn-warning shadow-lg position-fixed rounded-pill px-4 py-2"
+   style="bottom: 30px; right: 30px; z-index: 1050; display:none;"
+   data-bs-toggle="tooltip" data-bs-placement="left" title="Haz clic para comparar">
    <i class="bi bi-bar-chart me-1"></i> Comparar productos
 </a>
-
 
 <div class="container mt-5">
   <h2 class="mb-4 text-center text-success">Catálogo de Productos</h2>
@@ -63,9 +64,10 @@
           </button>
 
           <!-- Botón comparar -->
-          <button type="button" class="btn btn-outline-info btn-compare mt-1" data-id="{{ producto.ID_Producto|string }}">
-            <i class="bi bi-bar-chart me-1"></i> Comparar
-          </button>
+          <button type="button" class="btn btn-outline-info btn-compare" data-id="{{ producto.ID_Producto|string }}">
+  <i class="bi bi-bar-chart me-1"></i> Comparar
+</button>
+
         </div>
       </div>
     </div>
@@ -79,16 +81,18 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
+  // --- Inicializar tooltips ---
+  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+  tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+
   // --- FAVORITOS ---
   let favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]').map(String);
-
   const actualizarContadorFavoritos = () => {
     const contador = document.getElementById('contador-favoritos');
     if (!contador) return;
     contador.textContent = favoritos.length;
     contador.style.display = favoritos.length === 0 ? 'none' : 'inline-block';
   };
-
   const actualizarIcono = (btn, agregado) => {
     const icon = btn.querySelector('i');
     if (!icon) return;
@@ -100,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
       icon.classList.remove('bi-heart-fill', 'text-danger');
     }
   };
-
   const toggleFavorito = (id) => {
     id = id.toString();
     let agregado = false;
@@ -111,30 +114,23 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarContadorFavoritos();
     return agregado;
   };
-
-  document.querySelectorAll('.btn-favorite').forEach(btn => {
-    actualizarIcono(btn, favoritos.includes(btn.dataset.id));
-  });
-
+  document.querySelectorAll('.btn-favorite').forEach(btn => actualizarIcono(btn, favoritos.includes(btn.dataset.id)));
   document.addEventListener('click', e => {
     const btn = e.target.closest('.btn-favorite');
     if (!btn) return;
     const agregado = toggleFavorito(btn.dataset.id);
     actualizarIcono(btn, agregado);
   });
-
   actualizarContadorFavoritos();
 
   // --- CARRITO ---
   let carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
-
   const actualizarContadorCarrito = () => {
     const contador = document.getElementById('cart-count');
     if (!contador) return;
     contador.textContent = carrito.length;
     contador.style.display = carrito.length === 0 ? 'none' : 'inline-block';
   };
-
   const toggleCarrito = (id) => {
     id = id.toString();
     if (!carrito.includes(id)) carrito.push(id);
@@ -142,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarContadorCarrito();
     mostrarMensaje("Producto agregado al carrito", "success");
   };
-
   const mostrarMensaje = (texto, tipo) => {
     const alert = document.createElement('div');
     alert.className = `alert alert-${tipo} position-fixed top-0 end-0 m-4 shadow`;
@@ -151,13 +146,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(alert);
     setTimeout(() => alert.remove(), 3000);
   };
-
   document.addEventListener('click', e => {
     const btn = e.target.closest('.btn-add-cart');
     if (!btn) return;
     toggleCarrito(btn.dataset.id);
   });
-
   actualizarContadorCarrito();
 
   // --- COMPARAR ---
@@ -165,18 +158,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnComparar = document.getElementById('btn-comparar');
 
   const actualizarBotonComparar = () => {
-    btnComparar.style.display = comparar.length > 0 ? 'inline-block' : 'none';
+    if (comparar.length > 0) {
+      btnComparar.style.display = 'inline-block';
+      btnComparar.style.opacity = 0;
+      btnComparar.style.transition = 'opacity 0.4s';
+      setTimeout(() => { btnComparar.style.opacity = 1; }, 50);
+    } else {
+      btnComparar.style.opacity = 0;
+      setTimeout(() => { btnComparar.style.display = 'none'; }, 400);
+    }
   };
 
   document.querySelectorAll('.btn-compare').forEach(btn => {
-    const id = btn.dataset.id.toString();  // convertir a string
-
-    // Marcar botón activo si ya estaba seleccionado
+    const id = btn.dataset.id.toString();
     if (comparar.includes(id)) btn.classList.add('active');
 
     btn.addEventListener('click', () => {
       if (comparar.includes(id)) {
-        // Quitar producto
         comparar = comparar.filter(x => x !== id);
         btn.classList.remove('active');
       } else {
@@ -201,7 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = url;
   });
 
-  // Inicializar visibilidad del botón
   actualizarBotonComparar();
 });
 </script>
