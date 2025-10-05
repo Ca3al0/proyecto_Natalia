@@ -1,26 +1,35 @@
 {% extends "common/base.html" %}
 
+{% block navbar %}
+{% include "common/partials/navbar_cliente.html" %}
+{% include "common/partials/navbar_secundario2.html" %}
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <h2 class="text-center text-success mb-4">Comparar Productos</h2>
 
-    {% if productos|length == 2 %}
-    <div class="row g-4">
-        {% for producto in productos %}
-        <div class="col-md-6">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ url_for('static', filename=producto.ImagenPrincipal or 'img/catalogo.png') }}" class="card-img-top" alt="{{ producto.NombreProducto }}">
-                <div class="card-body">
-                    <h5 class="card-title">{{ producto.NombreProducto }}</h5>
-                    <p class="card-text">Precio: ${{ '%.2f'|format(producto.PrecioUnidad) }}</p>
-                    <p class="card-text">Descripción: {{ producto.Descripcion or 'No disponible' }}</p>
+    {% if productos|length != 2 %}
+        <p class="text-center text-muted">Selecciona exactamente 2 productos para comparar.</p>
+        <div class="text-center mt-3">
+            <a href="{{ url_for('cliente.catalogo') }}" class="btn btn-primary">Volver al catálogo</a>
+        </div>
+    {% else %}
+        <div class="row g-4">
+            {% for producto in productos %}
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <img src="{{ url_for('static', filename=producto.ImagenPrincipal or 'img/catalogo.png') }}"
+                         class="card-img-top" alt="{{ producto.NombreProducto }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ producto.NombreProducto }}</h5>
+                        <p class="card-text"><strong>Precio:</strong> ${{ '%.2f'|format(producto.PrecioUnidad) }}</p>
+                        <p class="card-text"><strong>Descripción:</strong> {{ producto.Descripcion or 'Sin descripción' }}</p>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-    {% else %}
-        <p class="text-center text-muted">Debes seleccionar 2 productos para comparar.</p>
     {% endif %}
 </div>
 {% endblock %}

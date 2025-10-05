@@ -233,8 +233,12 @@ def guardar_resena(id):
 
 @cliente.route('/comparar')
 def comparar():
-    # Obtener los IDs de la URL, pueden ser varios
-    ids = request.args.getlist('ids')
-    # Consultar los productos en la base de datos
+    # Obtiene todos los ids de los productos enviados en la URL
+    ids = request.args.getlist('ids')  # ej: /comparar?ids=1&ids=2
+    if len(ids) != 2:
+        # Redirige o muestra mensaje si no son exactamente 2
+        return render_template('cliente/comparar.html', productos=[])
+    
+    # Trae los productos de la base de datos
     productos = Producto.query.filter(Producto.ID_Producto.in_(ids)).all()
-    return render_template('comparar.html', productos=productos)
+    return render_template('cliente/comparar.html', productos=productos)
