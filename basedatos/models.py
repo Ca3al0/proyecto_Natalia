@@ -66,8 +66,16 @@ class Proveedor(db.Model):
     Telefono = db.Column(db.String(20))
     Pais = db.Column(db.String(50))
     CargoContacto = db.Column(db.String(50))
+    Cantidad = db.Column(db.Float)
+    Precio_Unitario = db.Column(db.Numeric(10, 2))
+    Ciudad = db.Column(db.String(100))
+    Direccion = db.Column(db.String(200))
 
+    # Relación con productos (opcional, si existe tabla Producto)
     productos = db.relationship('Producto', back_populates='proveedor', lazy=True)
+
+    def __repr__(self):
+        return f'<Proveedor {self.NombreEmpresa} - {self.Ciudad}>'
 
 # ------------------ Categorias ------------------
 class Categorias(db.Model):
