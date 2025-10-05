@@ -24,12 +24,12 @@
   {% endif %}
 {% endwith %}
 
-<!-- Botón flotante de comparar -->
-<a href="#" id="btn-comparar" 
+<a href="{{ url_for('cliente.comparar') }}" id="btn-comparar" 
    class="btn btn-warning shadow-lg position-fixed"
-   style="bottom: 20px; right: 20px; z-index: 1050; display:none;">
+   style="bottom: 20px; right: 20px; z-index: 1050; display:inline-block;">
    <i class="bi bi-bar-chart me-1"></i> Comparar productos
 </a>
+
 
 <div class="container mt-5">
   <h2 class="mb-4 text-center text-success">Catálogo de Productos</h2>
@@ -84,20 +84,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const actualizarContadorFavoritos = () => {
     const contador = document.getElementById('contador-favoritos');
-    if(!contador) return;
+    if (!contador) return;
     contador.textContent = favoritos.length;
     contador.style.display = favoritos.length === 0 ? 'none' : 'inline-block';
   };
 
   const actualizarIcono = (btn, agregado) => {
     const icon = btn.querySelector('i');
-    if(!icon) return;
-    if(agregado){
+    if (!icon) return;
+    if (agregado) {
       icon.classList.remove('bi-heart');
-      icon.classList.add('bi-heart-fill','text-danger');
+      icon.classList.add('bi-heart-fill', 'text-danger');
     } else {
       icon.classList.add('bi-heart');
-      icon.classList.remove('bi-heart-fill','text-danger');
+      icon.classList.remove('bi-heart-fill', 'text-danger');
     }
   };
 
@@ -105,20 +105,20 @@ document.addEventListener('DOMContentLoaded', () => {
     id = id.toString();
     let agregado = false;
     const index = favoritos.indexOf(id);
-    if(index === -1){ favoritos.push(id); agregado=true; }
-    else { favoritos.splice(index,1); }
+    if (index === -1) { favoritos.push(id); agregado = true; }
+    else { favoritos.splice(index, 1); }
     localStorage.setItem('favoritos', JSON.stringify(favoritos));
     actualizarContadorFavoritos();
     return agregado;
   };
 
-  document.querySelectorAll('.btn-favorite').forEach(btn=>{
+  document.querySelectorAll('.btn-favorite').forEach(btn => {
     actualizarIcono(btn, favoritos.includes(btn.dataset.id));
   });
 
-  document.addEventListener('click', e=>{
+  document.addEventListener('click', e => {
     const btn = e.target.closest('.btn-favorite');
-    if(!btn) return;
+    if (!btn) return;
     const agregado = toggleFavorito(btn.dataset.id);
     actualizarIcono(btn, agregado);
   });
@@ -130,54 +130,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const actualizarContadorCarrito = () => {
     const contador = document.getElementById('cart-count');
-    if(!contador) return;
+    if (!contador) return;
     contador.textContent = carrito.length;
-    contador.style.display = carrito.length === 0 ? 'none':'inline-block';
+    contador.style.display = carrito.length === 0 ? 'none' : 'inline-block';
   };
 
   const toggleCarrito = (id) => {
     id = id.toString();
-    if(!carrito.includes(id)) carrito.push(id);
+    if (!carrito.includes(id)) carrito.push(id);
     localStorage.setItem('carrito', JSON.stringify(carrito));
     actualizarContadorCarrito();
-    mostrarMensaje("Producto agregado al carrito","success");
+    mostrarMensaje("Producto agregado al carrito", "success");
   };
 
-  const mostrarMensaje = (texto,tipo) => {
+  const mostrarMensaje = (texto, tipo) => {
     const alert = document.createElement('div');
-    alert.className=`alert alert-${tipo} position-fixed top-0 end-0 m-4 shadow`;
-    alert.style.zIndex=2000;
-    alert.innerHTML=`<i class="bi bi-check-circle-fill me-2"></i>${texto}`;
+    alert.className = `alert alert-${tipo} position-fixed top-0 end-0 m-4 shadow`;
+    alert.style.zIndex = 2000;
+    alert.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i>${texto}`;
     document.body.appendChild(alert);
-    setTimeout(()=>alert.remove(),3000);
+    setTimeout(() => alert.remove(), 3000);
   };
 
-  document.addEventListener('click', e=>{
+  document.addEventListener('click', e => {
     const btn = e.target.closest('.btn-add-cart');
-    if(!btn) return;
+    if (!btn) return;
     toggleCarrito(btn.dataset.id);
   });
 
   actualizarContadorCarrito();
 
   // --- COMPARAR ---
-  let comparar = JSON.parse(localStorage.getItem('comparar')||'[]');
+  let comparar = JSON.parse(localStorage.getItem('comparar') || '[]').map(String);
   const btnComparar = document.getElementById('btn-comparar');
 
   const actualizarBotonComparar = () => {
-    btnComparar.style.display = comparar.length>0 ? 'inline-block' : 'none';
+    btnComparar.style.display = comparar.length > 0 ? 'inline-block' : 'none';
   };
 
-  document.querySelectorAll('.btn-compare').forEach(btn=>{
-    const id = btn.dataset.id;
-    if(comparar.includes(id)) btn.classList.add('active');
+  document.querySelectorAll('.btn-compare').forEach(btn => {
+    const id = btn.dataset.id.toString();  // convertir a string
 
-    btn.addEventListener('click', ()=>{
-      if(comparar.includes(id)){
-        comparar = comparar.filter(x=>x!==id);
+    // Marcar botón activo si ya estaba seleccionado
+    if (comparar.includes(id)) btn.classList.add('active');
+
+    btn.addEventListener('click', () => {
+      if (comparar.includes(id)) {
+        // Quitar producto
+        comparar = comparar.filter(x => x !== id);
         btn.classList.remove('active');
       } else {
-        if(comparar.length>=2){ alert("Solo puedes comparar 2 productos."); return; }
+        if (comparar.length >= 2) {
+          alert("Solo puedes comparar 2 productos.");
+          return;
+        }
         comparar.push(id);
         btn.classList.add('active');
       }
@@ -186,13 +192,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  btnComparar.addEventListener('click', ()=>{
-    if(comparar.length<2){ alert("Selecciona 2 productos para comparar."); return; }
-    // Redirige correctamente a la ruta Flask
-    const url = "{{ url_for('cliente.comparar') }}?" + comparar.map(id=>"ids="+id).join("&");
+  btnComparar.addEventListener('click', () => {
+    if (comparar.length < 2) {
+      alert("Selecciona 2 productos para comparar.");
+      return;
+    }
+    const url = "{{ url_for('cliente.comparar') }}?" + comparar.map(id => "ids=" + id).join("&");
     window.location.href = url;
   });
 
+  // Inicializar visibilidad del botón
   actualizarBotonComparar();
 });
 </script>

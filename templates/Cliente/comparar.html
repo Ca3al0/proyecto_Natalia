@@ -12,7 +12,7 @@
     {% if productos|length != 2 %}
         <p class="text-center text-muted">Selecciona exactamente 2 productos para comparar.</p>
         <div class="text-center mt-3">
-            <a href="{{ url_for('cliente.catalogo') }}" class="btn btn-primary">Volver al catálogo</a>
+            <a href="{{ url_for('catalogo') }}" class="btn btn-primary">Volver al catálogo</a>
         </div>
     {% else %}
         <div class="row g-4">
