@@ -9,19 +9,18 @@
         {% for producto in productos %}
         <div class="col-md-6">
             <div class="card h-100 shadow-sm">
-                <img src="{{ url_for('static', filename=producto.ImagenPrincipal or 'img/catalogo.png') }}" 
-                     class="card-img-top" alt="{{ producto.NombreProducto }}">
+                <img src="{{ url_for('static', filename=producto.ImagenPrincipal or 'img/catalogo.png') }}" class="card-img-top" alt="{{ producto.NombreProducto }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ producto.NombreProducto }}</h5>
-                    <p class="card-text">${{ '%.2f'|format(producto.PrecioUnidad) }}</p>
-                    <p class="card-text">{{ producto.Descripcion or '' }}</p>
+                    <p class="card-text">Precio: ${{ '%.2f'|format(producto.PrecioUnidad) }}</p>
+                    <p class="card-text">Descripción: {{ producto.Descripcion or 'No disponible' }}</p>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-        <p class="text-center text-muted">Selecciona exactamente 2 productos para comparar.</p>
+        <p class="text-center text-muted">Debes seleccionar 2 productos para comparar.</p>
     {% endif %}
 </div>
 {% endblock %}
