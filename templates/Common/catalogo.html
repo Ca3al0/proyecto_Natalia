@@ -80,113 +80,88 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  // --- Inicializar tooltips de Bootstrap ---
-  const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-  tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
-
-  // --- FAVORITOS ---
+  // --- Favoritos ---
   let favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]').map(String);
-
   const actualizarContadorFavoritos = () => {
     const contador = document.getElementById('contador-favoritos');
-    if (!contador) return;
+    if(!contador) return;
     contador.textContent = favoritos.length;
     contador.style.display = favoritos.length === 0 ? 'none' : 'inline-block';
   };
-
   const actualizarIconoFavorito = (btn, agregado) => {
     const icon = btn.querySelector('i');
-    if (!icon) return;
-    if (agregado) {
+    if(!icon) return;
+    if(agregado){
       icon.classList.remove('bi-heart');
-      icon.classList.add('bi-heart-fill', 'text-danger');
+      icon.classList.add('bi-heart-fill','text-danger');
     } else {
       icon.classList.add('bi-heart');
-      icon.classList.remove('bi-heart-fill', 'text-danger');
+      icon.classList.remove('bi-heart-fill','text-danger');
     }
   };
-
   const toggleFavorito = (id) => {
     id = id.toString();
     let agregado = false;
     const index = favoritos.indexOf(id);
-    if (index === -1) { favoritos.push(id); agregado = true; }
-    else { favoritos.splice(index, 1); }
+    if(index === -1){ favoritos.push(id); agregado=true; }
+    else { favoritos.splice(index,1); }
     localStorage.setItem('favoritos', JSON.stringify(favoritos));
     actualizarContadorFavoritos();
     return agregado;
   };
-
-  document.querySelectorAll('.btn-favorite').forEach(btn => {
+  document.querySelectorAll('.btn-favorite').forEach(btn=>{
     actualizarIconoFavorito(btn, favoritos.includes(btn.dataset.id));
   });
-
-  document.addEventListener('click', e => {
+  document.addEventListener('click', e=>{
     const btn = e.target.closest('.btn-favorite');
-    if (!btn) return;
+    if(!btn) return;
     const agregado = toggleFavorito(btn.dataset.id);
     actualizarIconoFavorito(btn, agregado);
   });
-
   actualizarContadorFavoritos();
 
-  // --- CARRITO ---
+  // --- Carrito ---
   let carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
-
   const actualizarContadorCarrito = () => {
     const contador = document.getElementById('cart-count');
-    if (!contador) return;
+    if(!contador) return;
     contador.textContent = carrito.length;
-    contador.style.display = carrito.length === 0 ? 'none' : 'inline-block';
+    contador.style.display = carrito.length===0?'none':'inline-block';
   };
-
   const toggleCarrito = (id) => {
     id = id.toString();
-    if (!carrito.includes(id)) carrito.push(id);
+    if(!carrito.includes(id)) carrito.push(id);
     localStorage.setItem('carrito', JSON.stringify(carrito));
     actualizarContadorCarrito();
-    mostrarMensaje("Producto agregado al carrito", "success");
+    mostrarMensaje("Producto agregado al carrito","success");
   };
-
-  const mostrarMensaje = (texto, tipo) => {
+  const mostrarMensaje = (texto,tipo) => {
     const alert = document.createElement('div');
-    alert.className = `alert alert-${tipo} position-fixed top-0 end-0 m-4 shadow`;
-    alert.style.zIndex = 2000;
-    alert.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i>${texto}`;
+    alert.className=`alert alert-${tipo} position-fixed top-0 end-0 m-4 shadow`;
+    alert.style.zIndex=2000;
+    alert.innerHTML=`<i class="bi bi-check-circle-fill me-2"></i>${texto}`;
     document.body.appendChild(alert);
-    setTimeout(() => alert.remove(), 3000);
+    setTimeout(()=>alert.remove(),3000);
   };
-
-  document.addEventListener('click', e => {
+  document.addEventListener('click', e=>{
     const btn = e.target.closest('.btn-add-cart');
-    if (!btn) return;
+    if(!btn) return;
     toggleCarrito(btn.dataset.id);
   });
-
   actualizarContadorCarrito();
 
-  // --- COMPARAR ---
-  let comparar = JSON.parse(localStorage.getItem('comparar') || '[]').map(String);
+
+   // --- COMPARAR ---
+  let comparar = []; // IDs seleccionados
+
   const btnComparar = document.getElementById('btn-comparar');
 
-  const actualizarBotonComparar = () => {
-    if (comparar.length > 0) {
-      btnComparar.style.display = 'inline-block';
-      btnComparar.style.opacity = 0;
-      btnComparar.style.transition = 'opacity 0.4s';
-      setTimeout(() => { btnComparar.style.opacity = 1; }, 50);
-    } else {
-      btnComparar.style.opacity = 0;
-      setTimeout(() => { btnComparar.style.display = 'none'; }, 400);
-    }
-  };
-
-  const actualizarBotonesCompare = () => {
+  const actualizarBotones = () => {
     document.querySelectorAll('.btn-compare').forEach(btn => {
-      const id = btn.dataset.id.toString();
-      if (comparar.includes(id)) {
+      const id = btn.dataset.id;
+      if(comparar.includes(id)){
         btn.classList.add('active');
-        btn.style.backgroundColor = '#0dcaf0'; // azul claro activo
+        btn.style.backgroundColor = '#0dcaf0';
         btn.style.color = '#fff';
       } else {
         btn.classList.remove('active');
@@ -196,26 +171,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  document.querySelectorAll('.btn-compare').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.id.toString();
-      if (comparar.includes(id)) {
-        comparar = comparar.filter(x => x !== id);
-      } else {
-        if (comparar.length >= 2) {
-          alert("Solo puedes comparar 2 productos.");
-          return;
-        }
-        comparar.push(id);
+  const actualizarBotonFlotante = () => {
+    btnComparar.style.display = comparar.length > 0 ? 'inline-block' : 'none';
+  };
+
+  // Delegación de eventos: escucha clic en cualquier botón de comparar
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-compare');
+    if(!btn) return;
+
+    const id = btn.dataset.id;
+    if(comparar.includes(id)){
+      comparar = comparar.filter(x => x !== id);
+    } else {
+      if(comparar.length >= 2){
+        alert("Solo puedes comparar 2 productos.");
+        return;
       }
-      localStorage.setItem('comparar', JSON.stringify(comparar));
-      actualizarBotonesCompare();
-      actualizarBotonComparar();
-    });
+      comparar.push(id);
+    }
+
+    localStorage.setItem('comparar', JSON.stringify(comparar));
+    actualizarBotones();
+    actualizarBotonFlotante();
   });
 
+  // Botón flotante
   btnComparar.addEventListener('click', () => {
-    if (comparar.length < 2) {
+    if(comparar.length < 2){
       alert("Selecciona 2 productos para comparar.");
       return;
     }
@@ -223,9 +206,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = url;
   });
 
-  // Inicializar visual y estado
-  actualizarBotonesCompare();
-  actualizarBotonComparar();
+  // Inicializar visual
+  actualizarBotones();
+  actualizarBotonFlotante();
 
 });
 </script>
