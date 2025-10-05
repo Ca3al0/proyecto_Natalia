@@ -24,13 +24,13 @@
   {% endif %}
 {% endwith %}
 
-<!-- Botón flotante de comparar -->
-<a href="{{ url_for('cliente.comparar') }}" id="btn-comparar"
+<!-- Botón flotante -->
+<a href="{{ url_for('cliente.comparar') }}" 
    class="btn btn-warning shadow-lg position-fixed rounded-pill px-4 py-2"
-   style="bottom: 30px; right: 30px; z-index: 1050; display:none;"
-   data-bs-toggle="tooltip" data-bs-placement="left" title="Haz clic para comparar">
+   style="bottom: 30px; right: 30px; z-index: 1050;">
    <i class="bi bi-bar-chart me-1"></i> Comparar productos
 </a>
+
 
 <div class="container mt-5">
   <h2 class="mb-4 text-center text-success">Catálogo de Productos</h2>
