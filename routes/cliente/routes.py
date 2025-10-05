@@ -230,3 +230,11 @@ def guardar_resena(id):
     db.session.commit()
     flash('Reseña creada exitosamente.', 'success')
     return redirect(url_for('cliente.detalle_producto', id=id))  
+
+@cliente.route('/comparar')
+def comparar():
+    ids = request.args.getlist('ids')  # ['1', '3']
+    productos = []
+    if ids:
+        productos = Producto.query.filter(Producto.ID_Producto.in_(ids)).all()
+    return render_template('comparar.html', productos=productos)
