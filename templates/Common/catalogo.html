@@ -43,6 +43,7 @@
           <img src="{{ url_for('static', filename='img/catalogo.png') }}" class="card-img-top" alt="Imagen no disponible">
         {% endif %}
 
+        <!-- Botón favorito -->
         <button type="button" class="btn btn-light btn-favorite position-absolute top-0 end-0 m-2" title="Agregar a favoritos" data-id="{{ producto.ID_Producto|string }}">
           <i class="bi bi-heart"></i>
         </button>
@@ -56,10 +57,12 @@
             <i class="bi bi-star me-1"></i> Añadir reseña
           </a>
 
+          <!-- Botón agregar al carrito -->
           <button type="button" class="btn btn-primary btn-add-cart mt-auto mb-2" data-id="{{ producto.ID_Producto|string }}">
             <i class="bi bi-cart-plus me-2"></i> Agregar al carrito
           </button>
 
+          <!-- Botón comparar -->
           <button type="button" class="btn btn-outline-info btn-compare mt-1" data-id="{{ producto.ID_Producto|string }}">
             <i class="bi bi-bar-chart me-1"></i> Comparar
           </button>
@@ -75,20 +78,21 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+
   // --- FAVORITOS ---
   let favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]').map(String);
 
   const actualizarContadorFavoritos = () => {
     const contador = document.getElementById('contador-favoritos');
-    if (!contador) return;
+    if(!contador) return;
     contador.textContent = favoritos.length;
     contador.style.display = favoritos.length === 0 ? 'none' : 'inline-block';
   };
 
-  const actualizarIcono = (button, agregado) => {
-    const icon = button.querySelector('i');
-    if (!icon) return;
-    if (agregado) {
+  const actualizarIcono = (btn, agregado) => {
+    const icon = btn.querySelector('i');
+    if(!icon) return;
+    if(agregado){
       icon.classList.remove('bi-heart');
       icon.classList.add('bi-heart-fill','text-danger');
     } else {
@@ -99,25 +103,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const toggleFavorito = (id) => {
     id = id.toString();
-    const index = favoritos.indexOf(id);
     let agregado = false;
-    if(index===-1){favoritos.push(id); agregado=true;}
-    else {favoritos.splice(index,1);}
+    const index = favoritos.indexOf(id);
+    if(index === -1){ favoritos.push(id); agregado=true; }
+    else { favoritos.splice(index,1); }
     localStorage.setItem('favoritos', JSON.stringify(favoritos));
     actualizarContadorFavoritos();
     return agregado;
   };
 
-  document.querySelectorAll('.btn-favorite').forEach(btn => {
-    const id = btn.dataset.id;
-    actualizarIcono(btn, favoritos.includes(id));
+  document.querySelectorAll('.btn-favorite').forEach(btn=>{
+    actualizarIcono(btn, favoritos.includes(btn.dataset.id));
   });
 
-  document.addEventListener('click', e => {
+  document.addEventListener('click', e=>{
     const btn = e.target.closest('.btn-favorite');
     if(!btn) return;
-    toggleFavorito(btn.dataset.id);
-    actualizarIcono(btn, favoritos.includes(btn.dataset.id));
+    const agregado = toggleFavorito(btn.dataset.id);
+    actualizarIcono(btn, agregado);
   });
 
   actualizarContadorFavoritos();
@@ -149,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(()=>alert.remove(),3000);
   };
 
-  document.addEventListener('click', e => {
+  document.addEventListener('click', e=>{
     const btn = e.target.closest('.btn-add-cart');
     if(!btn) return;
     toggleCarrito(btn.dataset.id);
@@ -174,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
         comparar = comparar.filter(x=>x!==id);
         btn.classList.remove('active');
       } else {
-        if(comparar.length>=2){alert("Solo puedes comparar 2 productos."); return;}
+        if(comparar.length>=2){ alert("Solo puedes comparar 2 productos."); return; }
         comparar.push(id);
         btn.classList.add('active');
       }
@@ -184,9 +187,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   btnComparar.addEventListener('click', ()=>{
-    if(comparar.length<2){alert("Selecciona 2 productos para comparar."); return;}
-    const url="/comparar?"+comparar.map(id=>"ids="+id).join("&");
-    window.location.href=url;
+    if(comparar.length<2){ alert("Selecciona 2 productos para comparar."); return; }
+    const url="/comparar?" + comparar.map(id=>"ids="+id).join("&");
+    window.location.href = url;
   });
 
   actualizarBotonComparar();
