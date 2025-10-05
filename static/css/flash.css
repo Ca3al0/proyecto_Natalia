@@ -1,0 +1,28 @@
+.flash-small {
+  display: inline-flex;        /* para que solo ocupe lo necesario */
+  align-items: center;
+  max-width: 300px;           /* ancho máximo */
+  padding: 6px 12px;          /* más compacto */
+  font-size: 13px;            /* texto más pequeño */
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  opacity: 0.95;
+  transition: all 0.3s ease;
+  margin: 5px;                 /* espacio entre flashes */
+}
+
+/* Colores según categoría */
+.alert-success { background: #4e9f50; color: #fff; }
+.alert-danger  { background: #d43f3f; color: #fff; }
+.alert-warning { background: #e0b800; color: #2c3e50; }
+.alert-info    { background: #2a9fd6; color: #fff; }
+
+/* Animación */
+.flash-small {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

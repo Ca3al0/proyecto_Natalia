@@ -1,0 +1,233 @@
+{% extends "common/base.html" %}
+
+{% block navbar %}
+  {% include "common/partials/navbar_cliente.html" %}
+  {% include "common/partials/navbar_secundario2.html" %}
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/notificaciones.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
+<style>
+  
+  .form-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 2rem;
+  }
+
+  .auth-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .auth-card h5 {
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .auth-input {
+    border-radius: 50px;
+    padding: 12px 15px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.3s;
+    width: 100%;
+  }
+
+  .auth-input:focus {
+    border-color: #28a745;
+    box-shadow: 0 0 5px rgba(40,167,69,0.5);
+    outline: none;
+  }
+
+  .auth-btn {
+    border-radius: 50px;
+    padding: 12px;
+    font-weight: 600;
+    transition: background 0.3s, transform 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+
+  .auth-btn:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Modal estilo overlay */
+  .auth-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(6px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+  }
+
+    .btn-success {
+    background: linear-gradient(135deg, #4CAF50, #81C784);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 50px;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+  }
+
+  .btn-success:hover {
+    background: linear-gradient(135deg, #81C784, #4CAF50);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+  }
+
+  .btn-wrapper {
+    text-align: center;
+    margin-top: 30px;
+  }
+  
+</style>
+
+{# Mostrar mensajes flash #}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} flash-small d-flex align-items-center" role="alert">
+        {% if category == 'success' %}
+          <i class="bi bi-check-circle-fill me-2"></i>
+        {% elif category == 'danger' %}
+          <i class="bi bi-x-circle-fill me-2"></i>
+        {% elif category == 'warning' %}
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {% elif category == 'info' %}
+          <i class="bi bi-info-circle-fill me-2"></i>
+        {% endif %}
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="form-wrapper">
+  <form method="POST" id="instalacionForm" class="auth-card">
+    <h5>Agendar Instalación</h5>
+
+    <label for="pedido_id">Seleccionar pedido:</label>
+    <select name="pedido_id" id="pedido_id" required class="auth-input">
+      {% for pedido in pedidos %}
+        <option value="{{ pedido.ID_Pedido }}">
+          {{ pedido.NombreComprador }} - {{ pedido.Destino }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <label for="fecha">Fecha:</label>
+    <input type="date" name="fecha" id="fecha" required class="auth-input">
+
+    <label for="hora">Hora:</label>
+    <input type="time" name="hora" id="hora" required class="auth-input">
+
+    <label for="ubicacion">Ubicación:</label>
+    <select name="ubicacion" id="ubicacion" required class="auth-input">
+      {% for direccion in direcciones %}
+        <option value="{{ direccion.Direccion }}">
+          {{ direccion.Direccion }}, {{ direccion.Ciudad }}, {{ direccion.Departamento }}
+        </option>
+      {% endfor %}
+    </select>
+
+    <button type="submit" class="btn-success" style="width: 100%; margin-top: 1rem;">
+    Agendar instalación
+    </button>
+
+  </form>
+</div>
+
+<!-- Modal de Éxito -->
+<div id="modalExito" class="auth-overlay" style="display:none;">
+  <div class="auth-card">
+    <h5>¡Instalación guardada!</h5>
+    <div class="btn-wrapper">
+      <button id="verInstalacionesBtn" class="btn-success">
+        Ver instalaciones
+      </button>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/actualizacion.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('instalacionForm');
+    const modal = document.getElementById('modalExito');
+    const verInstalacionesBtn = document.getElementById('verInstalacionesBtn');
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(form);
+      fetch(window.location.href, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          modal.style.display = 'flex';
+          form.reset();
+        } else {
+          alert(data.message || 'Error al agendar la instalación');
+        }
+      })
+      .catch(() => {
+        alert('Error al agendar la instalación. Intenta de nuevo.');
+      });
+    });
+
+    verInstalacionesBtn.addEventListener('click', () => {
+      // Usa url_for para generar la ruta correcta
+      window.location.href = "{{ url_for('cliente.ver_instalaciones') }}";
+    });
+
+    window.addEventListener('click', (event) => {
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  });
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

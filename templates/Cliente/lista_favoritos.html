@@ -1,0 +1,25 @@
+{% if productos %}
+  <div class="row">
+    {% for producto in productos %}
+      <div class="col-md-4 mb-3">
+        <div class="card">
+          {% if producto.ImagenPrincipal %}
+            <img src="{{ url_for('static', filename=producto.ImagenPrincipal) }}"
+                 class="card-img-top"
+                 alt="Imagen de {{ producto.NombreProducto }}">
+          {% else %}
+            <img src="{{ url_for('static', filename='img/catalogo.png') }}"
+                 class="card-img-top"
+                 alt="Imagen no disponible">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ producto.NombreProducto }}</h5>
+            <p class="card-text">$ {{ '%.2f' | format(producto.PrecioUnidad) }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No tienes productos favoritos.</p>
+{% endif %}

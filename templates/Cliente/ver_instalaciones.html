@@ -1,0 +1,184 @@
+{% extends "common/base.html" %}
+
+{% block navbar %}
+  {% include "common/partials/navbar_cliente.html" %}
+  {% include "common/partials/navbar_secundario2.html" %}
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/notificaciones.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
+<style>
+  :root {
+    --primary-green: #5f8f3f;
+    --secondary-green: #4e7b33;
+    --light-green: #6c9a50;
+    --accent-green: #7cb342;
+    --bg-cream: #f8f6f0;
+    --text-dark: #2c3e50;
+    --shadow-light: rgba(0, 0, 0, 0.08);
+    --shadow-medium: rgba(0, 0, 0, 0.15);
+  }
+
+  h2 {
+    text-align: center;
+    color: var(--primary-green);
+    margin-bottom: 30px;
+    font-size: 2rem;
+    font-weight: 700;
+    position: relative;
+  }
+
+  h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-green), var(--primary-green));
+    border-radius: 2px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 25px;
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: 0 5px 20px var(--shadow-light);
+  }
+
+  ul.installaciones {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  ul.installaciones li {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    font-size: 16px;
+    color: var(--text-dark);
+  }
+
+  ul.installaciones li strong {
+    color: var(--primary-green);
+  }
+
+  ul.installaciones li:last-child {
+    border-bottom: none;
+  }
+
+  .no-data {
+    text-align: center;
+    font-size: 1rem;
+    color: #888;
+    margin-bottom: 20px;
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #4CAF50, #81C784);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 50px;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+  }
+
+  .btn-success:hover {
+    background: linear-gradient(135deg, #81C784, #4CAF50);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+  }
+
+  .btn-wrapper {
+    text-align: center;
+    margin-top: 30px;
+  }
+</style>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} flash-small d-flex align-items-center" role="alert">
+        {% if category == 'success' %}
+          <i class="bi bi-check-circle-fill me-2"></i>
+        {% elif category == 'danger' %}
+          <i class="bi bi-x-circle-fill me-2"></i>
+        {% elif category == 'warning' %}
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {% elif category == 'info' %}
+          <i class="bi bi-info-circle-fill me-2"></i>
+        {% endif %}
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+
+<div class="card">
+  <h2>Instalaciones Agendadas</h2>
+
+  {% if instalaciones %}
+    <ul class="installaciones">
+  {% for inst in instalaciones %}
+    <li>
+      <div><strong>Fecha:</strong> {{ inst.Fecha }}</div>
+      <div><strong>Hora:</strong> {{ inst.Hora }}</div>
+      <div><strong>Ubicación:</strong> {{ inst.Ubicacion }}</div>
+      <div><strong>Agendado por:</strong> {{ inst.NombreUsuario }}</div>
+    </li>
+  {% endfor %}
+</ul>
+
+  {% else %}
+    <p class="no-data">No tienes instalaciones agendadas aún.</p>
+  {% endif %}
+
+  <div class="btn-wrapper">
+  <a href="{{ url_for('cliente.agendar_instalacion') }}" class="btn-success">Volver a agendar</a>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/actualizacion.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

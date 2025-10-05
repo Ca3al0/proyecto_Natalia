@@ -1,0 +1,257 @@
+:root {
+  --primary-green: #5f8f3f;
+  --secondary-green: #4e7b33;
+  --light-green: #6c9a50;
+  --accent-green: #7cb342;
+  --bg-cream: #f8f6f0;
+  --text-dark: #2c3e50;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+}
+
+
+
+/* Titulos */
+h2 {
+  text-align: center;
+  color: var(--primary-green);
+  margin-bottom: 30px;
+  font-size: 2rem;
+  font-weight: 700;
+  position: relative;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-green), var(--primary-green));
+  border-radius: 2px;
+}
+
+/* Card */
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 25px;
+  max-width: 1100px;
+  margin: 0 auto;
+  overflow-x: auto;
+  box-shadow: 0 5px 20px var(--shadow-light);
+}
+
+/* Tabla */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px;
+  font-size: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  color: var(--primary-green);
+  font-weight: 600;
+  border-bottom: 2px solid var(--accent-green);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+/* Select dentro de tabla */
+.card table select {
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 14px;
+  border: 1px solid #c8e6c9;
+  background: #f8fff5;
+  color: var(--text-dark);
+  transition: all 0.3s ease;
+}
+
+.card table select:focus {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 5px rgba(124, 179, 66, 0.5);
+}
+
+/* Botones generales */
+button {
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
+}
+
+/* Botón principal de acción */
+button.btn-success {
+  background: linear-gradient(135deg, #4CAF50, #81C784);
+  color: #fff;
+  box-shadow: 0 6px 15px rgba(76, 175, 80, 0.3);
+}
+
+button.btn-success:hover {
+  background: linear-gradient(135deg, #81C784, #4CAF50);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+}
+
+button.btn-success:active {
+  transform: scale(0.95);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+/* Dropdown */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-button {
+  background: linear-gradient(135deg, #5f8f3f, #7cb342);
+  color: #fff;
+  border-radius: 30px;
+  padding: 10px 25px;
+  font-weight: 500;
+  font-size: 15px;
+  box-shadow: 0 4px 15px rgba(95, 143, 63, 0.3);
+}
+
+.dropdown-button:hover {
+  background: linear-gradient(135deg, #7cb342, #5f8f3f);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(95, 143, 63, 0.4);
+}
+
+/* Botones dentro del dropdown */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #ffffff;
+  min-width: 200px;
+  box-shadow: 0 6px 20px var(--shadow-medium);
+  border-radius: 12px;
+  overflow: hidden;
+  z-index: 1;
+  margin-top: 8px;
+  animation: fadeIn 0.3s ease;
+}
+
+.dropdown-content button {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #f8f8f8;
+  color: var(--text-dark);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.dropdown-content button:hover {
+  background-color: #e6f2d9;
+  color: var(--primary-green);
+  transform: translateX(4px);
+  font-weight: 600;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tr {
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px var(--shadow-light);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  td {
+    padding: 12px;
+    text-align: right;
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: var(--primary-green);
+  }
+}
+
+/* Contenedor de formulario dentro de la celda para alinear select + botón */
+.card table td form {
+  display: flex;
+  align-items: center;
+  gap: 8px; /* espacio entre select y botón */
+}
+
+/* Select */
+.card table select {
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 14px;
+  border: 1px solid #c8e6c9;
+  background: #f8fff5;
+  color: var(--text-dark);
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+.card table select:focus {
+  border-color: var(--accent-green);
+  box-shadow: 0 0 5px rgba(124, 179, 66, 0.5);
+}
+
+/* Botón */
+.card table button.btn-success {
+  padding: 6px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #4CAF50, #81C784);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.card table button.btn-success:hover {
+  background: linear-gradient(135deg, #81C784, #4CAF50);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(76, 175, 80, 0.4);
+}
+
+.card table button.btn-success:active {
+  transform: scale(0.95);
+  box-shadow: 0 3px 10px rgba(76, 175, 80, 0.2);
+}

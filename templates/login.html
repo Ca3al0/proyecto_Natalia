@@ -1,0 +1,56 @@
+{% extends "common/base.html" %}
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block navbar %}
+  {% include "common/partials/navbar_cliente.html" %}
+  {% include "common/partials/navbar_secundario.html" %}
+{% endblock %}
+
+{% block content %}
+
+<div id="login-overlay" class="auth-overlay">
+  <div class="auth-card">
+    <h3 class="text-center fw-bold text-success mb-4">Bienvenido de vuelta</h3>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-dismissible fade show alert-{{ category }}" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Formulario -->
+    <form method="POST" action="{{ url_for('auth.login') }}">
+      <div class="mb-3">
+        <input type="email" class="form-control auth-input" name="correo" placeholder="Correo electrónico" required
+               value="{{ correo if correo else '' }}">
+      </div>
+      <div class="mb-3">
+        <input type="password" class="form-control auth-input" name="password" placeholder="Contraseña" required>
+      </div>
+      <button type="submit" class="btn btn-success w-100 auth-btn">Iniciar Sesión</button>
+    </form>
+
+    <div class="text-center mt-3">
+      <a href="{{ url_for('auth.forgot_password') }}" class="small text-decoration-none">¿Olvidaste tu contraseña?</a>
+    </div>
+    <hr>
+    <div class="text-center">
+      <span class="small">¿No tienes cuenta?</span>
+      <a href="{{ url_for('auth.register') }}" class="small text-primary">Regístrate aquí</a>
+    </div>
+
+    <!-- Botón cerrar -->
+    <div class="close-login-btn">
+      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary mt-3 w-100">Cerrar</a>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/formularios.js') }}"></script>
+
+{% endblock %}

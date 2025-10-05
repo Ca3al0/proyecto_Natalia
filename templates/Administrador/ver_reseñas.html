@@ -1,0 +1,147 @@
+{% extends "common/base.html" %}
+
+{% block navbar %}
+  {% include "common/partials/navbar_admin.html" %}
+    {% include "common/partials/navbar_secundario3.html" %}
+{% endblock %}
+
+{% block content %}
+<style>
+  :root {
+    --primary-green: #5f8f3f;
+    --secondary-green: #4e7b33;
+    --light-green: #6c9a50;
+    --accent-green: #7cb342;
+    --bg-cream: #f8f6f0;
+    --text-dark: #2c3e50;
+    --shadow-light: rgba(0, 0, 0, 0.08);
+    --shadow-medium: rgba(0, 0, 0, 0.15);
+  }
+
+  body {
+    background-color: var(--bg-cream);
+  }
+
+  h2 {
+    text-align: center;
+    color: var(--primary-green);
+    margin-bottom: 30px;
+    font-size: 2rem;
+    font-weight: 700;
+    position: relative;
+  }
+
+  h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-green), var(--primary-green));
+    border-radius: 2px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 25px;
+    max-width: 950px;
+    margin: 0 auto 40px auto;
+    box-shadow: 0 5px 20px var(--shadow-light);
+    transition: transform 0.3s ease;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 30px var(--shadow-medium);
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, var(--light-green), var(--accent-green));
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+  }
+
+  table {
+    margin: 0;
+  }
+
+  thead th {
+    background-color: var(--bg-cream);
+    color: var(--text-dark);
+  }
+
+  tbody td {
+    vertical-align: middle;
+    color: var(--text-dark);
+  }
+
+  .bi-star-fill,
+  .bi-star {
+    font-size: 1rem;
+  }
+
+  .no-data {
+    text-align: center;
+    font-size: 1rem;
+    color: #888;
+    margin-bottom: 20px;
+  }
+</style>
+
+<div class="container my-5">
+  <h2><i class="bi bi-star me-2"></i>Reseñas de productos</h2>
+
+  {% set total_resenas = 0 %}
+  {% for producto in productos %}
+    {% if producto.resenas %}
+      {% set total_resenas = total_resenas + (producto.resenas | length) %}
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-box-seam me-2"></i>{{ producto.NombreProducto }}</span>
+          <span class="badge bg-light text-dark">{{ producto.resenas | length }} reseñas</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-striped table-hover m-0">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Calificación</th>
+                  <th>Comentario</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for resena in producto.resenas %}
+                  <tr>
+                    <td>{{ resena.usuario.Nombre }} {{ resena.usuario.Apellido }}</td>
+                    <td>
+                      {% for i in range(resena.Calificacion) %}
+                        <i class="bi bi-star-fill text-warning"></i>
+                      {% endfor %}
+                      {% for i in range(5 - resena.Calificacion) %}
+                        <i class="bi bi-star text-muted"></i>
+                      {% endfor %}
+                      <small class="text-muted ms-1">({{ resena.Calificacion }})</small>
+                    </td>
+                    <td>{{ resena.Comentario }}</td>
+                    <td>{{ resena.Fecha.strftime('%d/%m/%Y') }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+
+
+</div>
+{% endblock %}
