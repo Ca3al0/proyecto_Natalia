@@ -11,13 +11,11 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarMain">
-      <!-- Buscador -->
       <div class="search-container mx-auto d-none d-md-block">
         <input class="form-control rounded-pill border-success-subtle" type="search"
           placeholder="¿Qué estás buscando hoy?" aria-label="Buscar">
       </div>
 
-      <!-- Iconos -->
       <div class="d-flex align-items-center gap-3 ms-auto">
 
         <!-- Favoritos -->
@@ -35,7 +33,6 @@
             aria-label="Menú usuario">
             <i class="bi bi-person fs-4 text-success"></i>
           </a>
-
           {% if current_user.is_authenticated %}
           <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 250px;">
             <li class="d-flex align-items-center mb-3">
@@ -94,6 +91,8 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   // --- FAVORITOS ---
@@ -101,9 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const actualizarContadorFavoritos = () => {
     const contador = document.getElementById('contador-favoritos');
-    if (!contador) return;
-    contador.textContent = favoritos.length;
     contador.style.display = favoritos.length > 0 ? 'inline-block' : 'none';
+    contador.textContent = favoritos.length;
   };
 
   const actualizarIconoFavorito = (button, agregado) => {
@@ -122,21 +120,16 @@ document.addEventListener('DOMContentLoaded', () => {
     id = id.toString();
     let agregado = false;
     const index = favoritos.indexOf(id);
-    if (index === -1) {
-      favoritos.push(id);
-      agregado = true;
-    } else {
-      favoritos.splice(index, 1);
-    }
+    if (index === -1) { favoritos.push(id); agregado = true; }
+    else { favoritos.splice(index, 1); }
     localStorage.setItem('favoritos', JSON.stringify(favoritos));
     actualizarContadorFavoritos();
     return agregado;
   };
 
-  // Inicializar botones de productos
+  // Inicializar botones de producto
   document.querySelectorAll('.btn-favorite').forEach(btn => {
     const id = btn.dataset.id;
-    if (!id) return;
     actualizarIconoFavorito(btn, favoritos.includes(id));
     btn.addEventListener('click', () => {
       const agregado = toggleFavorito(id);
@@ -144,34 +137,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Mostrar modal de favoritos
-  const btnFavModal = document.getElementById('btn-favoritos');
-  btnFavModal?.addEventListener('click', () => {
-    const modalEl = document.getElementById('favoritosModal');
-    const modal = new bootstrap.Modal(modalEl);
-    const container = document.getElementById('favoritosContent');
+  actualizarContadorFavoritos();
 
+  // Mostrar modal favoritos
+  document.getElementById('btn-favoritos')?.addEventListener('click', () => {
+    const container = document.getElementById('favoritosContent');
     if (favoritos.length === 0) {
       container.innerHTML = '<p>No tienes productos favoritos aún.</p>';
-      modal.show();
-      return;
+    } else {
+      let html = '<div class="row g-3">';
+      favoritos.forEach(id => {
+        const card = document.querySelector(`.btn-favorite[data-id='${id}']`)?.closest('.card');
+        if (card) {
+          const nombre = card.querySelector('.card-title')?.textContent || '';
+          const precio = card.querySelector('.card-text')?.textContent || '';
+          const imgSrc = card.querySelector('img')?.getAttribute('src') || '';
+          html += `
+            <div class="col-6 col-md-4">
+              <div class="card h-100 shadow-sm">
+                <img src="${imgSrc}" class="card-img-top" alt="${nombre}">
+                <div class="card-body">
+                  <h6 class="card-title">${nombre}</h6>
+                  <p class="card-text">${precio}</p>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      });
+      html += '</div>';
+      container.innerHTML = html;
     }
-
-    // Construye HTML del modal con los mismos cards
-    let html = '<div class="row g-3">';
-    favoritos.forEach(id => {
-      const productoEl = document.querySelector(`.btn-favorite[data-id='${id}']`);
-      if (productoEl) {
-        const card = productoEl.closest('.card');
-        html += `<div class="col-6 col-md-4">${card.outerHTML}</div>`;
-      }
-    });
-    html += '</div>';
-    container.innerHTML = html;
+    const modal = new bootstrap.Modal(document.getElementById('favoritosModal'));
     modal.show();
   });
-
-  actualizarContadorFavoritos();
 });
 </script>
 {% endblock %}
