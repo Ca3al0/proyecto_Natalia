@@ -236,64 +236,62 @@ def comparar():
     productos = Producto.query.all()  # o la consulta que tengas
     return render_template('cliente/comparar.html', productos=productos)
 
-@cliente.route('/api/pedidos', methods=['POST'])
+@cliente.route('/api/comprar', methods=['POST'])
 @login_required
-def crear_pedido():
+def comprar_producto():
     try:
         data = request.get_json()
-        productos_ids = data.get('productos')
-        direccion_id = data.get('direccion_id')
-        metodo_pago = data.get('metodo_pago')
+        id_producto = int(data.get('ID_Producto'))
+        id_direccion = int(data.get('ID_Direccion'))
+        metodo_pago = data.get('MetodoPago')
 
-        if not productos_ids or not direccion_id or not metodo_pago:
-            return jsonify({"mensaje":"Faltan datos para completar la compra"}), 400
-
-        # Obtener dirección
-        direccion = Direccion.query.filter_by(ID_Direccion=direccion_id, ID_Usuario=current_user.ID_Usuario).first()
+        # Verificar que la dirección pertenece al usuario
+        direccion = Direccion.query.filter_by(ID_Direccion=id_direccion, ID_Usuario=current_user.ID_Usuario).first()
         if not direccion:
-            return jsonify({"mensaje":"Dirección no encontrada"}), 404
+            return jsonify({"mensaje":"Dirección no válida"}), 400
+
+        # Obtener producto
+        producto = Producto.query.get(id_producto)
+        if not producto:
+            return jsonify({"mensaje":"Producto no encontrado"}), 404
 
         # Crear pedido
         pedido = Pedido(
             NombreComprador=current_user.Nombre,
             Estado='pendiente',
-            FechaPedido=datetime.utcnow().date(),
+            FechaPedido=datetime.today().date(),
             Destino=f"{direccion.Direccion}, {direccion.Barrio}, {direccion.Ciudad}, {direccion.Departamento}, {direccion.Pais}",
+            Descuento=0.0,
             ID_Usuario=current_user.ID_Usuario
         )
         db.session.add(pedido)
-        db.session.flush()  # Para obtener ID_Pedido antes del commit
+        db.session.commit()  # Guardamos para obtener ID_Pedido
 
-        # Agregar detalles del pedido
-        for pid in productos_ids:
-            producto = Producto.query.get(pid)
-            if producto is None:
-                db.session.rollback()
-                return jsonify({"mensaje":f"Producto ID {pid} no encontrado"}), 404
-            detalle = Detalle_Pedido(
-                ID_Pedido=pedido.ID_Pedido,
-                ID_Producto=producto.ID_Producto,
-                Cantidad=1,  # Puedes hacer que el usuario seleccione cantidad
-                PrecioUnidad=producto.PrecioUnidad
-            )
-            db.session.add(detalle)
+        # Crear detalle del pedido
+        detalle = Detalle_Pedido(
+            ID_Pedido=pedido.ID_Pedido,
+            ID_Producto=producto.ID_Producto,
+            Cantidad=1,
+            PrecioUnidad=producto.PrecioUnidad
+        )
+        db.session.add(detalle)
 
-        # Crear pago
+        # Registrar pago
         pago = Pagos(
             MetodoPago=metodo_pago,
-            FechaPago=datetime.utcnow().date(),
-            Monto=sum([Producto.query.get(pid).PrecioUnidad for pid in productos_ids]),
+            FechaPago=datetime.today().date(),
+            Monto=producto.PrecioUnidad,
             ID_Pedido=pedido.ID_Pedido
         )
         db.session.add(pago)
 
         db.session.commit()
-        return jsonify({"mensaje":"Compra registrada correctamente ✅"}), 201
+        return jsonify({"mensaje":"Compra registrada correctamente"}), 200
 
     except Exception as e:
         db.session.rollback()
-        print("Error al crear pedido:", e)
-        return jsonify({"mensaje":"Error al realizar la compra ❌"}), 500
+        print("Error al realizar la compra:", e)
+        return jsonify({"mensaje":"Error al realizar la compra"}), 500
 
 @cliente.route('/api/direcciones', methods=['GET'])
 @login_required
