@@ -1,3 +1,5 @@
+{% extends "common/base.html" %}
+{% block content %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -19,7 +21,7 @@
       flex-wrap: wrap;
     }
 
-    /* PANEL IZQUIERDO (Formulario) */
+    /* PANEL IZQUIERDO: FORMULARIO DE PROVEEDOR */
     .formulario-proveedor {
       flex: 1;
       min-width: 300px;
@@ -36,8 +38,8 @@
       text-align: center;
     }
 
-    /* PANEL DERECHO (Tabla) */
-    .tabla-proveedores {
+    /* PANEL DERECHO: LISTA DE PROVEEDORES */
+    .lista-proveedores {
       flex: 2;
       min-width: 400px;
       background: #fff;
@@ -46,7 +48,7 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
-    .tabla-proveedores h3 {
+    .lista-proveedores h3 {
       color: #198754;
       font-weight: bold;
       text-align: center;
@@ -57,26 +59,6 @@
       background-color: #198754;
       color: white;
     }
-
-    /* Botón flotante */
-    .btn-flotante {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background-color: #198754;
-      color: white;
-      border: none;
-      padding: 14px 22px;
-      border-radius: 50px;
-      font-size: 16px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      transition: all 0.3s ease;
-    }
-
-    .btn-flotante:hover {
-      background-color: #145c38;
-      transform: scale(1.05);
-    }
   </style>
 </head>
 <body>
@@ -84,45 +66,39 @@
 <div class="container-modulo">
   <!-- FORMULARIO DE PROVEEDOR -->
   <div class="formulario-proveedor">
-    <h3>Registrar Proveedor</h3>
+    <h3>Agregar Proveedor</h3>
     <form id="formProveedor">
       <div class="mb-3">
-        <label class="form-label">Nombre de la Empresa</label>
-        <input type="text" class="form-control" id="nombreEmpresa" required>
+        <label class="form-label">Nombre Empresa</label>
+        <input type="text" class="form-control" id="empresa" required>
       </div>
-
       <div class="mb-3">
         <label class="form-label">Nombre del Contacto</label>
-        <input type="text" class="form-control" id="nombreContacto" required>
+        <input type="text" class="form-control" id="contacto" required>
       </div>
-
       <div class="mb-3">
         <label class="form-label">Cargo del Contacto</label>
-        <input type="text" class="form-control" id="cargoContacto" required>
+        <input type="text" class="form-control" id="cargo" required>
       </div>
-
       <div class="mb-3">
         <label class="form-label">Dirección</label>
         <input type="text" class="form-control" id="direccion" required>
       </div>
-
       <div class="mb-3">
         <label class="form-label">Ciudad</label>
         <input type="text" class="form-control" id="ciudad" required>
       </div>
-
       <div class="mb-3">
         <label class="form-label">País</label>
         <input type="text" class="form-control" id="pais" required>
       </div>
-
       <button type="submit" class="btn btn-success w-100">Guardar Proveedor</button>
     </form>
   </div>
 
   <!-- TABLA DE PROVEEDORES -->
-  <div class="tabla-proveedores">
-    <h3>Lista de Proveedores</h3>
+  <div class="lista-proveedores">
+    <h3>Listado de Proveedores</h3>
     <div class="table-responsive">
       <table class="table table-bordered text-center align-middle">
         <thead>
@@ -135,56 +111,77 @@
             <th>País</th>
           </tr>
         </thead>
-        <tbody id="tablaProveedores">
-          {% for proveedor in proveedores %}
-          <tr>
-            <td>{{ proveedor.NombreEmpresa }}</td>
-            <td>{{ proveedor.NombreContacto }}</td>
-            <td>{{ proveedor.CargoContacto }}</td>
-            <td>{{ proveedor.Direccion }}</td>
-            <td>{{ proveedor.Ciudad }}</td>
-            <td>{{ proveedor.Pais }}</td>
-          </tr>
-          {% else %}
-          <tr><td colspan="6">No hay proveedores registrados</td></tr>
-          {% endfor %}
-        </tbody>
+        <tbody id="tablaProveedores"></tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- BOTÓN FLOTANTE -->
-<a href="{{ url_for('admin.dashboard') }}" class="btn-flotante">Volver al Panel</a>
-
 <script>
-  // Enviar proveedor al servidor Flask
-  document.getElementById('formProveedor').addEventListener('submit', async function(e) {
-    e.preventDefault();
+const tablaProveedores = document.getElementById('tablaProveedores');
+const formProveedor = document.getElementById('formProveedor');
 
-    const datos = {
-      NombreEmpresa: document.getElementById('nombreEmpresa').value,
-      NombreContacto: document.getElementById('nombreContacto').value,
-      CargoContacto: document.getElementById('cargoContacto').value,
-      Direccion: document.getElementById('direccion').value,
-      Ciudad: document.getElementById('ciudad').value,
-      Pais: document.getElementById('pais').value
-    };
+// 🟢 Cargar lista de proveedores
+async function cargarProveedores() {
+  try {
+    const res = await fetch("/admin/api/proveedores");
+    const data = await res.json();
+    tablaProveedores.innerHTML = "";
+    data.forEach(p => {
+      tablaProveedores.innerHTML += `
+        <tr>
+          <td>${p.empresa}</td>
+          <td>${p.contacto}</td>
+          <td>${p.cargo}</td>
+          <td>${p.direccion}</td>
+          <td>${p.ciudad}</td>
+          <td>${p.pais}</td>
+        </tr>
+      `;
+    });
+  } catch (error) {
+    console.error("❌ Error al cargar proveedores:", error);
+  }
+}
 
-    const respuesta = await fetch('/admin/proveedores', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(datos)
+// 🟢 Guardar proveedor nuevo
+formProveedor.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const nuevoProveedor = {
+    empresa: document.getElementById("empresa").value,
+    contacto: document.getElementById("contacto").value,
+    cargo: document.getElementById("cargo").value,
+    direccion: document.getElementById("direccion").value,
+    ciudad: document.getElementById("ciudad").value,
+    pais: document.getElementById("pais").value
+  };
+
+  try {
+    const res = await fetch("/admin/api/proveedores", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nuevoProveedor)
     });
 
-    if (respuesta.ok) {
-      alert('Proveedor guardado correctamente ✅');
-      location.reload();
+    const data = await res.json();
+    if (res.ok) {
+      alert(data.mensaje);
+      formProveedor.reset();
+      cargarProveedores();
     } else {
-      alert('Error al guardar el proveedor ❌');
+      alert(data.mensaje || "Error al guardar el proveedor ❌");
     }
-  });
+  } catch (error) {
+    console.error("Error al guardar proveedor:", error);
+    alert("Error al guardar el proveedor ❌");
+  }
+});
+
+// Inicializar tabla
+cargarProveedores();
 </script>
 
 </body>
 </html>
+{% endblock %}
