@@ -40,7 +40,7 @@
         <h4>🌿 HOLA!</h4>
         <a id="menu-perfil" class="active" href="javascript:void(0);"><i class="bi bi-person-circle me-2"></i>Perfil</a>
         <a id="menu-direcciones" href="javascript:void(0);"><i class="bi bi-geo-alt me-2"></i>Direcciones</a>
-        <a id="menu-pedidos" href="javascript:void(0);"><i class="bi bi-box-seam me-2"></i>Pedidos</a>
+        <a href="{{ url_for('admin.ver_pedidos') }}"><i class="bi bi-heart me-2"></i>Pedidos</a>
         <a href="#"><i class="bi bi-heart me-2"></i>Favoritos</a>
         <a href="{{ url_for('admin.dashboard') }}"><i class="bi bi-box-arrow-right me-2"></i>Salir</a>
       </div>
@@ -114,70 +114,6 @@
         </div>
       </div>
 
-      <!-- Sección Pedidos -->
-      <div id="seccion-pedidos" class="mt-4" style="display:none;">
-        {% if pedidos %}
-          <div class="row g-3">
-            {% for pedido in pedidos %}
-              <div class="col-md-6">
-                <div class="card border shadow-sm p-3">
-                  <h6 class="fw-bold">Cliente: {{ pedido.Nombre }}</h6>
-                 <ul class="mb-2">
-                  {% for producto in pedido.Productos %}
-                    <li><strong>{{ producto.Nombre }}</strong> — {{ producto.Cantidad }}</li>
-                  {% endfor %}
-                </ul>
-
-
-                  <button class="btn btn-outline-dark btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalPedido{{ loop.index }}">
-                    Ver detalles
-                  </button>
-                </div>
-              </div>
-
-              <!-- Modal Detalles -->
-              <div class="modal fade" id="modalPedido{{ loop.index }}" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                  <div class="modal-content p-4 rounded-4">
-                    <div class="modal-header border-0">
-                      <h5 class="modal-title fw-bold">Detalles del Pedido</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                      <p><strong>Nombre:</strong> {{ pedido.Nombre }}</p>
-                      <p><strong>Teléfono:</strong> {{ pedido.Celular }}</p>
-                      <p><strong>Dirección:</strong> {{ pedido.Direccion }}</p>
-                      <ul class="mb-2">
-                          {% for producto in pedido.Productos %}
-                            <li>
-                              <strong>{{ producto.Nombre }}</strong> — Cantidad: {{ producto.Cantidad }}
-                            </li>
-                          {% endfor %}
-                        </ul>
-
-                      <p><strong>ID Pedido:</strong> {{ pedido.ID }}</p>
-
-                     {% set img = pedido.Productos[0].Imagen if pedido.Productos and pedido.Productos[0].Imagen else None %}
-                      {% if img %}
-                        <img src="{{ url_for('static', filename=img) }}" alt="Imagen de producto" class="img-fluid" style="max-width: 150px;">
-                      {% else %}
-                        <img src="{{ url_for('static', filename='img/catalogo.png') }}" alt="Imagen no disponible" class="img-fluid" style="max-width: 150px;">
-                      {% endif %}
-
-                      <div class="text-end mt-3">
-                        <button class="btn btn-green">Aceptar proceso de envío</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <p class="text-muted">No tienes pedidos pendientes.</p>
-        {% endif %}
-      </div>
-
     </div>
   </div>
 </div>
@@ -202,7 +138,6 @@
 
           <div class="row g-3 mb-3">
             <div class="col-md-6">
-                          <div class="col-md-6">
               <label for="modal_departamento" class="form-label">Departamento</label>
               <input type="text" id="modal_departamento" name="departamento" class="form-control rounded-pill" value="Bogotá, D.C." readonly />
             </div>
@@ -263,4 +198,3 @@
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
 {% endblock %}
-
