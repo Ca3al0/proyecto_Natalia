@@ -292,3 +292,21 @@ def checkout():
         db.session.rollback()
         print("Error en checkout:", e)
         return jsonify({"mensaje": "Error al procesar la compra ❌"}), 500
+    
+@cliente.route('/api/direcciones', methods=['GET'])
+@login_required
+def get_direcciones():
+    direcciones = Direccion.query.filter_by(ID_Usuario=current_user.ID_Usuario).all()
+    data = []
+    for d in direcciones:
+        data.append({
+            "id": d.ID_Direccion,
+            "pais": d.Pais,
+            "departamento": d.Departamento,
+            "ciudad": d.Ciudad,
+            "direccion": d.Direccion,
+            "barrio": d.Barrio,
+            "destinatario": d.Destinatario,
+            "info": d.InfoAdicional
+        })
+    return jsonify(data)
