@@ -43,7 +43,7 @@
         <li><strong>Material:</strong> {{ producto.Material or 'No especificado' }}</li>
         <li><strong>Color:</strong> {{ producto.Color or 'No especificado' }}</li>
         {% if producto.Stock is not none %}
-          <li><strong>Stock disponible:</strong> {{ producto.Stock }}</li>
+    
         {% endif %}
       </ul>
 
@@ -101,6 +101,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+
 document.addEventListener('DOMContentLoaded', async () => {
 
     const btnComprar = document.getElementById('btn-comprar');
@@ -114,7 +115,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const alert = document.createElement('div');
         alert.className = `alert alert-${tipo} position-fixed top-0 end-0 m-4 shadow`;
         alert.style.zIndex = 2000;
-        alert.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i>${texto}`;
+        alert.innerHTML = `<i class="bi bi-${tipo === 'success' ? 'check' : 'x'}-circle-fill me-2"></i>${texto}`;
         document.body.appendChild(alert);
         setTimeout(() => alert.remove(), 3000);
     };
@@ -132,8 +133,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error("Error al cargar direcciones:", err);
     }
 
-    // Abrir modal al hacer clic en Comprar
+    // Validar stock y abrir modal si hay disponibilidad
     btnComprar.addEventListener('click', () => {
+        const stockDisponible = parseInt(btnComprar.dataset.stock, 10) || 0;
+
+        if (stockDisponible <= 0) {
+            mostrarMensaje('No hay stock disponible para este producto ❌', 'danger');
+            return; // No permite continuar
+        }
+
         inputProductoID.value = btnComprar.dataset.id;
         modalCompra.show();
     });
@@ -144,7 +152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const direccionID = selectDireccion.value;
         const metodoPago = selectMetodoPago.value;
 
-        if(!direccionID){
+        if (!direccionID) {
             mostrarMensaje("Debes seleccionar una dirección de entrega ❌", "danger");
             return;
         }
@@ -159,15 +167,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                     MetodoPago: metodoPago
                 })
             });
+
             const data = await res.json();
-            if(res.ok){
+            if (res.ok) {
                 mostrarMensaje('Compra registrada correctamente ✅', 'success');
                 modalCompra.hide();
-                setTimeout(()=> window.location.href='/cliente/pedidos', 1500);
+                setTimeout(() => window.location.href = '/cliente/pedidos', 1500);
             } else {
                 mostrarMensaje(data.mensaje || 'Error al registrar la compra ❌', 'danger');
             }
-        } catch(err){
+
+        } catch (err) {
             console.error(err);
             mostrarMensaje('Error en la conexión ❌', 'danger');
         }
@@ -175,4 +185,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 });
 </script>
+
 {% endblock %}
