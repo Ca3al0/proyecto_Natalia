@@ -233,6 +233,31 @@ def get_pedidos_pendientes_usuario(usuario_id):
     return pedidos_enriquecidos
 
 
+def get_pedidos_pendientes_todos():
+    from sqlalchemy import func
+    pedidos = Pedido.query.filter(func.lower(func.trim(Pedido.Estado)) == 'pendiente').all()
+    
+    pedidos_enriquecidos = []
+    for pedido in pedidos:
+        productos_info = []
+        for detalle in pedido.detalles_pedido:
+            producto = detalle.producto
+            productos_info.append({
+                'Nombre': producto.NombreProducto if producto else 'Producto no disponible',
+                'Cantidad': detalle.Cantidad,
+                'Imagen': producto.ImagenPrincipal if producto and producto.ImagenPrincipal else None
+            })
+
+        pedidos_enriquecidos.append({
+            'ID': pedido.ID_Pedido,
+            'Estado': (pedido.Estado or '').strip(),
+            'Productos': productos_info,
+            'Nombre': pedido.NombreComprador,
+            'Celular': pedido.usuario.Telefono if pedido.usuario else '',
+            'Direccion': pedido.Destino
+        })
+
+    return pedidos_enriquecidos
 
 
 def get_usuario_actual():
@@ -240,6 +265,7 @@ def get_usuario_actual():
     if user_id:
         return Usuario.query.get(user_id)
     return None
+
 
 @admin.route('/admin/perfil')
 def perfil():
@@ -254,14 +280,13 @@ def perfil():
     for pedido in pedidos_pendientes_todos:
         print(f"Pedido: {pedido}")
 
-    pedidos_pendientes_todos = get_pedidos_pendientes_todos()
-
     return render_template(
-    "administrador/admin_actualizacion_datos.htm",
-    usuario=usuario,
-    direcciones=direcciones,
-    pedidos=pedidos_pendientes_todos
-)
+        "administrador/admin_actualizacion_datos.html",
+        usuario=usuario,
+        direcciones=direcciones,
+        pedidos=pedidos_pendientes_todos
+    )
+
 
 
 

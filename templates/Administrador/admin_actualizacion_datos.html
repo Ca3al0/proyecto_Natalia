@@ -114,69 +114,82 @@
         </div>
       </div>
 
-      <!-- Sección Pedidos -->
-      <div id="seccion-pedidos" class="mt-4" style="display:none;">
-        {% if pedidos %}
-          <div class="row g-3">
-            {% for pedido in pedidos %}
-              <div class="col-md-6">
-                <div class="card border shadow-sm p-3">
-                  <h6 class="fw-bold">Cliente: {{ pedido.Nombre }}</h6>
-                 <ul class="mb-2">
-                  {% for producto in pedido.Productos %}
-                    <li><strong>{{ producto.Nombre }}</strong> — {{ producto.Cantidad }}</li>
-                  {% endfor %}
+   <!-- Sección Pedidos -->
+<div id="seccion-pedidos" class="mt-4" style="display:none;">
+  {% if pedidos %}
+    <div class="row g-3">
+      {% for pedido in pedidos %}
+        <div class="col-md-6">
+          <div class="card border shadow-sm p-3">
+            <h6 class="fw-bold">Cliente: {{ pedido.Nombre }}</h6>
+            <ul class="mb-2">
+              {% if pedido.Productos %}
+                {% for producto in pedido.Productos %}
+                  <li><strong>{{ producto.Nombre }}</strong> — {{ producto.Cantidad }}</li>
+                {% endfor %}
+              {% else %}
+                <li class="text-muted">No hay productos en este pedido.</li>
+              {% endif %}
+            </ul>
+
+            <button class="btn btn-outline-dark btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalPedido{{ loop.index }}">
+              Ver detalles
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Detalles -->
+        <div class="modal fade" id="modalPedido{{ loop.index }}" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-4 rounded-4">
+              <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold">Detalles del Pedido</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <p><strong>Nombre:</strong> {{ pedido.Nombre }}</p>
+                <p><strong>Teléfono:</strong> {{ pedido.Celular }}</p>
+                <p><strong>Dirección:</strong> {{ pedido.Direccion }}</p>
+
+                <ul class="mb-2">
+                  {% if pedido.Productos %}
+                    {% for producto in pedido.Productos %}
+                      <li><strong>{{ producto.Nombre }}</strong> — Cantidad: {{ producto.Cantidad }}</li>
+                    {% endfor %}
+                  {% else %}
+                    <li class="text-muted">No hay productos para mostrar.</li>
+                  {% endif %}
                 </ul>
 
+                <p><strong>ID Pedido:</strong> {{ pedido.ID }}</p>
 
-                  <button class="btn btn-outline-dark btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalPedido{{ loop.index }}">
-                    Ver detalles
-                  </button>
+                {% set img = pedido.Productos[0].Imagen if pedido.Productos and pedido.Productos[0].Imagen else None %}
+                {% if img %}
+                  <img src="{{ url_for('static', filename=img) }}" alt="Imagen de producto {{ pedido.Productos[0].Nombre }}" class="img-fluid" style="max-width: 150px;">
+                {% else %}
+                  <img src="{{ url_for('static', filename='img/catalogo.png') }}" alt="Imagen no disponible" class="img-fluid" style="max-width: 150px;">
+                {% endif %}
+
+                <div class="text-end mt-3">
+                  <form method="POST" action="{{ url_for('admin.aceptar_envio', id_pedido=pedido.ID) }}">
+                    {{ csrf_token() if csrf_token is defined }}
+                    <button type="submit" class="btn btn-green">Aceptar proceso de envío</button>
+                  </form>
                 </div>
               </div>
-
-              <!-- Modal Detalles -->
-              <div class="modal fade" id="modalPedido{{ loop.index }}" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                  <div class="modal-content p-4 rounded-4">
-                    <div class="modal-header border-0">
-                      <h5 class="modal-title fw-bold">Detalles del Pedido</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    <div class="modal-body">
-                      <p><strong>Nombre:</strong> {{ pedido.Nombre }}</p>
-                      <p><strong>Teléfono:</strong> {{ pedido.Celular }}</p>
-                      <p><strong>Dirección:</strong> {{ pedido.Direccion }}</p>
-                      <ul class="mb-2">
-                          {% for producto in pedido.Productos %}
-                            <li>
-                              <strong>{{ producto.Nombre }}</strong> — Cantidad: {{ producto.Cantidad }}
-                            </li>
-                          {% endfor %}
-                        </ul>
-
-                      <p><strong>ID Pedido:</strong> {{ pedido.ID }}</p>
-
-                     {% set img = pedido.Productos[0].Imagen if pedido.Productos and pedido.Productos[0].Imagen else None %}
-                      {% if img %}
-                        <img src="{{ url_for('static', filename=img) }}" alt="Imagen de producto" class="img-fluid" style="max-width: 150px;">
-                      {% else %}
-                        <img src="{{ url_for('static', filename='img/catalogo.png') }}" alt="Imagen no disponible" class="img-fluid" style="max-width: 150px;">
-                      {% endif %}
-
-                      <div class="text-end mt-3">
-                        <button class="btn btn-green">Aceptar proceso de envío</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            {% endfor %}
+            </div>
           </div>
-        {% else %}
-          <p class="text-muted">No tienes pedidos pendientes.</p>
-        {% endif %}
-      </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-muted fst-italic">
+  <i class="bi bi-info-circle me-2"></i>No tienes pedidos pendientes en este momento.
+</p>
+
+  {% endif %}
+</div>
+
 
     </div>
   </div>
