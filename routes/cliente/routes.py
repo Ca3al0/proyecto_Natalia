@@ -235,3 +235,29 @@ def guardar_resena(id):
 def comparar():
     productos = Producto.query.all()  # o la consulta que tengas
     return render_template('cliente/comparar.html', productos=productos)
+
+
+@cliente.route('/api/pedidos', methods=['POST'])
+@login_required
+def crear_pedido():
+    try:
+        data = request.get_json()
+        productos_ids = data.get('productos', [])
+        if not productos_ids:
+            return jsonify({"mensaje":"No se recibieron productos"}), 400
+
+        for pid in productos_ids:
+            pedido = Pedido(
+                UsuarioID=current_user.ID_Usuario,
+                ProductoID=int(pid),
+                Cantidad=1,  # puedes mejorar para permitir cantidad
+                Fecha=datetime.now()
+            )
+            db.session.add(pedido)
+        db.session.commit()
+        return jsonify({"mensaje":"Pedido registrado correctamente"}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print("Error al registrar pedido:", e)
+        return jsonify({"mensaje":"Error al registrar pedido"}), 500
