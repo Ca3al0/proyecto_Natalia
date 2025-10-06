@@ -1,57 +1,103 @@
 {% extends "common/base.html" %}
 
-{% block title %}Gestión de Proveedores{% endblock %}
+{% block title %}Gestión de Proveedores y Compras{% endblock %}
 
 {% block content %}
 <div class="container mt-5 p-4 bg-white rounded shadow">
-    <h3 class="text-center text-success mb-4">Gestión de Proveedores</h3>
+
+    <h3 class="text-center text-success mb-4">Gestión de Proveedores y Compras</h3>
 
     <div id="alerta" class="alert text-center" style="display:none;"></div>
 
-    <!-- Formulario -->
-    <form id="formProveedor" class="mb-4">
-        <div class="row g-3">
-            <div class="col-md-4"><input type="text" id="empresa" class="form-control" placeholder="Nombre Empresa" required></div>
-            <div class="col-md-4"><input type="text" id="contacto" class="form-control" placeholder="Nombre Contacto" required></div>
-            <div class="col-md-4"><input type="text" id="cargo" class="form-control" placeholder="Cargo Contacto" required></div>
-            <div class="col-md-4"><input type="text" id="direccion" class="form-control" placeholder="Dirección" required></div>
-            <div class="col-md-4"><input type="text" id="ciudad" class="form-control" placeholder="Ciudad" required></div>
-            <div class="col-md-4"><input type="text" id="pais" class="form-control" placeholder="País" required></div>
-        </div>
-        <div class="mt-3 text-center">
-            <button type="submit" class="btn btn-success">Guardar Proveedor</button>
-        </div>
-    </form>
+    <div class="row">
+        <!-- PANEL PROVEEDORES -->
+        <div class="col-md-6 mb-4">
+            <h5 class="text-success mb-3">Proveedores</h5>
+            <form id="formProveedor" class="mb-3">
+                <div class="row g-2">
+                    <div class="col-12"><input type="text" id="empresa" class="form-control" placeholder="Nombre Empresa" required></div>
+                    <div class="col-12"><input type="text" id="contacto" class="form-control" placeholder="Nombre Contacto"></div>
+                    <div class="col-12"><input type="text" id="cargo" class="form-control" placeholder="Cargo Contacto"></div>
+                    <div class="col-12"><input type="text" id="direccion" class="form-control" placeholder="Dirección"></div>
+                    <div class="col-6"><input type="text" id="ciudad" class="form-control" placeholder="Ciudad"></div>
+                    <div class="col-6"><input type="text" id="pais" class="form-control" placeholder="País"></div>
+                </div>
+                <div class="mt-2 text-center">
+                    <button type="submit" class="btn btn-success w-100">Guardar Proveedor</button>
+                </div>
+            </form>
 
-    <!-- Tabla -->
-    <div class="table-responsive">
-        <table class="table table-bordered text-center align-middle">
-            <thead class="table-success">
-                <tr>
-                    <th>ID</th><th>Empresa</th><th>Contacto</th><th>Cargo</th>
-                    <th>Dirección</th><th>Ciudad</th><th>País</th><th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="tablaProveedores"></tbody>
-        </table>
+            <div class="table-responsive">
+                <table class="table table-bordered text-center align-middle">
+                    <thead class="table-success">
+                        <tr>
+                            <th>ID</th><th>Empresa</th><th>Contacto</th><th>Cargo</th>
+                            <th>Dirección</th><th>Ciudad</th><th>País</th><th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaProveedores"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PANEL COMPRAS -->
+        <div class="col-md-6 mb-4">
+            <h5 class="text-success mb-3">Registrar Compras</h5>
+            <form id="formCompra" class="mb-3">
+                <div class="mb-2">
+                    <input type="text" id="producto" class="form-control" placeholder="Nombre Producto" required>
+                </div>
+                <div class="mb-2">
+                    <input type="number" id="cantidad" class="form-control" placeholder="Cantidad" required min="1">
+                </div>
+                <div class="mb-2">
+                    <select id="selectProveedor" class="form-select" required></select>
+                </div>
+                <div class="mb-2">
+                    <input type="date" id="fecha" class="form-control" required>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success w-100">Guardar Compra</button>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-bordered text-center align-middle">
+                    <thead class="table-success">
+                        <tr>
+                            <th>Producto</th><th>Cantidad</th><th>Proveedor</th><th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaCompras"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
-const form = document.getElementById('formProveedor');
-const tabla = document.getElementById('tablaProveedores');
+const formProveedor = document.getElementById('formProveedor');
+const tablaProveedores = document.getElementById('tablaProveedores');
+const selectProveedor = document.getElementById('selectProveedor');
 const alerta = document.getElementById('alerta');
 
+const formCompra = document.getElementById('formCompra');
+const tablaCompras = document.getElementById('tablaCompras');
+
+let compras = [];
+
+// 🔹 Funciones Proveedores
 async function cargarProveedores(){
     try {
         const res = await fetch('/admin/api/proveedores');
         const data = await res.json();
         if(!Array.isArray(data)) throw new Error("JSON inválido");
-        tabla.innerHTML = '';
+        tablaProveedores.innerHTML = '';
+        selectProveedor.innerHTML = '';
         data.forEach(p => {
-            tabla.innerHTML += `
+            tablaProveedores.innerHTML += `
             <tr>
                 <td>${p.id}</td>
                 <td>${p.empresa}</td>
@@ -61,10 +107,11 @@ async function cargarProveedores(){
                 <td>${p.ciudad}</td>
                 <td>${p.pais}</td>
                 <td>
-                    <button class="btn btn-warning btn-sm me-1" onclick="editar(${p.id})">Editar</button>
-                    <button class="btn btn-danger btn-sm" onclick="eliminar(${p.id})">Eliminar</button>
+                    <button class="btn btn-warning btn-sm me-1" onclick="editarProveedor(${p.id})">Editar</button>
+                    <button class="btn btn-danger btn-sm" onclick="eliminarProveedor(${p.id})">Eliminar</button>
                 </td>
             </tr>`;
+            selectProveedor.innerHTML += `<option value="${p.empresa}">${p.empresa}</option>`;
         });
     } catch(e){
         mostrarAlerta("Error al cargar proveedores ❌", "danger");
@@ -72,7 +119,7 @@ async function cargarProveedores(){
     }
 }
 
-form.addEventListener('submit', async e=>{
+formProveedor.addEventListener('submit', async e => {
     e.preventDefault();
     const nuevo = {
         empresa: document.getElementById('empresa').value,
@@ -84,23 +131,21 @@ form.addEventListener('submit', async e=>{
     };
     try{
         const res = await fetch('/admin/api/proveedores', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(nuevo)
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(nuevo)
         });
         const data = await res.json();
-        if(res.ok){
-            mostrarAlerta(data.mensaje,'success');
-            form.reset();
-            cargarProveedores();
-        } else mostrarAlerta(data.mensaje,'danger');
+        mostrarAlerta(data.mensaje, res.ok ? 'success':'danger');
+        formProveedor.reset();
+        cargarProveedores();
     } catch(e){
         mostrarAlerta("Error al guardar proveedor ❌",'danger');
         console.error(e);
     }
 });
 
-async function eliminar(id){
+async function eliminarProveedor(id){
     if(!confirm("¿Seguro que deseas eliminar este proveedor?")) return;
     try{
         const res = await fetch(`/admin/api/proveedores/${id}`, {method:'DELETE'});
@@ -112,10 +157,38 @@ async function eliminar(id){
     }
 }
 
-function editar(id){
+function editarProveedor(id){
     alert("Función de edición aún no implementada (ID: "+id+")");
 }
 
+// 🔹 Funciones Compras
+formCompra.addEventListener('submit', e => {
+    e.preventDefault();
+    const compra = {
+        producto: document.getElementById('producto').value,
+        cantidad: document.getElementById('cantidad').value,
+        proveedor: selectProveedor.value,
+        fecha: document.getElementById('fecha').value
+    };
+    compras.push(compra);
+    actualizarTablaCompras();
+    formCompra.reset();
+});
+
+function actualizarTablaCompras(){
+    tablaCompras.innerHTML = '';
+    compras.forEach(c=>{
+        tablaCompras.innerHTML += `
+        <tr>
+            <td>${c.producto}</td>
+            <td>${c.cantidad}</td>
+            <td>${c.proveedor}</td>
+            <td>${c.fecha}</td>
+        </tr>`;
+    });
+}
+
+// 🔹 Alertas
 function mostrarAlerta(msg,tipo){
     alerta.className = `alert alert-${tipo}`;
     alerta.textContent = msg;
@@ -123,6 +196,7 @@ function mostrarAlerta(msg,tipo){
     setTimeout(()=>alerta.style.display='none',3000);
 }
 
+// Inicializar
 cargarProveedores();
 </script>
 {% endblock %}
