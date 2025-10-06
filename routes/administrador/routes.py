@@ -625,3 +625,8 @@ def asignar_transportista(id_pedido):
 
     flash('Transportista asignado correctamente.', 'success')
     return redirect(url_for('admin.ver_pedidos'))
+
+@admin.route('/reportes')
+def reporte_entregas():
+    pedidos_entregados = Pedido.query.filter_by(Estado='entregado').order_by(Pedido.FechaEntrega.desc()).all()
+    return render_template('administrador/reportes_entregas.html', pedidos_entregados=pedidos_entregados)
