@@ -1,6 +1,35 @@
 {% extends "common/base.html" %}
 
+{% block navbar %}
+  {% include "common/partials/navbar_admin.html" %}
+  {% include "common/partials/navbar_secundario3.html" %}
+{% endblock %}
+
 {% block content %}
+
+<!-- Estilos -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/perfil.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
+
+<!-- Flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} flash-small d-flex align-items-center mt-3" role="alert">
+        {% if category == 'success' %}
+          <i class="bi bi-check-circle-fill me-2"></i>
+        {% elif category == 'danger' %}
+          <i class="bi bi-x-circle-fill me-2"></i>
+        {% elif category == 'warning' %}
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {% elif category == 'info' %}
+          <i class="bi bi-info-circle-fill me-2"></i>
+        {% endif %}
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 <div class="container mt-4">
     <h2 class="mb-4">📦 Todos los Pedidos</h2>
 
