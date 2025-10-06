@@ -217,7 +217,7 @@ def get_usuario_actual():
 def get_direcciones(usuario_id):
     return Direccion.query.filter_by(ID_Usuario=usuario_id).all()
 
-# Obtener pedidos del usuario con datos enriquecidos
+# Obtener todos los pedidos del usuario con datos enriquecidos
 def get_pedidos_usuario(usuario_id):
     pedidos = Pedido.query.filter_by(ID_Usuario=usuario_id).all()
     pedidos_enriquecidos = []
@@ -239,9 +239,9 @@ def get_pedidos_usuario(usuario_id):
 
     return pedidos_enriquecidos
 
-# Obtener todos los pedidos pendientes (para vista admin)
-def get_pedidos_pendientes_todos():
-    pedidos = Pedido.query.filter_by(Estado='pendiente').all()
+# Obtener pedidos pendientes del usuario (Estado == 'pendiente')
+def get_pedidos_pendientes_usuario(usuario_id):
+    pedidos = Pedido.query.filter_by(ID_Usuario=usuario_id, Estado='pendiente').all()
     pedidos_enriquecidos = []
 
     for pedido in pedidos:
@@ -261,7 +261,32 @@ def get_pedidos_pendientes_todos():
 
     return pedidos_enriquecidos
 
-# Ruta para perfil de usuario (admin)
+def get_pedidos_pendientes_todos():
+    pedidos = Pedido.query.filter_by(Estado='pendiente').all()
+    print(f"[DEBUG] Pedidos pendientes encontrados: {len(pedidos)}")
+    
+    pedidos_enriquecidos = []
+
+    for pedido in pedidos:
+        print(f"[DEBUG] Pedido ID: {pedido.ID_Pedido}, Estado: {pedido.Estado}, Cliente: {pedido.NombreComprador}")
+        detalle = pedido.detalles_pedido[0] if pedido.detalles_pedido else None
+        producto = detalle.producto if detalle and hasattr(detalle, 'producto') else None
+
+        pedidos_enriquecidos.append({
+            'ID': pedido.ID_Pedido,
+            'Cantidad': detalle.Cantidad if detalle else 0,
+            'Estado': (pedido.Estado or '').strip(),
+            'Producto': producto.Nombre if producto else 'Producto no disponible',
+            'ImagenPrincipal': producto.Imagen if producto and producto.Imagen else None,
+            'Nombre': pedido.NombreComprador,
+            'Celular': pedido.usuario.Telefono if pedido.usuario else '',
+            'Direccion': pedido.Destino
+        })
+
+    return pedidos_enriquecidos
+
+
+
 @admin.route('/admin/perfil')
 def perfil():
     usuario = get_usuario_actual()
@@ -269,16 +294,20 @@ def perfil():
         return redirect(url_for('auth.login'))
 
     direcciones = get_direcciones(usuario.ID_Usuario)
-    pedidos = get_pedidos_usuario(usuario.ID_Usuario)
     pedidos_pendientes_todos = get_pedidos_pendientes_todos()
+
+    # DEBUG: imprimir los pedidos pendientes en consola
+    print("Pedidos pendientes encontrados:", len(pedidos_pendientes_todos))
+    for p in pedidos_pendientes_todos:
+        print(f"Pedido ID: {p['ID']}, Estado: {p['Estado']}, Cliente: {p['Nombre']}")
 
     return render_template(
         "admin/perfil.html",
         usuario=usuario,
         direcciones=direcciones,
-        pedidos=pedidos,
-        pedidos_pendientes_todos=pedidos_pendientes_todos
+        pedidos=pedidos_pendientes_todos
     )
+
 
 
 
