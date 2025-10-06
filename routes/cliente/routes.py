@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, render_template_string
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Calendario,Pedido, Producto, Resena
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Calendario,Pedido, Producto, Resena, Detalle_Pedido, Pagos
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
 from datetime import datetime
@@ -236,33 +236,38 @@ def comparar():
     productos = Producto.query.all()  # o la consulta que tengas
     return render_template('cliente/comparar.html', productos=productos)
 
-@cliente.route('/api/pedidos', methods=['POST'])
+@cliente.route('/api/checkout', methods=['POST'])
 @login_required
-def crear_pedido():
+def checkout():
     try:
         data = request.get_json()
-        productos_ids = data.get('productos', [])
-        cantidades = data.get('cantidades', [])
+        productos_ids = data.get('productos', [])     # lista de IDs de productos
+        cantidades = data.get('cantidades', [])       # lista de cantidades
+        direccion = data.get('direccion')            # dirección de entrega
+        metodo_pago = data.get('metodo_pago', 'tarjeta')  # método de pago
 
-        if not productos_ids:
-            return jsonify({"mensaje": "No se recibieron productos"}), 400
+        if not productos_ids or not direccion:
+            return jsonify({"mensaje": "Faltan datos para procesar la compra"}), 400
 
         # Crear pedido
         pedido = Pedido(
             NombreComprador=current_user.Nombre,
             Estado='pendiente',
             FechaPedido=date.today(),
+            Destino=direccion,
             ID_Usuario=current_user.ID_Usuario
         )
         db.session.add(pedido)
-        db.session.flush()  # para obtener ID_Pedido antes del commit
+        db.session.flush()  # Para obtener ID_Pedido antes del commit
 
-        # Agregar productos al detalle del pedido
+        total = 0
+        # Agregar detalle del pedido
         for idx, pid in enumerate(productos_ids):
             producto = Producto.query.get(pid)
             if not producto:
                 continue
             cantidad = cantidades[idx] if cantidades and len(cantidades) > idx else 1
+            total += producto.PrecioUnidad * cantidad
             detalle = Detalle_Pedido(
                 ID_Pedido=pedido.ID_Pedido,
                 ID_Producto=producto.ID_Producto,
@@ -271,10 +276,19 @@ def crear_pedido():
             )
             db.session.add(detalle)
 
+        # Registrar pago simulado
+        pago = Pagos(
+            MetodoPago=metodo_pago,
+            FechaPago=date.today(),
+            Monto=total,
+            ID_Pedido=pedido.ID_Pedido
+        )
+        db.session.add(pago)
+
         db.session.commit()
-        return jsonify({"mensaje": "Pedido registrado correctamente"}), 201
+        return jsonify({"mensaje": "Compra realizada correctamente ✅", "ID_Pedido": pedido.ID_Pedido}), 201
 
     except Exception as e:
         db.session.rollback()
-        print("Error al registrar pedido:", e)
-        return jsonify({"mensaje": "Error al registrar pedido"}), 500
+        print("Error en checkout:", e)
+        return jsonify({"mensaje": "Error al procesar la compra ❌"}), 500
