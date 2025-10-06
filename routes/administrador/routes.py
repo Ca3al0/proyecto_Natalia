@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from datetime import date,datetime, timedelta
 from flask import current_app
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido, Calendario
 from werkzeug.security import generate_password_hash
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
@@ -276,11 +276,13 @@ def ver_pedidos():
         return redirect(url_for('index'))
 
     pedidos = get_todos_los_pedidos()
+    usuarios_transportistas = Usuario.query.filter_by(Rol='transportista').all()
 
     return render_template(
         "administrador/ver_pedidos.html",
         usuario=current_user,
-        pedidos=pedidos
+        pedidos=pedidos,
+        usuarios_transportistas=usuarios_transportistas 
     )
 
 
@@ -593,3 +595,40 @@ def agregar_compra():
         db.session.rollback()
         print("Error al registrar compra:", e)
         return jsonify({"mensaje": "Error al registrar compra ❌"}), 500
+    
+
+@admin.route('/admin/pedidos/<int:id_pedido>/asignar', methods=['POST'])
+@login_required
+def asignar_transportista(id_pedido):
+    transportista_id = request.form.get('transportista_id')
+    hora_llegada_str = request.form.get('hora_llegada')
+
+    if not transportista_id or not hora_llegada_str:
+        flash('Debe seleccionar un transportista y una hora de llegada.', 'danger')
+        return redirect(url_for('admin.ver_pedidos'))
+
+    try:
+        hora_llegada_dt = datetime.strptime(hora_llegada_str, '%Y-%m-%dT%H:%M')
+    except ValueError:
+        flash('Formato de hora de llegada inválido.', 'danger')
+        return redirect(url_for('admin.ver_pedidos'))
+
+    pedido = Pedido.query.get_or_404(id_pedido)
+    transportista = Usuario.query.filter_by(ID_Usuario=int(transportista_id), Rol='transportista').first()
+    if not transportista:
+        flash('Transportista no válido.', 'danger')
+        return redirect(url_for('admin.ver_pedidos'))
+
+    calendario_entry = Calendario(
+        Fecha=hora_llegada_dt.date(),
+        Hora=hora_llegada_dt.time(),
+        Ubicacion=pedido.Direccion,
+        Tipo='AsignacionTransportista',
+        ID_Usuario=transportista.ID_Usuario,
+        ID_Pedido=pedido.ID_Pedido
+    )
+    db.session.add(calendario_entry)
+    db.session.commit()
+
+    flash(f'Transportista {transportista.Nombre} asignado correctamente al pedido #{pedido.ID_Pedido}.', 'success')
+    return redirect(url_for('admin.ver_pedidos'))
