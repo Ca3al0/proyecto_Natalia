@@ -10,20 +10,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/detalles.css') }}">
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }} flash-small d-flex align-items-center" role="alert">
-        {% if category == 'success' %}<i class="bi bi-check-circle-fill me-2"></i>
-        {% elif category == 'danger' %}<i class="bi bi-x-circle-fill me-2"></i>
-        {% elif category == 'warning' %}<i class="bi bi-exclamation-triangle-fill me-2"></i>
-        {% elif category == 'info' %}<i class="bi bi-info-circle-fill me-2"></i>{% endif %}
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-
 <div class="container mt-5">
   <div class="row">
     <!-- Imagen -->
@@ -43,7 +29,7 @@
         <li><strong>Material:</strong> {{ producto.Material or 'No especificado' }}</li>
         <li><strong>Color:</strong> {{ producto.Color or 'No especificado' }}</li>
         {% if producto.Stock is not none %}
-    
+        <li><strong>Stock disponible:</strong> {{ producto.Stock }}</li>
         {% endif %}
       </ul>
 
@@ -53,7 +39,9 @@
       <!-- Botón Comprar -->
       <button id="btn-comprar" 
         class="btn btn-success mt-4"
-        data-id="{{ producto.ID_Producto }}">
+        data-id="{{ producto.ID_Producto }}"
+        data-stock="{{ producto.Stock or 0 }}"
+        {% if producto.Stock == 0 %}disabled{% endif %}>
         <i class="bi bi-cart-plus me-2"></i> Comprar
       </button>
 
@@ -101,7 +89,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-
 document.addEventListener('DOMContentLoaded', async () => {
 
     const btnComprar = document.getElementById('btn-comprar');
@@ -111,7 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const inputProductoID = document.getElementById('producto_id');
     const btnConfirmarCompra = document.getElementById('btnConfirmarCompra');
 
-    const mostrarMensaje = (texto, tipo='success') => {
+    const mostrarMensaje = (texto, tipo = 'success') => {
         const alert = document.createElement('div');
         alert.className = `alert alert-${tipo} position-fixed top-0 end-0 m-4 shadow`;
         alert.style.zIndex = 2000;
@@ -129,24 +116,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${d.destinatario} - ${d.direccion}, ${d.barrio}, ${d.ciudad}, ${d.departamento}, ${d.pais}
             </option>`;
         });
-    } catch(err){
+    } catch (err) {
         console.error("Error al cargar direcciones:", err);
     }
 
-    // Validar stock y abrir modal si hay disponibilidad
+    // Validar stock antes de abrir modal
     btnComprar.addEventListener('click', () => {
         const stockDisponible = parseInt(btnComprar.dataset.stock, 10) || 0;
 
         if (stockDisponible <= 0) {
             mostrarMensaje('No hay stock disponible para este producto ❌', 'danger');
-            return; // No permite continuar
+            return;
         }
 
         inputProductoID.value = btnComprar.dataset.id;
         modalCompra.show();
     });
 
-    // Confirmar compra desde modal
+    // Confirmar compra
     btnConfirmarCompra.addEventListener('click', async () => {
         const productoID = inputProductoID.value;
         const direccionID = selectDireccion.value;
@@ -160,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
             const res = await fetch('/cliente/api/comprar', {
                 method: 'POST',
-                headers: {'Content-Type':'application/json'},
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ID_Producto: productoID,
                     ID_Direccion: direccionID,
@@ -169,6 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             const data = await res.json();
+
             if (res.ok) {
                 mostrarMensaje('Compra registrada correctamente ✅', 'success');
                 modalCompra.hide();
@@ -182,8 +170,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             mostrarMensaje('Error en la conexión ❌', 'danger');
         }
     });
-
 });
 </script>
-
 {% endblock %}
