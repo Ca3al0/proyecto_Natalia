@@ -403,6 +403,7 @@ def obtener_proveedores():
 def agregar_proveedor():
     try:
         data = request.get_json()
+        print("📩 Datos recibidos:", data)  # 👈 importante
 
         nuevo = Proveedor(
             Nombre_Empresa=data.get('empresa'),
@@ -422,6 +423,7 @@ def agregar_proveedor():
         db.session.rollback()
         print("❌ Error al guardar el proveedor:", e)
         return jsonify({"mensaje": "Error al guardar el proveedor ❌"}), 500
+
 
 
 # ----------------------------------------------------------
