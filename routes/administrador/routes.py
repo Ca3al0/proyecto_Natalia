@@ -597,33 +597,4 @@ def agregar_compra():
         return jsonify({"mensaje": "Error al registrar compra ❌"}), 500
     
 
-@admin.route('/calendario')
-def index():
-    return render_template('administrador/calendario.html')
 
-@admin.route('/events')
-def events():
-    eventos = Calendario.query.all()
-    eventos_json = []
-
-    for evento in eventos:
-        start_datetime = datetime.combine(evento.Fecha, evento.Hora)
-
-        if evento.Tipo.lower() == 'instalacion':
-            titulo = f"Instalación - {evento.Ubicacion}"
-            color = '#4caf50'  # verde fuerte para instalaciones
-        elif evento.Tipo.lower() == 'pedido':
-            titulo = f"Pedido - {evento.Ubicacion}"
-            color = '#2196f3'  # azul para pedidos
-        else:
-            titulo = f"{evento.Tipo} - {evento.Ubicacion}"
-            color = '#9e9e9e'  # gris para otros tipos
-
-        eventos_json.append({
-            'id': evento.ID_Calendario,
-            'title': titulo,
-            'start': start_datetime.isoformat(),
-            'color': color
-        })
-
-    return jsonify(eventos_json)
