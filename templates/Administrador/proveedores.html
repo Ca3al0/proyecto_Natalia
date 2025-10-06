@@ -1,5 +1,11 @@
 {% extends "common/base.html" %}
 
+{% block navbar %}
+  {% include "common/partials/navbar_admin.html" %}
+  {% include "common/partials/navbar_secundario3.html" %}
+{% endblock %}
+
+
 {% block title %}Gestión de Proveedores y Compras{% endblock %}
 
 {% block content %}
@@ -122,6 +128,7 @@ async function cargarProveedores(){
                     <button class="btn btn-danger btn-sm" onclick="eliminarProveedor(${p.id})">Eliminar</button>
                 </td>
             </tr>`;
+            // Guardamos ID en value, no nombre
             selectProveedor.innerHTML += `<option value="${p.id}">${p.empresa}</option>`;
         });
         cargarCompras(); // recargar compras al cargar proveedores
@@ -131,57 +138,13 @@ async function cargarProveedores(){
     }
 }
 
-// EVENTO GUARDAR PROVEEDOR
-formProveedor.addEventListener('submit', async e => {
-    e.preventDefault();
-    const nuevo = {
-        empresa: document.getElementById('empresa').value,
-        contacto: document.getElementById('contacto').value,
-        cargo: document.getElementById('cargo').value,
-        direccion: document.getElementById('direccion').value,
-        ciudad: document.getElementById('ciudad').value,
-        pais: document.getElementById('pais').value
-    };
-    try{
-        const res = await fetch('/admin/api/proveedores', {
-            method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify(nuevo)
-        });
-        const data = await res.json();
-        mostrarAlerta(data.mensaje, res.ok ? 'success':'danger');
-        formProveedor.reset();
-        cargarProveedores();
-    } catch(e){
-        mostrarAlerta("Error al guardar proveedor ❌",'danger');
-        console.error(e);
-    }
-});
-
-// ELIMINAR PROVEEDOR
-async function eliminarProveedor(id){
-    if(!confirm("¿Seguro que deseas eliminar este proveedor?")) return;
-    try{
-        const res = await fetch(`/admin/api/proveedores/${id}`, {method:'DELETE'});
-        const data = await res.json();
-        mostrarAlerta(data.mensaje, res.ok ? 'success':'danger');
-        cargarProveedores();
-    } catch(e){
-        mostrarAlerta("Error en conexión ❌",'danger');
-    }
-}
-
-function editarProveedor(id){
-    alert("Función de edición aún no implementada (ID: "+id+")");
-}
-
 // GUARDAR COMPRA
 formCompra.addEventListener('submit', async e => {
     e.preventDefault();
     const compra = {
         producto: document.getElementById('producto').value,
-        cantidad: document.getElementById('cantidad').value,
-        proveedor: selectProveedor.value,
+        cantidad: parseInt(document.getElementById('cantidad').value),
+        proveedor_id: parseInt(selectProveedor.value), // enviar ID
         fecha: document.getElementById('fecha').value
     };
     try {
@@ -202,7 +165,7 @@ formCompra.addEventListener('submit', async e => {
     }
 });
 
-// CARGAR COMPRAS DESDE LA BD
+// CARGAR COMPRAS
 async function cargarCompras(){
     try {
         const res = await fetch('/admin/api/compras');

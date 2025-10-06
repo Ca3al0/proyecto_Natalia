@@ -488,7 +488,6 @@ def obtener_compras():
         })
     return jsonify(data), 200
 
-# Agregar nueva compra
 @admin.route('/api/compras', methods=['POST'])
 @login_required
 def agregar_compra():
@@ -499,16 +498,20 @@ def agregar_compra():
         if not proveedor:
             return jsonify({"mensaje": "Proveedor no encontrado"}), 404
 
+        # Convertir string fecha a datetime.date
+        fecha_obj = datetime.strptime(data['fecha'], '%Y-%m-%d').date()
+
         nueva = Compra(
             Producto=data['producto'],
             Cantidad=data['cantidad'],
-            Fecha=data['fecha'],
+            Fecha=fecha_obj,
             ProveedorID=proveedor.ID_Proveedor
         )
         db.session.add(nueva)
         db.session.commit()
-        return jsonify({"mensaje":"Compra registrada correctamente ✅"}), 201
+        return jsonify({"mensaje": "Compra registrada correctamente ✅"}), 201
+
     except Exception as e:
         db.session.rollback()
         print("Error al registrar compra:", e)
-        return jsonify({"mensaje":"Error al registrar compra ❌"}), 500
+        return jsonify({"mensaje": "Error al registrar compra ❌"}), 500
