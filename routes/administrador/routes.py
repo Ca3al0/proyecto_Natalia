@@ -207,14 +207,12 @@ def borrar_direccion(id_direccion):
 
     return redirect(url_for("admin.actualizacion_datos"))
 
-
-def get_pedidos_pendientes_todos():
-    pedidos = Pedido.query.filter_by(Estado='pendiente').all()
+def get_pedidos_pendientes_usuario(usuario_id):
+    pedidos = Pedido.query.filter_by(Estado='pendiente', ID_Usuario=usuario_id).all()
     
     pedidos_enriquecidos = []
     for pedido in pedidos:
         productos_info = []
-
         for detalle in pedido.detalles_pedido:
             producto = detalle.producto
             productos_info.append({
@@ -225,7 +223,7 @@ def get_pedidos_pendientes_todos():
 
         pedidos_enriquecidos.append({
             'ID': pedido.ID_Pedido,
-            'Estado': (pedido.Estado or '').strip(),
+            'Estado': pedido.Estado,
             'Productos': productos_info,
             'Nombre': pedido.NombreComprador,
             'Celular': pedido.usuario.Telefono if pedido.usuario else '',
@@ -250,14 +248,14 @@ def perfil():
         return redirect(url_for('auth.login'))
 
     direcciones = Direccion.query.filter_by(ID_Usuario=usuario.ID_Usuario).all()
-    pedidos_pendientes_todos = get_pedidos_pendientes_todos()
+    pedidos_pendientes_todos = get_pedidos_pendientes_usuario(usuario.ID_Usuario)
 
-    print(f"[DEBUG] Total pedidos pendientes para admin: {len(pedidos_pendientes_todos)}")
+    print(f"[DEBUG] Total pedidos pendientes para usuario {usuario.ID_Usuario}: {len(pedidos_pendientes_todos)}")
     for pedido in pedidos_pendientes_todos:
         print(f"Pedido: {pedido}")
 
     return render_template(
-        "admin/perfil.html",
+        "administrador/admin_actualizacion_datos.html",
         usuario=usuario,
         direcciones=direcciones,
         pedidos=pedidos_pendientes_todos
