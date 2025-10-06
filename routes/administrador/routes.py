@@ -293,6 +293,7 @@ def perfil():
 
 
 
+
 # ---------- AGREGAR PRODUCTO ----------
 
 @admin.route('/admin/agregar-producto', methods=['GET', 'POST'])

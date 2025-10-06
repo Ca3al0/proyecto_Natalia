@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
 # ------------------ MODELOS ------------------ #
-from basedatos.models import db, Usuario, Producto
+from basedatos.models import db, Usuario, Producto,Pedido
 
 # ------------------ EXTENSIONES ------------------ #
 from basedatos.decoradores import mail
@@ -85,6 +85,12 @@ def favoritos():
     productos = Producto.query.filter(Producto.ID_Producto.in_(ids)).all()
     html = render_template("cliente/lista_favoritos.html", productos=productos)
     return jsonify({"html": html})
+
+@app.route('/admin/pedidos')
+def pedidos_admin():
+    pedidos = Pedido.query.all()  # O la consulta que uses para obtener todos los pedidos
+    print(pedidos)  # Para debug: asegúrate que trae datos
+    return render_template('admin/perfil.html', pedidos=pedidos)
 
 
 # ------------------ TEMPLATE FILTER ------------------ #
