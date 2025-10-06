@@ -408,31 +408,28 @@ def obtener_proveedores():
 # ----------------------------------------------------------
 # 🟢 API: Agregar proveedor
 # ----------------------------------------------------------
-@admin.route('/api/proveedores', methods=['POST'])
+@admin.route('/api/proveedores', methods=['GET'])
 @login_required
 @role_required("admin")
-def agregar_proveedor():
+def obtener_proveedores():
     try:
-        data = request.get_json()
-        if not data:
-            return jsonify({"mensaje": "No se recibió JSON válido"}), 400
-
-        nuevo = Proveedor(
-            Nombre_Empresa=data.get('empresa'),
-            Nombre_Contacto=data.get('contacto'),
-            Cargo_Contacto=data.get('cargo'),
-            Direccion=data.get('direccion'),
-            Ciudad=data.get('ciudad'),
-            Pais=data.get('pais')
-        )
-        db.session.add(nuevo)
-        db.session.commit()
-        return jsonify({"mensaje": "Proveedor agregado correctamente ✅"}), 201
-
+        proveedores = Proveedor.query.all()
+        data = [
+            {
+                "id": p.ID_Proveedor,
+                "empresa": p.Nombre_Empresa,
+                "contacto": p.Nombre_Contacto,
+                "cargo": p.Cargo_Contacto,
+                "direccion": p.Direccion,
+                "ciudad": p.Ciudad,
+                "pais": p.Pais
+            } for p in proveedores
+        ]
+        return jsonify(data), 200
     except Exception as e:
-        db.session.rollback()
-        print("❌ Error al guardar proveedor:", e)
-        return jsonify({"mensaje": "Error al guardar proveedor ❌"}), 500
+        print("❌ ERROR EN GET PROVEEDORES:", e)
+        return jsonify({"mensaje": "Error interno"}), 500
+
 
 # ----------------------------------------------------------
 # 🟡 API: Editar proveedor
