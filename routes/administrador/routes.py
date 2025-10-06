@@ -230,7 +230,28 @@ def get_pedidos_usuario(usuario_id):
             'Cantidad': pedido.Cantidad,
             'Estado': pedido.Estado,
             'Producto': producto.Nombre if producto else 'Producto no disponible',
-            'Imagen': producto.Imagen if producto and producto.Imagen else None,
+            'ImagenPrincipal': producto.Imagen if producto and producto.Imagen else None,
+            'Nombre': pedido.Nombre if hasattr(pedido, 'Nombre') else '',
+            'Celular': pedido.Celular if hasattr(pedido, 'Celular') else '',
+            'Direccion': pedido.Direccion if hasattr(pedido, 'Direccion') else '',
+        })
+
+    return pedidos_enriquecidos
+
+# Obtener todos los pedidos pendientes de todos los usuarios (si lo necesitas)
+def get_pedidos_pendientes_todos():
+    pedidos = Pedido.query.filter_by(Estado='pendiente').all()
+    pedidos_enriquecidos = []
+
+    for pedido in pedidos:
+        producto = Producto.query.get(pedido.ID_Producto)
+
+        pedidos_enriquecidos.append({
+            'ID': pedido.ID,
+            'Cantidad': pedido.Cantidad,
+            'Estado': pedido.Estado,
+            'Producto': producto.Nombre if producto else 'Producto no disponible',
+            'ImagenPrincipal': producto.Imagen if producto and producto.Imagen else None,
             'Nombre': pedido.Nombre if hasattr(pedido, 'Nombre') else '',
             'Celular': pedido.Celular if hasattr(pedido, 'Celular') else '',
             'Direccion': pedido.Direccion if hasattr(pedido, 'Direccion') else '',
@@ -243,16 +264,19 @@ def get_pedidos_usuario(usuario_id):
 def perfil():
     usuario = get_usuario_actual()
     if not usuario:
-        return redirect(url_for('auth.login'))  # Cambia esta ruta por la real de login
+        return redirect(url_for('auth.login'))  # Ajusta esta ruta según tu app
 
     direcciones = get_direcciones(usuario.id)
     pedidos = get_pedidos_usuario(usuario.id)
+    # Si quieres mostrar todos los pedidos pendientes de todos los usuarios, descomenta la línea siguiente:
+    # pedidos_pendientes_todos = get_pedidos_pendientes_todos()
 
     return render_template(
         "admin/perfil.html",
         usuario=usuario,
         direcciones=direcciones,
-        pedidos=pedidos
+        pedidos=pedidos,
+        #pedidos_pendientes_todos=pedidos_pendientes_todos,  # Pasa esta variable si la usas en la plantilla
     )
 
 
