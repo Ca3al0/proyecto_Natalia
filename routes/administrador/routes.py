@@ -268,7 +268,7 @@ def get_usuario_actual():
     return None
 
 
-@admin.route('/admin/ver_pedidos')
+@admin.route('/ver_pedidos')
 @login_required
 def ver_pedidos():
     if current_user.Rol != 'admin':
