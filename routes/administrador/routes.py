@@ -269,16 +269,17 @@ def get_usuario_actual():
 
 
 @admin.route('/admin/ver_pedidos')
+@login_required
 def ver_pedidos():
-    usuario = get_usuario_actual()
-    if not usuario:
-        return redirect(url_for('auth.login'))
+    if current_user.Rol != 'admin':
+        flash("No tienes permiso para acceder a esta página.", "danger")
+        return redirect(url_for('index'))
 
     pedidos = get_todos_los_pedidos()
 
     return render_template(
         "administrador/ver_pedidos.html",
-        usuario=usuario,
+        usuario=current_user,
         pedidos=pedidos
     )
 
