@@ -125,7 +125,11 @@
                   <h6 class="fw-bold">Cliente: {{ pedido.Nombre }}</h6>
                   <p><strong>Producto:</strong> {{ pedido.Producto }}</p>
                   <p><strong>Cantidades:</strong> {{ pedido.Cantidad }}</p>
-                  <p><strong>Estado:</strong> {{ pedido.Estado }}</p>
+                  <ul>
+  {% for pedido in pedidos %}
+    <li>ID: {{ pedido.ID_Pedido }}, Estado: '{{ pedido.Estado }}', Producto: {{ pedido.Producto }}</li>
+  {% endfor %}
+</ul>
                   <button class="btn btn-outline-dark btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalPedido{{ loop.index }}">
                     Ver detalles
                   </button>
