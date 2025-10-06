@@ -366,13 +366,8 @@ def estadisticas_reseñas():
         compras_por_mes=compras_por_mes,
         resolucion_json=json.dumps(resolucion_por_mes)
     )
-
-@admin.route('/administrar_proveedores')
-def index():
-    return render_template('administrador/compras.html')
-
 # ----------------------------------------------------------
-# 🟢 PANEL PRINCIPAL DEL ADMIN (Vista de proveedores)
+# 🟢 VISTA DE PROVEEDORES
 # ----------------------------------------------------------
 @admin.route('/proveedores', methods=['GET'])
 def vista_proveedores():
@@ -389,15 +384,12 @@ def obtener_proveedores():
     data = [
         {
             "id": p.ID_Proveedor,
-            "empresa": p.NombreEmpresa,
-            "contacto": p.NombreContacto,
-            "telefono": p.Telefono,
-            "pais": p.Pais,
-            "cargo": p.CargoContacto,
-            "cantidad": p.Cantidad,
-            "precio": float(p.Precio_Unitario or 0),
+            "empresa": p.Nombre_Empresa,
+            "contacto": p.Nombre_Contacto,
+            "cargo": p.Cargo_Contacto,
+            "direccion": p.Direccion,
             "ciudad": p.Ciudad,
-            "direccion": p.Direccion
+            "pais": p.Pais
         }
         for p in proveedores
     ]
@@ -409,21 +401,27 @@ def obtener_proveedores():
 # ----------------------------------------------------------
 @admin.route('/api/proveedores', methods=['POST'])
 def agregar_proveedor():
-    data = request.get_json()
-    nuevo = Proveedor(
-        NombreEmpresa=data.get('empresa'),
-        NombreContacto=data.get('contacto'),
-        Telefono=data.get('telefono'),
-        Pais=data.get('pais'),
-        CargoContacto=data.get('cargo'),
-        Cantidad=data.get('cantidad'),
-        Precio_Unitario=data.get('precio'),
-        Ciudad=data.get('ciudad'),
-        Direccion=data.get('direccion')
-    )
-    db.session.add(nuevo)
-    db.session.commit()
-    return jsonify({"mensaje": "Proveedor agregado correctamente"}), 201
+    try:
+        data = request.get_json()
+
+        nuevo = Proveedor(
+            Nombre_Empresa=data.get('empresa'),
+            Nombre_Contacto=data.get('contacto'),
+            Cargo_Contacto=data.get('cargo'),
+            Direccion=data.get('direccion'),
+            Ciudad=data.get('ciudad'),
+            Pais=data.get('pais')
+        )
+
+        db.session.add(nuevo)
+        db.session.commit()
+
+        return jsonify({"mensaje": "Proveedor agregado correctamente ✅"}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print("❌ Error al guardar el proveedor:", e)
+        return jsonify({"mensaje": "Error al guardar el proveedor ❌"}), 500
 
 
 # ----------------------------------------------------------
@@ -434,18 +432,15 @@ def editar_proveedor(id):
     proveedor = Proveedor.query.get_or_404(id)
     data = request.get_json()
 
-    proveedor.NombreEmpresa = data.get('empresa', proveedor.NombreEmpresa)
-    proveedor.NombreContacto = data.get('contacto', proveedor.NombreContacto)
-    proveedor.Telefono = data.get('telefono', proveedor.Telefono)
-    proveedor.Pais = data.get('pais', proveedor.Pais)
-    proveedor.CargoContacto = data.get('cargo', proveedor.CargoContacto)
-    proveedor.Cantidad = data.get('cantidad', proveedor.Cantidad)
-    proveedor.Precio_Unitario = data.get('precio', proveedor.Precio_Unitario)
-    proveedor.Ciudad = data.get('ciudad', proveedor.Ciudad)
+    proveedor.Nombre_Empresa = data.get('empresa', proveedor.Nombre_Empresa)
+    proveedor.Nombre_Contacto = data.get('contacto', proveedor.Nombre_Contacto)
+    proveedor.Cargo_Contacto = data.get('cargo', proveedor.Cargo_Contacto)
     proveedor.Direccion = data.get('direccion', proveedor.Direccion)
+    proveedor.Ciudad = data.get('ciudad', proveedor.Ciudad)
+    proveedor.Pais = data.get('pais', proveedor.Pais)
 
     db.session.commit()
-    return jsonify({"mensaje": "Proveedor actualizado correctamente"})
+    return jsonify({"mensaje": "Proveedor actualizado correctamente ✅"}), 200
 
 
 # ----------------------------------------------------------
@@ -456,4 +451,4 @@ def eliminar_proveedor(id):
     proveedor = Proveedor.query.get_or_404(id)
     db.session.delete(proveedor)
     db.session.commit()
-    return jsonify({"mensaje": "Proveedor eliminado"}), 200
+    return jsonify({"mensaje": "Proveedor eliminado ✅"}), 200

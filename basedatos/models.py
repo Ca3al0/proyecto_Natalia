@@ -60,22 +60,20 @@ class Direccion(db.Model):
 class Proveedor(db.Model):
     __tablename__ = 'Proveedor'
 
-    ID_Proveedor = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    NombreEmpresa = db.Column(db.String(100), nullable=False)
-    NombreContacto = db.Column(db.String(100))
-    Telefono = db.Column(db.String(20))
-    Pais = db.Column(db.String(50))
-    CargoContacto = db.Column(db.String(50))
-    Cantidad = db.Column(db.Float)
-    Precio_Unitario = db.Column(db.Numeric(10, 2))
-    Ciudad = db.Column(db.String(100))
-    Direccion = db.Column(db.String(200))
+    ID_Proveedor = db.Column(db.Integer, primary_key=True)
+    Nombre_Empresa = db.Column(db.String(100), nullable=False)
+    Nombre_Contacto = db.Column(db.String(100), nullable=False)
+    Cargo_Contacto = db.Column(db.String(100), nullable=False)
+    Direccion = db.Column(db.String(200), nullable=False)
+    Ciudad = db.Column(db.String(100), nullable=False)
+    Pais = db.Column(db.String(100), nullable=False)
 
-    # Relación con productos (opcional, si existe tabla Producto)
+    # Relación con productos (opcional)
     productos = db.relationship('Producto', back_populates='proveedor', lazy=True)
 
     def __repr__(self):
-        return f'<Proveedor {self.NombreEmpresa} - {self.Ciudad}>'
+        return f"<Proveedor {self.Nombre_Empresa} - {self.Ciudad}>"
+
 
 # ------------------ Categorias ------------------
 class Categorias(db.Model):
