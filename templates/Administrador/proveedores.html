@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestión de Proveedores</title>
+  <title>Módulo de Proveedores</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
@@ -19,7 +19,7 @@
       flex-wrap: wrap;
     }
 
-    /* PANEL IZQUIERDO (Formulario de proveedor) */
+    /* PANEL IZQUIERDO (Formulario) */
     .formulario-proveedor {
       flex: 1;
       min-width: 300px;
@@ -36,7 +36,7 @@
       text-align: center;
     }
 
-    /* PANEL DERECHO (Tabla de proveedores) */
+    /* PANEL DERECHO (Tabla) */
     .tabla-proveedores {
       flex: 2;
       min-width: 400px;
@@ -82,39 +82,38 @@
 <body>
 
 <div class="container-modulo">
-
   <!-- FORMULARIO DE PROVEEDOR -->
   <div class="formulario-proveedor">
     <h3>Registrar Proveedor</h3>
     <form id="formProveedor">
       <div class="mb-3">
         <label class="form-label">Nombre de la Empresa</label>
-        <input type="text" class="form-control" id="nombreEmpresa" name="NombreEmpresa" required>
+        <input type="text" class="form-control" id="nombreEmpresa" required>
       </div>
 
       <div class="mb-3">
         <label class="form-label">Nombre del Contacto</label>
-        <input type="text" class="form-control" id="nombreContacto" name="NombreContacto" required>
+        <input type="text" class="form-control" id="nombreContacto" required>
       </div>
 
       <div class="mb-3">
         <label class="form-label">Cargo del Contacto</label>
-        <input type="text" class="form-control" id="cargoContacto" name="CargoContacto" required>
+        <input type="text" class="form-control" id="cargoContacto" required>
       </div>
 
       <div class="mb-3">
         <label class="form-label">Dirección</label>
-        <input type="text" class="form-control" id="direccion" name="Direccion" required>
+        <input type="text" class="form-control" id="direccion" required>
       </div>
 
       <div class="mb-3">
         <label class="form-label">Ciudad</label>
-        <input type="text" class="form-control" id="ciudad" name="Ciudad" required>
+        <input type="text" class="form-control" id="ciudad" required>
       </div>
 
       <div class="mb-3">
         <label class="form-label">País</label>
-        <input type="text" class="form-control" id="pais" name="Pais" required>
+        <input type="text" class="form-control" id="pais" required>
       </div>
 
       <button type="submit" class="btn btn-success w-100">Guardar Proveedor</button>
@@ -146,19 +145,20 @@
             <td>{{ proveedor.Ciudad }}</td>
             <td>{{ proveedor.Pais }}</td>
           </tr>
+          {% else %}
+          <tr><td colspan="6">No hay proveedores registrados</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
-
 </div>
 
 <!-- BOTÓN FLOTANTE -->
 <a href="{{ url_for('admin.dashboard') }}" class="btn-flotante">Volver al Panel</a>
 
 <script>
-  // Enviar el formulario al servidor con fetch()
+  // Enviar proveedor al servidor Flask
   document.getElementById('formProveedor').addEventListener('submit', async function(e) {
     e.preventDefault();
 
