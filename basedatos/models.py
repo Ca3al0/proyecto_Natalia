@@ -4,6 +4,8 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime, CheckConstraint, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import date
+from flask_sqlalchemy import SQLAlchemy
 
 Base = declarative_base()
 
@@ -69,8 +71,8 @@ class Proveedor(db.Model):
     Ciudad = db.Column(db.String(100))
     Direccion = db.Column(db.String(200))
 
-    # Relación con productos (opcional, si existe tabla Producto)
     productos = db.relationship('Producto', back_populates='proveedor', lazy=True)
+    compras = db.relationship('Compra', back_populates='proveedor', lazy=True)
 
     def __repr__(self):
         return f'<Proveedor {self.NombreEmpresa} - {self.Ciudad}>'
@@ -213,6 +215,7 @@ class Comentarios(db.Model):
     texto = db.Column(db.Text, nullable=False)
     fecha = db.Column(db.DateTime, default=db.func.current_timestamp())
 
+# ------------------ Reseñas ------------------
 
 class Resena(db.Model):
     __tablename__ = 'Resena'  
@@ -231,3 +234,18 @@ class Resena(db.Model):
         CheckConstraint('Calificacion >= 1 AND Calificacion <= 5', name='check_calificacion_range'),
     )
 
+# ------------------ Compras ------------------
+
+class Compra(db.Model):
+    __tablename__ = 'Compra'
+
+    ID_Compra = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    Producto = db.Column(db.String(100), nullable=False)
+    Cantidad = db.Column(db.Integer, nullable=False)
+    Fecha = db.Column(db.Date, nullable=False, default=date.today)
+    ProveedorID = db.Column(db.Integer, db.ForeignKey('Proveedor.ID_Proveedor'), nullable=False)
+
+    proveedor = db.relationship('Proveedor', back_populates='compras')
+
+    def __repr__(self):
+        return f'<Compra {self.Producto} - {self.Cantidad} unidades>'

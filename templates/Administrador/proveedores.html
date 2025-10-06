@@ -3,81 +3,94 @@
 {% block title %}Gestión de Proveedores y Compras{% endblock %}
 
 {% block content %}
-<div class="container mt-5 p-4 bg-white rounded shadow">
+<div class="container mt-5 p-4 bg-light rounded-4 shadow-sm">
 
-    <h3 class="text-center text-success mb-4">Gestión de Proveedores y Compras</h3>
+    <h3 class="text-center text-success mb-5 fw-bold">Gestión de Proveedores y Compras</h3>
 
     <div id="alerta" class="alert text-center" style="display:none;"></div>
 
-    <div class="row">
+    <div class="row g-4">
         <!-- PANEL PROVEEDORES -->
-        <div class="col-md-6 mb-4">
-            <h5 class="text-success mb-3">Proveedores</h5>
-            <form id="formProveedor" class="mb-3">
-                <div class="row g-2">
-                    <div class="col-12"><input type="text" id="empresa" class="form-control" placeholder="Nombre Empresa" required></div>
-                    <div class="col-12"><input type="text" id="contacto" class="form-control" placeholder="Nombre Contacto"></div>
-                    <div class="col-12"><input type="text" id="cargo" class="form-control" placeholder="Cargo Contacto"></div>
-                    <div class="col-12"><input type="text" id="direccion" class="form-control" placeholder="Dirección"></div>
-                    <div class="col-6"><input type="text" id="ciudad" class="form-control" placeholder="Ciudad"></div>
-                    <div class="col-6"><input type="text" id="pais" class="form-control" placeholder="País"></div>
-                </div>
-                <div class="mt-2 text-center">
-                    <button type="submit" class="btn btn-success w-100">Guardar Proveedor</button>
-                </div>
-            </form>
+        <div class="col-12">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="text-success mb-4 fw-bold text-center">Proveedores</h5>
+                    <form id="formProveedor" class="mb-4">
+                        <div class="row g-2">
+                            <div class="col-md-4"><input type="text" id="empresa" class="form-control rounded-pill shadow-sm" placeholder="Nombre Empresa" required></div>
+                            <div class="col-md-4"><input type="text" id="contacto" class="form-control rounded-pill shadow-sm" placeholder="Nombre Contacto" required></div>
+                            <div class="col-md-4"><input type="text" id="cargo" class="form-control rounded-pill shadow-sm" placeholder="Cargo Contacto"></div>
+                            <div class="col-md-4"><input type="text" id="direccion" class="form-control rounded-pill shadow-sm" placeholder="Dirección"></div>
+                            <div class="col-md-4"><input type="text" id="ciudad" class="form-control rounded-pill shadow-sm" placeholder="Ciudad"></div>
+                            <div class="col-md-4"><input type="text" id="pais" class="form-control rounded-pill shadow-sm" placeholder="País"></div>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <button type="submit" class="btn btn-success w-50 fw-bold shadow-sm" style="border-radius:50px;">Guardar Proveedor</button>
+                        </div>
+                    </form>
 
-            <div class="table-responsive">
-                <table class="table table-bordered text-center align-middle">
-                    <thead class="table-success">
-                        <tr>
-                            <th>ID</th><th>Empresa</th><th>Contacto</th><th>Cargo</th>
-                            <th>Dirección</th><th>Ciudad</th><th>País</th><th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaProveedores"></tbody>
-                </table>
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center align-middle w-100" style="min-width: 900px;">
+                            <thead class="table-success text-dark fw-bold">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Empresa</th>
+                                    <th>Contacto</th>
+                                    <th>Cargo</th>
+                                    <th>Dirección</th>
+                                    <th>Ciudad</th>
+                                    <th>País</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaProveedores"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- PANEL COMPRAS -->
-        <div class="col-md-6 mb-4">
-            <h5 class="text-success mb-3">Registrar Compras</h5>
-            <form id="formCompra" class="mb-3">
-                <div class="mb-2">
-                    <input type="text" id="producto" class="form-control" placeholder="Nombre Producto" required>
-                </div>
-                <div class="mb-2">
-                    <input type="number" id="cantidad" class="form-control" placeholder="Cantidad" required min="1">
-                </div>
-                <div class="mb-2">
-                    <select id="selectProveedor" class="form-select" required></select>
-                </div>
-                <div class="mb-2">
-                    <input type="date" id="fecha" class="form-control" required>
-                </div>
-                <div class="text-center">
-                    <button type="submit" class="btn btn-success w-100">Guardar Compra</button>
-                </div>
-            </form>
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="text-success mb-4 fw-bold text-center">Registrar Compras</h5>
+                    <form id="formCompra" class="mb-4">
+                        <div class="row g-2">
+                            <div class="col-md-3"><input type="text" id="producto" class="form-control rounded-pill shadow-sm" placeholder="Producto" required></div>
+                            <div class="col-md-2"><input type="number" id="cantidad" class="form-control rounded-pill shadow-sm" placeholder="Cantidad" required min="1"></div>
+                            <div class="col-md-3">
+                                <select id="selectProveedor" class="form-select rounded-pill shadow-sm" required></select>
+                            </div>
+                            <div class="col-md-2"><input type="date" id="fecha" class="form-control rounded-pill shadow-sm" required></div>
+                            <div class="col-md-2 d-grid"><button type="submit" class="btn btn-success rounded-pill fw-bold shadow-sm">Guardar</button></div>
+                        </div>
+                    </form>
 
-            <div class="table-responsive">
-                <table class="table table-bordered text-center align-middle">
-                    <thead class="table-success">
-                        <tr>
-                            <th>Producto</th><th>Cantidad</th><th>Proveedor</th><th>Fecha</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaCompras"></tbody>
-                </table>
+                    <div class="table-responsive">
+                        <table class="table table-hover text-center align-middle w-100" style="min-width: 700px;">
+                            <thead class="table-success text-dark fw-bold">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Proveedor</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaCompras"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
+
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
+// VARIABLES
 const formProveedor = document.getElementById('formProveedor');
 const tablaProveedores = document.getElementById('tablaProveedores');
 const selectProveedor = document.getElementById('selectProveedor');
@@ -86,9 +99,7 @@ const alerta = document.getElementById('alerta');
 const formCompra = document.getElementById('formCompra');
 const tablaCompras = document.getElementById('tablaCompras');
 
-let compras = [];
-
-// 🔹 Funciones Proveedores
+// CARGAR PROVEEDORES
 async function cargarProveedores(){
     try {
         const res = await fetch('/admin/api/proveedores');
@@ -111,14 +122,16 @@ async function cargarProveedores(){
                     <button class="btn btn-danger btn-sm" onclick="eliminarProveedor(${p.id})">Eliminar</button>
                 </td>
             </tr>`;
-            selectProveedor.innerHTML += `<option value="${p.empresa}">${p.empresa}</option>`;
+            selectProveedor.innerHTML += `<option value="${p.id}">${p.empresa}</option>`;
         });
+        cargarCompras(); // recargar compras al cargar proveedores
     } catch(e){
         mostrarAlerta("Error al cargar proveedores ❌", "danger");
         console.error(e);
     }
 }
 
+// EVENTO GUARDAR PROVEEDOR
 formProveedor.addEventListener('submit', async e => {
     e.preventDefault();
     const nuevo = {
@@ -145,6 +158,7 @@ formProveedor.addEventListener('submit', async e => {
     }
 });
 
+// ELIMINAR PROVEEDOR
 async function eliminarProveedor(id){
     if(!confirm("¿Seguro que deseas eliminar este proveedor?")) return;
     try{
@@ -161,8 +175,8 @@ function editarProveedor(id){
     alert("Función de edición aún no implementada (ID: "+id+")");
 }
 
-// 🔹 Funciones Compras
-formCompra.addEventListener('submit', e => {
+// GUARDAR COMPRA
+formCompra.addEventListener('submit', async e => {
     e.preventDefault();
     const compra = {
         producto: document.getElementById('producto').value,
@@ -170,25 +184,46 @@ formCompra.addEventListener('submit', e => {
         proveedor: selectProveedor.value,
         fecha: document.getElementById('fecha').value
     };
-    compras.push(compra);
-    actualizarTablaCompras();
-    formCompra.reset();
+    try {
+        const res = await fetch('/admin/api/compras', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(compra)
+        });
+        const data = await res.json();
+        mostrarAlerta(data.mensaje, res.ok ? 'success':'danger');
+        if(res.ok){
+            cargarCompras();
+            formCompra.reset();
+        }
+    } catch(e){
+        mostrarAlerta("Error al guardar la compra ❌", 'danger');
+        console.error(e);
+    }
 });
 
-function actualizarTablaCompras(){
-    tablaCompras.innerHTML = '';
-    compras.forEach(c=>{
-        tablaCompras.innerHTML += `
-        <tr>
-            <td>${c.producto}</td>
-            <td>${c.cantidad}</td>
-            <td>${c.proveedor}</td>
-            <td>${c.fecha}</td>
-        </tr>`;
-    });
+// CARGAR COMPRAS DESDE LA BD
+async function cargarCompras(){
+    try {
+        const res = await fetch('/admin/api/compras');
+        const data = await res.json();
+        tablaCompras.innerHTML = '';
+        data.forEach(c=>{
+            tablaCompras.innerHTML += `
+            <tr>
+                <td>${c.producto}</td>
+                <td>${c.cantidad}</td>
+                <td>${c.proveedor}</td>
+                <td>${c.fecha}</td>
+            </tr>`;
+        });
+    } catch(e){
+        mostrarAlerta("Error al cargar compras ❌", 'danger');
+        console.error(e);
+    }
 }
 
-// 🔹 Alertas
+// ALERTAS
 function mostrarAlerta(msg,tipo){
     alerta.className = `alert alert-${tipo}`;
     alerta.textContent = msg;
@@ -196,7 +231,7 @@ function mostrarAlerta(msg,tipo){
     setTimeout(()=>alerta.style.display='none',3000);
 }
 
-// Inicializar
+// INICIALIZAR
 cargarProveedores();
 </script>
 {% endblock %}

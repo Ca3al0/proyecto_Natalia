@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from flask import current_app
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra
 from werkzeug.security import generate_password_hash
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
@@ -470,3 +470,44 @@ def eliminar_proveedor(id):
         db.session.rollback()
         print("❌ ERROR DELETE PROVEEDOR:", e)
         return jsonify({"mensaje": "Error al eliminar proveedor ❌"}), 500
+
+
+# ✅ Obtener todas las compras
+@admin.route('/api/compras', methods=['GET'])
+@login_required
+def obtener_compras():
+    compras = Compra.query.all()
+    data = []
+    for c in compras:
+        data.append({
+            "id": c.ID_Compra,
+            "producto": c.Producto,
+            "cantidad": c.Cantidad,
+            "proveedor": c.proveedor.NombreEmpresa,
+            "fecha": c.Fecha.strftime('%Y-%m-%d')
+        })
+    return jsonify(data), 200
+
+# ✅ Agregar nueva compra
+@admin.route('/api/compras', methods=['POST'])
+@login_required
+def agregar_compra():
+    try:
+        data = request.get_json()
+        proveedor = Proveedor.query.filter_by(NombreEmpresa=data['proveedor']).first()
+        if not proveedor:
+            return jsonify({"mensaje": "Proveedor no encontrado"}), 404
+
+        nueva = Compra(
+            Producto=data['producto'],
+            Cantidad=data['cantidad'],
+            Fecha=data['fecha'],
+            ProveedorID=proveedor.ID_Proveedor
+        )
+        db.session.add(nueva)
+        db.session.commit()
+        return jsonify({"mensaje":"Compra registrada correctamente ✅"}), 201
+    except Exception as e:
+        db.session.rollback()
+        print("Error al registrar compra:", e)
+        return jsonify({"mensaje":"Error al registrar compra ❌"}), 500
