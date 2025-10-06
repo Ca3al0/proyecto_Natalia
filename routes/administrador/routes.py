@@ -11,6 +11,8 @@ from basedatos.notificaciones import crear_notificacion
 from werkzeug.utils import secure_filename
 from sqlalchemy import func
 
+
+
 reviews = []
 
 admin = Blueprint("admin", __name__, url_prefix="/admin")
@@ -206,34 +208,19 @@ def borrar_direccion(id_direccion):
     return redirect(url_for("admin.actualizacion_datos"))
 
 
-
-def get_usuario_actual():
-    user_id = session.get('user_id')
-    if user_id:
-        return Usuario.query.get(user_id)
-    return None
-
-def get_direcciones(usuario_id):
-    return Direccion.query.filter_by(ID_Usuario=usuario_id).all()
-
 def get_pedidos_pendientes_todos():
     pedidos = Pedido.query.filter_by(Estado='pendiente').all()
-    print(f"Pedidos pendientes encontrados: {len(pedidos)}")  # Corregido aquí
+    print(f"Pedidos pendientes encontrados: {len(pedidos)}")
     
     pedidos_enriquecidos = []
 
     for pedido in pedidos:
-        print(f"[DEBUG] Pedido ID: {pedido.ID_Pedido}, Estado: {pedido.Estado}, Cliente: {pedido.NombreComprador}")
-        
-        detalle = pedido.detalles_pedido[0] if pedido.detalles_pedido else None
-        producto = detalle.producto if detalle and hasattr(detalle, 'producto') else None
-
         pedidos_enriquecidos.append({
             'ID': pedido.ID_Pedido,
-            'Cantidad': detalle.Cantidad if detalle else 0,
+            'Cantidad': 'N/A',  # temporal
             'Estado': (pedido.Estado or '').strip(),
-            'Producto': producto.Nombre if producto else 'Producto no disponible',
-            'ImagenPrincipal': producto.Imagen if producto and producto.Imagen else None,
+            'Producto': 'Sin detalle',  # temporal
+            'ImagenPrincipal': None,
             'Nombre': pedido.NombreComprador,
             'Celular': pedido.usuario.Telefono if pedido.usuario else '',
             'Direccion': pedido.Destino
@@ -241,13 +228,20 @@ def get_pedidos_pendientes_todos():
 
     return pedidos_enriquecidos
 
+
+def get_usuario_actual():
+    user_id = session.get('user_id')
+    if user_id:
+        return Usuario.query.get(user_id)
+    return None
+
 @admin.route('/admin/perfil')
 def perfil():
     usuario = get_usuario_actual()
     if not usuario:
         return redirect(url_for('auth.login'))
 
-    direcciones = get_direcciones(usuario.ID_Usuario)
+    direcciones = Direccion.query.filter_by(ID_Usuario=usuario.ID_Usuario).all()
     pedidos_pendientes_todos = get_pedidos_pendientes_todos()
 
     print(f"[DEBUG] Total pedidos pendientes para admin: {len(pedidos_pendientes_todos)}")
@@ -260,6 +254,7 @@ def perfil():
         direcciones=direcciones,
         pedidos=pedidos_pendientes_todos
     )
+
 
 
 
