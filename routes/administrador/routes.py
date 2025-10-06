@@ -597,38 +597,33 @@ def agregar_compra():
         return jsonify({"mensaje": "Error al registrar compra ❌"}), 500
     
 
-@admin.route('/admin/pedidos/<int:id_pedido>/asignar', methods=['POST'])
-@login_required
-def asignar_transportista(id_pedido):
-    transportista_id = request.form.get('transportista_id')
-    hora_llegada_str = request.form.get('hora_llegada')
+@admin.route('/calendario')
+def index():
+    return render_template('administrador/calendario.html')
 
-    if not transportista_id or not hora_llegada_str:
-        flash('Debe seleccionar un transportista y una hora de llegada.', 'danger')
-        return redirect(url_for('admin.ver_pedidos'))
+@admin.route('/events')
+def events():
+    eventos = Calendario.query.all()
+    eventos_json = []
 
-    try:
-        hora_llegada_dt = datetime.strptime(hora_llegada_str, '%Y-%m-%dT%H:%M')
-    except ValueError:
-        flash('Formato de hora de llegada inválido.', 'danger')
-        return redirect(url_for('admin.ver_pedidos'))
+    for evento in eventos:
+        start_datetime = datetime.combine(evento.Fecha, evento.Hora)
 
-    pedido = Pedido.query.get_or_404(id_pedido)
-    transportista = Usuario.query.filter_by(ID_Usuario=int(transportista_id), Rol='transportista').first()
-    if not transportista:
-        flash('Transportista no válido.', 'danger')
-        return redirect(url_for('admin.ver_pedidos'))
+        if evento.Tipo.lower() == 'instalacion':
+            titulo = f"Instalación - {evento.Ubicacion}"
+            color = '#4caf50'  # verde fuerte para instalaciones
+        elif evento.Tipo.lower() == 'pedido':
+            titulo = f"Pedido - {evento.Ubicacion}"
+            color = '#2196f3'  # azul para pedidos
+        else:
+            titulo = f"{evento.Tipo} - {evento.Ubicacion}"
+            color = '#9e9e9e'  # gris para otros tipos
 
-    calendario_entry = Calendario(
-        Fecha=hora_llegada_dt.date(),
-        Hora=hora_llegada_dt.time(),
-        Ubicacion=pedido.Direccion,
-        Tipo='AsignacionTransportista',
-        ID_Usuario=transportista.ID_Usuario,
-        ID_Pedido=pedido.ID_Pedido
-    )
-    db.session.add(calendario_entry)
-    db.session.commit()
+        eventos_json.append({
+            'id': evento.ID_Calendario,
+            'title': titulo,
+            'start': start_datetime.isoformat(),
+            'color': color
+        })
 
-    flash(f'Transportista {transportista.Nombre} asignado correctamente al pedido #{pedido.ID_Pedido}.', 'success')
-    return redirect(url_for('admin.ver_pedidos'))
+    return jsonify(eventos_json)
