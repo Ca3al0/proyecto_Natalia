@@ -207,6 +207,7 @@ def borrar_direccion(id_direccion):
 
     return redirect(url_for("admin.actualizacion_datos"))
 
+
 def get_pedidos_pendientes_usuario(usuario_id):
     pedidos = Pedido.query.filter_by(Estado='pendiente', ID_Usuario=usuario_id).all()
     
@@ -233,9 +234,8 @@ def get_pedidos_pendientes_usuario(usuario_id):
     return pedidos_enriquecidos
 
 
-def get_pedidos_pendientes_todos():
-    from sqlalchemy import func
-    pedidos = Pedido.query.filter(func.lower(func.trim(Pedido.Estado)) == 'pendiente').all()
+def get_todos_los_pedidos():
+    pedidos = Pedido.query.all()
     
     pedidos_enriquecidos = []
     for pedido in pedidos:
@@ -250,14 +250,15 @@ def get_pedidos_pendientes_todos():
 
         pedidos_enriquecidos.append({
             'ID': pedido.ID_Pedido,
-            'Estado': (pedido.Estado or '').strip(),
+            'Estado': pedido.Estado or 'sin estado',
             'Productos': productos_info,
-            'Nombre': pedido.NombreComprador,
-            'Celular': pedido.usuario.Telefono if pedido.usuario else '',
+            'NombreComprador': pedido.NombreComprador,
+            'TelefonoUsuario': pedido.usuario.Telefono if pedido.usuario else 'No disponible',
             'Direccion': pedido.Destino
         })
 
     return pedidos_enriquecidos
+
 
 
 def get_usuario_actual():
@@ -267,30 +268,19 @@ def get_usuario_actual():
     return None
 
 
-@admin.route('/admin/perfil')
-def perfil():
+@admin.route('/admin/ver_pedidos')
+def ver_pedidos():
     usuario = get_usuario_actual()
     if not usuario:
         return redirect(url_for('auth.login'))
 
-    direcciones = Direccion.query.filter_by(ID_Usuario=usuario.ID_Usuario).all()
-    pedidos_pendientes_todos = get_pedidos_pendientes_usuario(usuario.ID_Usuario)
-
-    print(f"[DEBUG] Total pedidos pendientes para usuario {usuario.ID_Usuario}: {len(pedidos_pendientes_todos)}")
-    for pedido in pedidos_pendientes_todos:
-        print(f"Pedido: {pedido}")
+    pedidos = get_todos_los_pedidos()
 
     return render_template(
-        "administrador/admin_actualizacion_datos.html",
+        "administrador/ver_pedidos.html",
         usuario=usuario,
-        direcciones=direcciones,
-        pedidos=pedidos_pendientes_todos
+        pedidos=pedidos
     )
-
-
-
-
-
 
 
 

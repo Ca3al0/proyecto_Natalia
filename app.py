@@ -2,6 +2,7 @@ import os
 from flask import Flask, render_template, session, redirect, request, flash, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from sqlalchemy.orm import joinedload
 
 # ------------------ MODELOS ------------------ #
 from basedatos.models import db, Usuario, Producto,Pedido
@@ -88,11 +89,11 @@ def favoritos():
 
 @app.route('/admin/pedidos')
 def pedidos_admin():
-    pedidos = Pedido.query.all()  # O la consulta que uses para obtener todos los pedidos
-    print(pedidos)  # Para debug: asegúrate que trae datos
+    pedidos = Pedido.query.options(joinedload(Pedido.Productos)).all()
+    print(f"Pedidos: {pedidos}")
+    for p in pedidos:
+        print(f"Pedido {p.ID} con productos: {p.Productos}")
     return render_template('administrador/admin_actualizacion_datos.html', pedidos=pedidos)
-
-
 # ------------------ TEMPLATE FILTER ------------------ #
 @app.template_filter("dict_get")
 def dict_get(d, key):

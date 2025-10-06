@@ -151,16 +151,6 @@
                       <p><strong>Teléfono:</strong> {{ pedido.Celular }}</p>
                       <p><strong>Dirección:</strong> {{ pedido.Direccion }}</p>
 
-                      <ul class="mb-2">
-                        {% if pedido.Productos %}
-                          {% for producto in pedido.Productos %}
-                            <li><strong>{{ producto.Nombre }}</strong> — Cantidad: {{ producto.Cantidad }}</li>
-                          {% endfor %}
-                        {% else %}
-                          <li class="text-muted">No hay productos para mostrar.</li>
-                        {% endif %}
-                      </ul>
-
                       <p><strong>ID Pedido:</strong> {{ pedido.ID }}</p>
 
                       {% set img = pedido.Productos[0].Imagen if pedido.Productos and pedido.Productos[0].Imagen else None %}
