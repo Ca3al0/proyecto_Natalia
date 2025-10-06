@@ -14,6 +14,7 @@ from basedatos.decoradores import mail
 from routes.auth import auth
 from routes.cliente import cliente
 from routes.administrador import admin
+from routes.transportista import transportista
 
 # ------------------ APP ------------------ #
 app = Flask(__name__)
