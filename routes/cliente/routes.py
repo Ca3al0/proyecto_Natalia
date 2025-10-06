@@ -236,63 +236,53 @@ def comparar():
     productos = Producto.query.all()  # o la consulta que tengas
     return render_template('cliente/comparar.html', productos=productos)
 
-@cliente.route('/api/checkout', methods=['POST'])
+@cliente.route('/api/comprar', methods=['POST'])
 @login_required
-def checkout():
+def comprar_producto():
+    data = request.get_json()
     try:
-        data = request.get_json()
-        productos_ids = data.get('productos', [])     # lista de IDs de productos
-        cantidades = data.get('cantidades', [])       # lista de cantidades
-        direccion = data.get('direccion')            # dirección de entrega
-        metodo_pago = data.get('metodo_pago', 'tarjeta')  # método de pago
-
-        if not productos_ids or not direccion:
-            return jsonify({"mensaje": "Faltan datos para procesar la compra"}), 400
+        producto = Producto.query.get(data['ID_Producto'])
+        direccion = Direccion.query.get(data['ID_Direccion'])
+        if not producto or not direccion:
+            return jsonify({"mensaje":"Producto o dirección no encontrados"}), 404
 
         # Crear pedido
         pedido = Pedido(
-            NombreComprador=current_user.Nombre,
+            NombreComprador=direccion.Destinatario,
             Estado='pendiente',
-            FechaPedido=date.today(),
-            Destino=direccion,
+            FechaPedido=datetime.date.today(),
+            Destino=f"{direccion.Direccion}, {direccion.Barrio}, {direccion.Ciudad}, {direccion.Departamento}, {direccion.Pais}",
             ID_Usuario=current_user.ID_Usuario
         )
         db.session.add(pedido)
-        db.session.flush()  # Para obtener ID_Pedido antes del commit
+        db.session.flush()  # para obtener ID_Pedido
 
-        total = 0
-        # Agregar detalle del pedido
-        for idx, pid in enumerate(productos_ids):
-            producto = Producto.query.get(pid)
-            if not producto:
-                continue
-            cantidad = cantidades[idx] if cantidades and len(cantidades) > idx else 1
-            total += producto.PrecioUnidad * cantidad
-            detalle = Detalle_Pedido(
-                ID_Pedido=pedido.ID_Pedido,
-                ID_Producto=producto.ID_Producto,
-                Cantidad=cantidad,
-                PrecioUnidad=producto.PrecioUnidad
-            )
-            db.session.add(detalle)
+        # Detalle pedido
+        detalle = Detalle_Pedido(
+            ID_Pedido=pedido.ID_Pedido,
+            ID_Producto=producto.ID_Producto,
+            Cantidad=1,
+            PrecioUnidad=producto.PrecioUnidad
+        )
+        db.session.add(detalle)
 
-        # Registrar pago simulado
+        # Pago
         pago = Pagos(
-            MetodoPago=metodo_pago,
-            FechaPago=date.today(),
-            Monto=total,
+            MetodoPago=data.get('MetodoPago','Efectivo'),
+            FechaPago=datetime.date.today(),
+            Monto=producto.PrecioUnidad,
             ID_Pedido=pedido.ID_Pedido
         )
         db.session.add(pago)
 
         db.session.commit()
-        return jsonify({"mensaje": "Compra realizada correctamente ✅", "ID_Pedido": pedido.ID_Pedido}), 201
+        return jsonify({"mensaje":"Compra realizada con éxito ✅"}), 201
 
     except Exception as e:
         db.session.rollback()
-        print("Error en checkout:", e)
-        return jsonify({"mensaje": "Error al procesar la compra ❌"}), 500
-    
+        print("Error al registrar pedido:", e)
+        return jsonify({"mensaje":"Error al realizar la compra ❌"}), 500
+
 @cliente.route('/api/direcciones', methods=['GET'])
 @login_required
 def get_direcciones():
