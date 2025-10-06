@@ -1,215 +1,190 @@
-{% extends "common/base.html" %}
-{% block title %}Módulo de Compras y Proveedores{% endblock %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Proveedores</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-{% block content %}
-<div class="container-modulo mt-4">
-  <!-- FORMULARIO DE COMPRA -->
-  <div class="formulario-compra">
-    <h3>Registrar Compra</h3>
-    <form id="formCompra">
+  <style>
+    body {
+      background-color: #f4f6f9;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .container-modulo {
+      display: flex;
+      gap: 20px;
+      padding: 30px;
+      flex-wrap: wrap;
+    }
+
+    /* PANEL IZQUIERDO (Formulario de proveedor) */
+    .formulario-proveedor {
+      flex: 1;
+      min-width: 300px;
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .formulario-proveedor h3 {
+      color: #198754;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* PANEL DERECHO (Tabla de proveedores) */
+    .tabla-proveedores {
+      flex: 2;
+      min-width: 400px;
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .tabla-proveedores h3 {
+      color: #198754;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    table th {
+      background-color: #198754;
+      color: white;
+    }
+
+    /* Botón flotante */
+    .btn-flotante {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background-color: #198754;
+      color: white;
+      border: none;
+      padding: 14px 22px;
+      border-radius: 50px;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      transition: all 0.3s ease;
+    }
+
+    .btn-flotante:hover {
+      background-color: #145c38;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+
+<div class="container-modulo">
+
+  <!-- FORMULARIO DE PROVEEDOR -->
+  <div class="formulario-proveedor">
+    <h3>Registrar Proveedor</h3>
+    <form id="formProveedor">
       <div class="mb-3">
-        <label class="form-label">Producto</label>
-        <input type="text" class="form-control" id="producto" required>
+        <label class="form-label">Nombre de la Empresa</label>
+        <input type="text" class="form-control" id="nombreEmpresa" name="NombreEmpresa" required>
       </div>
+
       <div class="mb-3">
-        <label class="form-label">Cantidad</label>
-        <input type="number" class="form-control" id="cantidad" required min="1">
+        <label class="form-label">Nombre del Contacto</label>
+        <input type="text" class="form-control" id="nombreContacto" name="NombreContacto" required>
       </div>
+
       <div class="mb-3">
-        <label class="form-label">Proveedor</label>
-        <select class="form-select" id="proveedor" required></select>
+        <label class="form-label">Cargo del Contacto</label>
+        <input type="text" class="form-control" id="cargoContacto" name="CargoContacto" required>
       </div>
+
       <div class="mb-3">
-        <label class="form-label">Fecha</label>
-        <input type="date" class="form-control" id="fecha" required>
+        <label class="form-label">Dirección</label>
+        <input type="text" class="form-control" id="direccion" name="Direccion" required>
       </div>
-      <button type="submit" class="btn btn-success w-100">Guardar Compra</button>
+
+      <div class="mb-3">
+        <label class="form-label">Ciudad</label>
+        <input type="text" class="form-control" id="ciudad" name="Ciudad" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">País</label>
+        <input type="text" class="form-control" id="pais" name="Pais" required>
+      </div>
+
+      <button type="submit" class="btn btn-success w-100">Guardar Proveedor</button>
     </form>
   </div>
 
-  <!-- TABLA DE COMPRAS -->
-  <div class="tabla-compras">
-    <h3>Historial de Compras</h3>
+  <!-- TABLA DE PROVEEDORES -->
+  <div class="tabla-proveedores">
+    <h3>Lista de Proveedores</h3>
     <div class="table-responsive">
       <table class="table table-bordered text-center align-middle">
         <thead>
           <tr>
-            <th>Producto</th>
-            <th>Cantidad</th>
-            <th>Proveedor</th>
-            <th>Fecha</th>
+            <th>Empresa</th>
+            <th>Contacto</th>
+            <th>Cargo</th>
+            <th>Dirección</th>
+            <th>Ciudad</th>
+            <th>País</th>
           </tr>
         </thead>
-        <tbody id="tablaCompras"></tbody>
+        <tbody id="tablaProveedores">
+          {% for proveedor in proveedores %}
+          <tr>
+            <td>{{ proveedor.NombreEmpresa }}</td>
+            <td>{{ proveedor.NombreContacto }}</td>
+            <td>{{ proveedor.CargoContacto }}</td>
+            <td>{{ proveedor.Direccion }}</td>
+            <td>{{ proveedor.Ciudad }}</td>
+            <td>{{ proveedor.Pais }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
       </table>
     </div>
   </div>
 
-  <!-- PANEL DE PROVEEDORES -->
-  <div class="panel-proveedores">
-    <h3>Proveedores</h3>
-    <form id="formProveedor" class="mb-3">
-      <input type="text" class="form-control mb-2" name="empresa" placeholder="Nombre de la empresa" required>
-      <input type="text" class="form-control mb-2" name="contacto" placeholder="Nombre del contacto" required>
-      <input type="text" class="form-control mb-2" name="telefono" placeholder="Teléfono" required>
-      <input type="text" class="form-control mb-2" name="pais" placeholder="País" required>
-      <input type="text" class="form-control mb-2" name="cargo" placeholder="Cargo del contacto">
-      <input type="number" step="0.01" class="form-control mb-2" name="cantidad" placeholder="Cantidad">
-      <input type="number" step="0.01" class="form-control mb-2" name="precio" placeholder="Precio unitario">
-      <input type="text" class="form-control mb-2" name="ciudad" placeholder="Ciudad" required>
-      <input type="text" class="form-control mb-2" name="direccion" placeholder="Dirección">
-      <button type="submit" class="btn btn-outline-success w-100">Agregar Proveedor</button>
-    </form>
-    <div id="listaProveedores"></div>
-  </div>
 </div>
 
 <!-- BOTÓN FLOTANTE -->
-<button class="btn-flotante" onclick="alert('Simulación de compra realizada ✅')">
-  Comprar Productos
-</button>
-{% endblock %}
+<a href="{{ url_for('admin.dashboard') }}" class="btn-flotante">Volver al Panel</a>
 
-{% block extra_css %}
-<style>
-  body {
-    background-color: #f4f6f9;
-    font-family: 'Poppins', sans-serif;
-  }
-  .container-modulo {
-    display: flex;
-    gap: 20px;
-    padding: 30px;
-    flex-wrap: wrap;
-  }
-  .formulario-compra, .tabla-compras, .panel-proveedores {
-    background: #fff;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-  .formulario-compra h3, .tabla-compras h3, .panel-proveedores h3 {
-    color: #198754;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  .formulario-compra { flex: 1; min-width: 300px; }
-  .tabla-compras { flex: 2; min-width: 400px; }
-  .panel-proveedores { flex: 1; min-width: 250px; }
-  table th { background-color: #198754; color: white; }
-  .proveedor-item {
-    background: #e9f7ef;
-    border-left: 4px solid #198754;
-    padding: 8px 10px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-  }
-  .btn-flotante {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background-color: #198754;
-    color: white;
-    border: none;
-    padding: 14px 22px;
-    border-radius: 50px;
-    font-size: 16px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    transition: all 0.3s ease;
-  }
-  .btn-flotante:hover {
-    background-color: #145c38;
-    transform: scale(1.05);
-  }
-</style>
-{% endblock %}
-
-{% block scripts %}
 <script>
-const proveedorSelect = document.getElementById('proveedor');
-const listaProveedores = document.getElementById('listaProveedores');
-const formProveedor = document.getElementById('formProveedor');
-const formCompra = document.getElementById('formCompra');
-const tablaCompras = document.getElementById('tablaCompras');
+  // Enviar el formulario al servidor con fetch()
+  document.getElementById('formProveedor').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-let compras = [];
+    const datos = {
+      NombreEmpresa: document.getElementById('nombreEmpresa').value,
+      NombreContacto: document.getElementById('nombreContacto').value,
+      CargoContacto: document.getElementById('cargoContacto').value,
+      Direccion: document.getElementById('direccion').value,
+      Ciudad: document.getElementById('ciudad').value,
+      Pais: document.getElementById('pais').value
+    };
 
-// 🟢 Cargar proveedores desde la base de datos
-async function cargarProveedores() {
-  const res = await fetch('/admin/api/proveedores');
-  const data = await res.json();
-  proveedorSelect.innerHTML = '';
-  listaProveedores.innerHTML = '';
+    const respuesta = await fetch('/admin/proveedores', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(datos)
+    });
 
-  data.forEach(p => {
-    proveedorSelect.innerHTML += `<option value="${p.id}">${p.empresa}</option>`;
-    listaProveedores.innerHTML += `
-      <div class="proveedor-item d-flex justify-content-between align-items-center">
-        <span>${p.empresa}</span>
-        <button class="btn btn-sm btn-danger" onclick="eliminarProveedor(${p.id})">
-          <i class="bi bi-trash"></i>
-        </button>
-      </div>`;
+    if (respuesta.ok) {
+      alert('Proveedor guardado correctamente ✅');
+      location.reload();
+    } else {
+      alert('Error al guardar el proveedor ❌');
+    }
   });
-}
-
-// 🟢 Agregar proveedor (guarda en base de datos)
-formProveedor.addEventListener('submit', async e => {
-  e.preventDefault();
-  const data = Object.fromEntries(new FormData(formProveedor).entries());
-
-  const res = await fetch('/admin/api/proveedores', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(data)
-  });
-
-  if (res.ok) {
-    alert('✅ Proveedor agregado correctamente');
-    formProveedor.reset();
-    cargarProveedores();
-  } else {
-    alert('❌ Error al agregar proveedor');
-  }
-});
-
-// 🔴 Eliminar proveedor
-async function eliminarProveedor(id) {
-  if (!confirm('¿Eliminar este proveedor?')) return;
-  const res = await fetch(`/admin/api/proveedores/${id}`, { method: 'DELETE' });
-  if (res.ok) {
-    alert('🗑️ Proveedor eliminado');
-    cargarProveedores();
-  }
-}
-
-// 🟡 Guardar compra (solo en tabla del front)
-formCompra.addEventListener('submit', e => {
-  e.preventDefault();
-  const proveedorTexto = proveedorSelect.options[proveedorSelect.selectedIndex].text;
-  const compra = {
-    producto: document.getElementById('producto').value,
-    cantidad: document.getElementById('cantidad').value,
-    proveedor: proveedorTexto,
-    fecha: document.getElementById('fecha').value
-  };
-  compras.push(compra);
-  actualizarTabla();
-  formCompra.reset();
-});
-
-function actualizarTabla() {
-  tablaCompras.innerHTML = compras.map(c => `
-    <tr>
-      <td>${c.producto}</td>
-      <td>${c.cantidad}</td>
-      <td>${c.proveedor}</td>
-      <td>${c.fecha}</td>
-    </tr>`).join('');
-}
-
-// Inicializar
-cargarProveedores();
 </script>
-{% endblock %}
+
+</body>
+</html>
