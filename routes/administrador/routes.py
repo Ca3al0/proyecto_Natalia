@@ -370,7 +370,10 @@ def estadisticas_reseñas():
 # 🟢 VISTA DE PROVEEDORES
 # ----------------------------------------------------------
 @admin.route('/proveedores', methods=['GET'])
+@login_required
+@role_required("admin")
 def vista_proveedores():
+    """Muestra la página de gestión de proveedores"""
     proveedores = Proveedor.query.all()
     return render_template('administrador/proveedores.html', proveedores=proveedores)
 
@@ -379,7 +382,10 @@ def vista_proveedores():
 # 🟢 API: Obtener todos los proveedores (JSON)
 # ----------------------------------------------------------
 @admin.route('/api/proveedores', methods=['GET'])
+@login_required
+@role_required("admin")
 def obtener_proveedores():
+    """Devuelve todos los proveedores en formato JSON"""
     proveedores = Proveedor.query.all()
     data = [
         {
@@ -393,17 +399,21 @@ def obtener_proveedores():
         }
         for p in proveedores
     ]
-    return jsonify(data)
+    return jsonify(data), 200
 
 
 # ----------------------------------------------------------
 # 🟢 API: Agregar un nuevo proveedor
 # ----------------------------------------------------------
 @admin.route('/api/proveedores', methods=['POST'])
+@login_required
+@role_required("admin")
 def agregar_proveedor():
+    """Agrega un nuevo proveedor desde el panel"""
     try:
         data = request.get_json()
-        print("📩 Datos recibidos:", data)  # 👈 importante
+        if not data:
+            return jsonify({"mensaje": "No se recibió JSON válido"}), 400
 
         nuevo = Proveedor(
             Nombre_Empresa=data.get('empresa'),
@@ -416,7 +426,6 @@ def agregar_proveedor():
 
         db.session.add(nuevo)
         db.session.commit()
-
         return jsonify({"mensaje": "Proveedor agregado correctamente ✅"}), 201
 
     except Exception as e:
@@ -425,34 +434,49 @@ def agregar_proveedor():
         return jsonify({"mensaje": "Error al guardar el proveedor ❌"}), 500
 
 
-
 # ----------------------------------------------------------
 # 🟡 API: Editar proveedor existente
 # ----------------------------------------------------------
 @admin.route('/api/proveedores/<int:id>', methods=['PUT'])
+@login_required
+@role_required("admin")
 def editar_proveedor(id):
-    proveedor = Proveedor.query.get_or_404(id)
-    data = request.get_json()
+    """Edita los datos de un proveedor existente"""
+    try:
+        proveedor = Proveedor.query.get_or_404(id)
+        data = request.get_json()
 
-    proveedor.Nombre_Empresa = data.get('empresa', proveedor.Nombre_Empresa)
-    proveedor.Nombre_Contacto = data.get('contacto', proveedor.Nombre_Contacto)
-    proveedor.Cargo_Contacto = data.get('cargo', proveedor.Cargo_Contacto)
-    proveedor.Direccion = data.get('direccion', proveedor.Direccion)
-    proveedor.Ciudad = data.get('ciudad', proveedor.Ciudad)
-    proveedor.Pais = data.get('pais', proveedor.Pais)
+        proveedor.Nombre_Empresa = data.get('empresa', proveedor.Nombre_Empresa)
+        proveedor.Nombre_Contacto = data.get('contacto', proveedor.Nombre_Contacto)
+        proveedor.Cargo_Contacto = data.get('cargo', proveedor.Cargo_Contacto)
+        proveedor.Direccion = data.get('direccion', proveedor.Direccion)
+        proveedor.Ciudad = data.get('ciudad', proveedor.Ciudad)
+        proveedor.Pais = data.get('pais', proveedor.Pais)
 
-    db.session.commit()
-    return jsonify({"mensaje": "Proveedor actualizado correctamente ✅"}), 200
+        db.session.commit()
+        return jsonify({"mensaje": "Proveedor actualizado correctamente ✅"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print("❌ Error al editar proveedor:", e)
+        return jsonify({"mensaje": "Error al editar el proveedor ❌"}), 500
 
 
 # ----------------------------------------------------------
-# 🔴 API: ELIMINAR PROVEEDOR
+# 🔴 API: Eliminar proveedor
 # ----------------------------------------------------------
 @admin.route('/api/proveedores/<int:id>', methods=['DELETE'])
 @login_required
 @role_required("admin")
 def eliminar_proveedor(id):
-    proveedor = Proveedor.query.get_or_404(id)
-    db.session.delete(proveedor)
-    db.session.commit()
-    return jsonify({"mensaje": "Proveedor eliminado ✅"}), 200
+    """Elimina un proveedor existente"""
+    try:
+        proveedor = Proveedor.query.get_or_404(id)
+        db.session.delete(proveedor)
+        db.session.commit()
+        return jsonify({"mensaje": "Proveedor eliminado ✅"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print("❌ Error al eliminar proveedor:", e)
+        return jsonify({"mensaje": "Error al eliminar proveedor ❌"}), 500
