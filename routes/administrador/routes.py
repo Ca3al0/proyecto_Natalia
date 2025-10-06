@@ -223,14 +223,15 @@ def get_pedidos_usuario(usuario_id):
     pedidos_enriquecidos = []
 
     for pedido in pedidos:
-        producto = Producto.query.get(pedido.ID_Producto)  # Ajusta el campo si tu modelo es diferente
+        producto = Producto.query.get(pedido.ID_Producto)
 
         pedidos_enriquecidos.append({
             'ID': pedido.ID,
             'Cantidad': pedido.Cantidad,
-            'Estado': pedido.Estado,
+            'Estado': pedido.Estado.strip() if pedido.Estado else '',
+            'EstadoLower': pedido.Estado.strip().lower() if pedido.Estado else '',
             'Producto': producto.Nombre if producto else 'Producto no disponible',
-            'ImagenPrincipal': producto.Imagen if producto and producto.Imagen else None,
+            'Imagen': producto.Imagen if producto and producto.Imagen else None,
             'Nombre': pedido.Nombre if hasattr(pedido, 'Nombre') else '',
             'Celular': pedido.Celular if hasattr(pedido, 'Celular') else '',
             'Direccion': pedido.Direccion if hasattr(pedido, 'Direccion') else '',
