@@ -651,5 +651,17 @@ def asignar_transportista(id_pedido):
 
 @admin.route('/reportes')
 def reporte_entregas():
-    pedidos_entregados = Pedido.query.filter_by(Estado='entregado').order_by(Pedido.FechaEntrega.desc()).all()
-    return render_template('administrador/reportes_entregas.html', pedidos_entregados=pedidos_entregados)
+    pedidos_entregados = Pedido.query.filter_by(Estado='entregado').all()
+
+    for pedido in pedidos_entregados:
+        if pedido.ID_Empleado:
+            transportista = Usuario.query.filter_by(ID_Usuario=pedido.ID_Empleado, Rol='transportista').first()
+            if transportista:
+                pedido.TransportistaNombre = f"{transportista.ID_Usuario} - {transportista.Nombre}"
+            else:
+                pedido.TransportistaNombre = 'No asignado'
+        else:
+            pedido.TransportistaNombre = 'No asignado'
+
+    return render_template('administrador/reportes_entregas.html',
+                           pedidos_entregados=pedidos_entregados)
