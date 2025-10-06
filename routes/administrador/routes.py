@@ -206,6 +206,20 @@ def borrar_direccion(id_direccion):
     return redirect(url_for("admin.actualizacion_datos"))
 
 
+@admin.route('/admin/perfil')  # ✅ CORRECTO, si estás usando Blueprint 'admin'
+def perfil():
+    usuario = get_usuario_actual()              # ✅ obtiene el usuario autenticado
+    direcciones = get_direcciones(usuario.id)   # ✅ obtiene direcciones asociadas
+    pedidos = get_pedidos_usuario(usuario.id)   # ✅ obtiene pedidos del usuario
+
+    return render_template(
+        "admin/perfil.html",                    # ✅ plantilla que se va a renderizar
+        usuario=usuario,
+        direcciones=direcciones,
+        pedidos=pedidos
+    )
+
+
 
 # ---------- AGREGAR PRODUCTO ----------
 
