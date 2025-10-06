@@ -90,7 +90,7 @@ def favoritos():
 def pedidos_admin():
     pedidos = Pedido.query.all()  # O la consulta que uses para obtener todos los pedidos
     print(pedidos)  # Para debug: asegúrate que trae datos
-    return render_template('admin/perfil.html', pedidos=pedidos)
+    return render_template('administrador/admin_actualizacion_datos.html', pedidos=pedidos)
 
 
 # ------------------ TEMPLATE FILTER ------------------ #
