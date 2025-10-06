@@ -366,3 +366,94 @@ def estadisticas_reseñas():
         compras_por_mes=compras_por_mes,
         resolucion_json=json.dumps(resolucion_por_mes)
     )
+
+@admin.route('/administrar_proveedores')
+def index():
+    return render_template('administrador/compras.html')
+
+# ----------------------------------------------------------
+# 🟢 PANEL PRINCIPAL DEL ADMIN (Vista de proveedores)
+# ----------------------------------------------------------
+@admin.route('/proveedores', methods=['GET'])
+def vista_proveedores():
+    proveedores = Proveedor.query.all()
+    return render_template('administrador/proveedores.html', proveedores=proveedores)
+
+
+# ----------------------------------------------------------
+# 🟢 API: Obtener todos los proveedores (JSON)
+# ----------------------------------------------------------
+@admin.route('/api/proveedores', methods=['GET'])
+def obtener_proveedores():
+    proveedores = Proveedor.query.all()
+    data = [
+        {
+            "id": p.ID_Proveedor,
+            "empresa": p.NombreEmpresa,
+            "contacto": p.NombreContacto,
+            "telefono": p.Telefono,
+            "pais": p.Pais,
+            "cargo": p.CargoContacto,
+            "cantidad": p.Cantidad,
+            "precio": float(p.Precio_Unitario or 0),
+            "ciudad": p.Ciudad,
+            "direccion": p.Direccion
+        }
+        for p in proveedores
+    ]
+    return jsonify(data)
+
+
+# ----------------------------------------------------------
+# 🟢 API: Agregar un nuevo proveedor
+# ----------------------------------------------------------
+@admin.route('/api/proveedores', methods=['POST'])
+def agregar_proveedor():
+    data = request.get_json()
+    nuevo = Proveedor(
+        NombreEmpresa=data.get('empresa'),
+        NombreContacto=data.get('contacto'),
+        Telefono=data.get('telefono'),
+        Pais=data.get('pais'),
+        CargoContacto=data.get('cargo'),
+        Cantidad=data.get('cantidad'),
+        Precio_Unitario=data.get('precio'),
+        Ciudad=data.get('ciudad'),
+        Direccion=data.get('direccion')
+    )
+    db.session.add(nuevo)
+    db.session.commit()
+    return jsonify({"mensaje": "Proveedor agregado correctamente"}), 201
+
+
+# ----------------------------------------------------------
+# 🟡 API: Editar proveedor existente
+# ----------------------------------------------------------
+@admin.route('/api/proveedores/<int:id>', methods=['PUT'])
+def editar_proveedor(id):
+    proveedor = Proveedor.query.get_or_404(id)
+    data = request.get_json()
+
+    proveedor.NombreEmpresa = data.get('empresa', proveedor.NombreEmpresa)
+    proveedor.NombreContacto = data.get('contacto', proveedor.NombreContacto)
+    proveedor.Telefono = data.get('telefono', proveedor.Telefono)
+    proveedor.Pais = data.get('pais', proveedor.Pais)
+    proveedor.CargoContacto = data.get('cargo', proveedor.CargoContacto)
+    proveedor.Cantidad = data.get('cantidad', proveedor.Cantidad)
+    proveedor.Precio_Unitario = data.get('precio', proveedor.Precio_Unitario)
+    proveedor.Ciudad = data.get('ciudad', proveedor.Ciudad)
+    proveedor.Direccion = data.get('direccion', proveedor.Direccion)
+
+    db.session.commit()
+    return jsonify({"mensaje": "Proveedor actualizado correctamente"})
+
+
+# ----------------------------------------------------------
+# 🔴 API: Eliminar proveedor
+# ----------------------------------------------------------
+@admin.route('/api/proveedores/<int:id>', methods=['DELETE'])
+def eliminar_proveedor(id):
+    proveedor = Proveedor.query.get_or_404(id)
+    db.session.delete(proveedor)
+    db.session.commit()
+    return jsonify({"mensaje": "Proveedor eliminado"}), 200
