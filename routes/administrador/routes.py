@@ -366,26 +366,30 @@ def estadisticas_reseñas():
         compras_por_mes=compras_por_mes,
         resolucion_json=json.dumps(resolucion_por_mes)
     )
+
+from flask import Blueprint, render_template, request, jsonify
+from flask_login import login_required
+from basedatos.models import db, Proveedor
+from basedatos.decoradores import role_required
+
+admin = Blueprint("admin", __name__, url_prefix="/admin")
+
 # ----------------------------------------------------------
-# 🟢 VISTA DE PROVEEDORES
+# 🟢 Página de proveedores
 # ----------------------------------------------------------
-@admin.route('/proveedores', methods=['GET'])
+@admin.route('/proveedores')
 @login_required
 @role_required("admin")
 def vista_proveedores():
-    """Muestra la página de gestión de proveedores"""
-    proveedores = Proveedor.query.all()
-    return render_template('administrador/proveedores.html', proveedores=proveedores)
-
+    return render_template('administrador/proveedores.html')
 
 # ----------------------------------------------------------
-# 🟢 API: Obtener todos los proveedores (JSON)
+# 🟢 API: Obtener todos los proveedores
 # ----------------------------------------------------------
 @admin.route('/api/proveedores', methods=['GET'])
 @login_required
 @role_required("admin")
 def obtener_proveedores():
-    """Devuelve todos los proveedores en formato JSON"""
     proveedores = Proveedor.query.all()
     data = [
         {
@@ -401,15 +405,13 @@ def obtener_proveedores():
     ]
     return jsonify(data), 200
 
-
 # ----------------------------------------------------------
-# 🟢 API: Agregar un nuevo proveedor
+# 🟢 API: Agregar proveedor
 # ----------------------------------------------------------
 @admin.route('/api/proveedores', methods=['POST'])
 @login_required
 @role_required("admin")
 def agregar_proveedor():
-    """Agrega un nuevo proveedor desde el panel"""
     try:
         data = request.get_json()
         if not data:
@@ -423,44 +425,37 @@ def agregar_proveedor():
             Ciudad=data.get('ciudad'),
             Pais=data.get('pais')
         )
-
         db.session.add(nuevo)
         db.session.commit()
         return jsonify({"mensaje": "Proveedor agregado correctamente ✅"}), 201
 
     except Exception as e:
         db.session.rollback()
-        print("❌ Error al guardar el proveedor:", e)
-        return jsonify({"mensaje": "Error al guardar el proveedor ❌"}), 500
-
+        print("❌ Error al guardar proveedor:", e)
+        return jsonify({"mensaje": "Error al guardar proveedor ❌"}), 500
 
 # ----------------------------------------------------------
-# 🟡 API: Editar proveedor existente
+# 🟡 API: Editar proveedor
 # ----------------------------------------------------------
 @admin.route('/api/proveedores/<int:id>', methods=['PUT'])
 @login_required
 @role_required("admin")
 def editar_proveedor(id):
-    """Edita los datos de un proveedor existente"""
     try:
         proveedor = Proveedor.query.get_or_404(id)
         data = request.get_json()
-
         proveedor.Nombre_Empresa = data.get('empresa', proveedor.Nombre_Empresa)
         proveedor.Nombre_Contacto = data.get('contacto', proveedor.Nombre_Contacto)
         proveedor.Cargo_Contacto = data.get('cargo', proveedor.Cargo_Contacto)
         proveedor.Direccion = data.get('direccion', proveedor.Direccion)
         proveedor.Ciudad = data.get('ciudad', proveedor.Ciudad)
         proveedor.Pais = data.get('pais', proveedor.Pais)
-
         db.session.commit()
         return jsonify({"mensaje": "Proveedor actualizado correctamente ✅"}), 200
-
     except Exception as e:
         db.session.rollback()
         print("❌ Error al editar proveedor:", e)
-        return jsonify({"mensaje": "Error al editar el proveedor ❌"}), 500
-
+        return jsonify({"mensaje": "Error al editar proveedor ❌"}), 500
 
 # ----------------------------------------------------------
 # 🔴 API: Eliminar proveedor
@@ -469,13 +464,11 @@ def editar_proveedor(id):
 @login_required
 @role_required("admin")
 def eliminar_proveedor(id):
-    """Elimina un proveedor existente"""
     try:
         proveedor = Proveedor.query.get_or_404(id)
         db.session.delete(proveedor)
         db.session.commit()
         return jsonify({"mensaje": "Proveedor eliminado ✅"}), 200
-
     except Exception as e:
         db.session.rollback()
         print("❌ Error al eliminar proveedor:", e)
