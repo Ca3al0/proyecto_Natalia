@@ -1,10 +1,10 @@
 import os
 import json
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify,session
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from flask import current_app
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido,DetallePedido,DetalleCompra,Carrito,Imagenes,Comentario,Calificacion,Estado,Calificacion,CalificacionProducto,CalificacionProveedor,CalificacionProducto,CalificacionProveedor
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido
 from werkzeug.security import generate_password_hash
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
@@ -205,6 +205,8 @@ def borrar_direccion(id_direccion):
 
     return redirect(url_for("admin.actualizacion_datos"))
 
+
+# Función para obtener usuario actual desde sesión
 def get_usuario_actual():
     user_id = session.get('user_id')
     if user_id:
@@ -215,22 +217,44 @@ def get_usuario_actual():
 def get_direcciones(usuario_id):
     return Direccion.query.filter_by(ID_Usuario=usuario_id).all()
 
-# Obtener pedidos del usuario
+# Obtener pedidos del usuario y añadir datos del producto
 def get_pedidos_usuario(usuario_id):
-    return Pedido.query.filter_by(ID_Usuario=usuario_id).all()
+    pedidos = Pedido.query.filter_by(ID_Usuario=usuario_id).all()
+    pedidos_enriquecidos = []
 
-@admin.route('/admin/perfil')  # ✅ CORRECTO, si estás usando Blueprint 'admin'
+    for pedido in pedidos:
+        producto = Producto.query.get(pedido.ID_Producto)  # Ajusta el campo si tu modelo es diferente
+
+        pedidos_enriquecidos.append({
+            'ID': pedido.ID,
+            'Cantidad': pedido.Cantidad,
+            'Estado': pedido.Estado,
+            'Producto': producto.Nombre if producto else 'Producto no disponible',
+            'Imagen': producto.Imagen if producto and producto.Imagen else None,
+            'Nombre': pedido.Nombre if hasattr(pedido, 'Nombre') else '',
+            'Celular': pedido.Celular if hasattr(pedido, 'Celular') else '',
+            'Direccion': pedido.Direccion if hasattr(pedido, 'Direccion') else '',
+        })
+
+    return pedidos_enriquecidos
+
+# Ruta para perfil de usuario
+@admin.route('/admin/perfil')
 def perfil():
-    usuario = get_usuario_actual()              # ✅ obtiene el usuario autenticado
-    direcciones = get_direcciones(usuario.id)   # ✅ obtiene direcciones asociadas
-    pedidos = get_pedidos_usuario(usuario.id)   # ✅ obtiene pedidos del usuario
+    usuario = get_usuario_actual()
+    if not usuario:
+        return redirect(url_for('auth.login'))  # Cambia esta ruta por la real de login
+
+    direcciones = get_direcciones(usuario.id)
+    pedidos = get_pedidos_usuario(usuario.id)
 
     return render_template(
-        "admin/perfil.html",                    # ✅ plantilla que se va a renderizar
+        "admin/perfil.html",
         usuario=usuario,
         direcciones=direcciones,
         pedidos=pedidos
     )
+
 
 
 
