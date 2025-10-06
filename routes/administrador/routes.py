@@ -210,28 +210,31 @@ def borrar_direccion(id_direccion):
 
 def get_pedidos_pendientes_todos():
     pedidos = Pedido.query.filter_by(Estado='pendiente').all()
-    print(f"[DEBUG] Pedidos pendientes encontrados: {len(pedidos)}")
     
     pedidos_enriquecidos = []
     for pedido in pedidos:
-        print(f"[DEBUG] Pedido ID: {pedido.ID_Pedido}, Comprador: {pedido.NombreComprador}, Estado: {pedido.Estado}")
+        productos_info = []
 
-        # Intentamos obtener el primer detalle del pedido
-        detalle = pedido.detalles_pedido[0] if pedido.detalles_pedido else None
-        producto = detalle.producto if detalle else None
+        for detalle in pedido.detalles_pedido:
+            producto = detalle.producto
+            productos_info.append({
+                'Nombre': producto.NombreProducto if producto else 'Producto no disponible',
+                'Cantidad': detalle.Cantidad,
+                'Imagen': producto.ImagenPrincipal if producto and producto.ImagenPrincipal else None
+            })
 
         pedidos_enriquecidos.append({
             'ID': pedido.ID_Pedido,
-            'Cantidad': detalle.Cantidad if detalle else 0,
             'Estado': (pedido.Estado or '').strip(),
-            'Producto': producto.NombreProducto if producto else 'Producto no disponible',
-            'ImagenPrincipal': producto.ImagenPrincipal if producto and producto.ImagenPrincipal else None,
+            'Productos': productos_info,
             'Nombre': pedido.NombreComprador,
             'Celular': pedido.usuario.Telefono if pedido.usuario else '',
             'Direccion': pedido.Destino
         })
 
     return pedidos_enriquecidos
+
+
 
 
 def get_usuario_actual():

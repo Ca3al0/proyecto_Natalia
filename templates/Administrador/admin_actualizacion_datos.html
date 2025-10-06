@@ -122,8 +122,12 @@
               <div class="col-md-6">
                 <div class="card border shadow-sm p-3">
                   <h6 class="fw-bold">Cliente: {{ pedido.Nombre }}</h6>
-                  <p><strong>Producto:</strong> {{ pedido.Producto }}</p>
-                  <p><strong>Cantidad:</strong> {{ pedido.Cantidad }}</p>
+                 <ul class="mb-2">
+                  {% for producto in pedido.Productos %}
+                    <li><strong>{{ producto.Nombre }}</strong> — {{ producto.Cantidad }}</li>
+                  {% endfor %}
+                </ul>
+
 
                   <button class="btn btn-outline-dark btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#modalPedido{{ loop.index }}">
                     Ver detalles
@@ -143,12 +147,19 @@
                       <p><strong>Nombre:</strong> {{ pedido.Nombre }}</p>
                       <p><strong>Teléfono:</strong> {{ pedido.Celular }}</p>
                       <p><strong>Dirección:</strong> {{ pedido.Direccion }}</p>
-                      <p><strong>Producto:</strong> {{ pedido.Producto }}</p>
-                      <p><strong>Cantidad solicitada:</strong> {{ pedido.Cantidad }}</p>
+                      <ul class="mb-2">
+                          {% for producto in pedido.Productos %}
+                            <li>
+                              <strong>{{ producto.Nombre }}</strong> — Cantidad: {{ producto.Cantidad }}
+                            </li>
+                          {% endfor %}
+                        </ul>
+
                       <p><strong>ID Pedido:</strong> {{ pedido.ID }}</p>
 
-                      {% if pedido.ImagenPrincipal %}
-                        <img src="{{ url_for('static', filename=pedido.ImagenPrincipal) }}" alt="Imagen de {{ pedido.Producto }}" class="img-fluid" style="max-width: 150px;">
+                     {% set img = pedido.Productos[0].Imagen if pedido.Productos and pedido.Productos[0].Imagen else None %}
+                      {% if img %}
+                        <img src="{{ url_for('static', filename=img) }}" alt="Imagen de producto" class="img-fluid" style="max-width: 150px;">
                       {% else %}
                         <img src="{{ url_for('static', filename='img/catalogo.png') }}" alt="Imagen no disponible" class="img-fluid" style="max-width: 150px;">
                       {% endif %}
