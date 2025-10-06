@@ -254,12 +254,14 @@ def perfil():
     for pedido in pedidos_pendientes_todos:
         print(f"Pedido: {pedido}")
 
+    pedidos_pendientes_todos = get_pedidos_pendientes_todos()
+
     return render_template(
-        "administrador/admin_actualizacion_datos.html",
-        usuario=usuario,
-        direcciones=direcciones,
-        pedidos=pedidos_pendientes_todos
-    )
+    "administrador/admin_actualizacion_datos.htm",
+    usuario=usuario,
+    direcciones=direcciones,
+    pedidos=pedidos_pendientes_todos
+)
 
 
 
