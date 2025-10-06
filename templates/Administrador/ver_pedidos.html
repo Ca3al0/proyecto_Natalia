@@ -38,7 +38,7 @@
         <div class="col-md-6 mb-4">
           <div class="card shadow-sm">
             <div class="card-body">
-              <h5 class="card-title">Pedido #{{ pedido['pedido_id'] }}</h5>
+              <h5 class="card-title">Pedido #{{ pedido['ID_Pedido'] }}</h5>
               <p><strong>Estado:</strong> {{ pedido['estado'] }}</p>
               <p><strong>Cliente:</strong> {{ pedido['nombre_comprador'] }}</p>
               <p><strong>Teléfono:</strong> {{ pedido['telefono_usuario'] }}</p>
@@ -50,10 +50,10 @@
                   <li>{{ producto['nombre'] }} - Cantidad: {{ producto['cantidad'] }}</li>
                 {% endfor %}
               </ul>
-<form method="POST" action="{{ url_for('admin.asignar_transportista', id_pedido=pedido.ID_Pedido) }}">
+              <form method="POST" action="{{ url_for('admin.asignar_transportista', id_pedido=pedido['ID_Pedido']) }}">
                 <div class="mb-3">
-                  <label for="transportista_{{ pedido['pedido_id'] }}" class="form-label">Asignar Transportista:</label>
-                  <select name="transportista_id" id="transportista_{{ pedido['pedido_id'] }}" class="form-select" required>
+                  <label for="transportista_{{ pedido['ID_Pedido'] }}" class="form-label">Asignar Transportista:</label>
+                  <select name="transportista_id" id="transportista_{{ pedido['ID_Pedido'] }}" class="form-select" required>
                     <option value="" disabled selected>Selecciona un transportista</option>
                     {% for usuario in usuarios_transportistas %}
                       <option value="{{ usuario['id_usuario'] }}">{{ usuario['nombre'] }}</option>
@@ -62,8 +62,8 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="hora_llegada_{{ pedido['pedido_id'] }}" class="form-label">Hora de llegada:</label>
-                  <input type="datetime-local" name="hora_llegada" id="hora_llegada_{{ pedido['pedido_id'] }}" class="form-control" required>
+                  <label for="hora_llegada_{{ pedido['ID_Pedido'] }}" class="form-label">Hora de llegada:</label>
+                  <input type="datetime-local" name="hora_llegada" id="hora_llegada_{{ pedido['ID_Pedido'] }}" class="form-control" required>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Asignar</button>
