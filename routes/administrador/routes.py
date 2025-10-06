@@ -216,11 +216,9 @@ def get_usuario_actual():
 def get_direcciones(usuario_id):
     return Direccion.query.filter_by(ID_Usuario=usuario_id).all()
 
-
-
 def get_pedidos_pendientes_todos():
     pedidos = Pedido.query.filter_by(Estado='pendiente').all()
-    print(f"[DEBUG] Pedidos pendientes encontrados: {len(pedidos)}")  # Debug para verificar la consulta
+    print(f"Pedidos pendientes encontrados: {len(pedidos)}")  # Corregido aquí
     
     pedidos_enriquecidos = []
 
@@ -252,7 +250,6 @@ def perfil():
     direcciones = get_direcciones(usuario.ID_Usuario)
     pedidos_pendientes_todos = get_pedidos_pendientes_todos()
 
-    # Debug para verificar los pedidos antes de enviarlos a la plantilla
     print(f"[DEBUG] Total pedidos pendientes para admin: {len(pedidos_pendientes_todos)}")
     for pedido in pedidos_pendientes_todos:
         print(f"Pedido: {pedido}")
@@ -263,6 +260,7 @@ def perfil():
         direcciones=direcciones,
         pedidos=pedidos_pendientes_todos
     )
+
 
 
 
