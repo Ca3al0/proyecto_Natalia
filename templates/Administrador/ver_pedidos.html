@@ -33,9 +33,11 @@
 <div class="container my-4">
   <h2 class="mb-4 text-center text-success">Listado de Pedidos</h2>
 
-  {% if pedidos %}
-    <div class="row row-cols-1 row-cols-md-2 g-4">
-      {% for pedido in pedidos %}
+  <!-- Pedidos Pendientes -->
+  <h3 class="mb-3">Pedidos Pendientes</h3>
+  {% if pedidos_pendientes %}
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-5">
+      {% for pedido in pedidos_pendientes %}
         <div class="col">
           <div class="card shadow-sm h-100 border-success">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -85,15 +87,64 @@
                 </div>
                 <button type="submit" class="btn btn-success w-100">Asignar</button>
               </form>
-
             </div>
           </div>
         </div>
       {% endfor %}
     </div>
   {% else %}
-    <div class="alert alert-success text-center" role="alert">
-      No hay pedidos disponibles.
+    <div class="alert alert-warning" role="alert">
+      No hay pedidos pendientes.
+    </div>
+  {% endif %}
+
+  <!-- Pedidos en Proceso -->
+  <h3 class="mb-3">Pedidos en Proceso</h3>
+  {% if pedidos_en_proceso %}
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+      {% for pedido in pedidos_en_proceso %}
+        <div class="col">
+          <div class="card shadow-sm h-100 border-warning">
+            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #f57c00; color: white;">
+              <strong>Pedido #{{ pedido.ID }}</strong>
+              <span class="badge badge-estado rounded-pill">{{ pedido.Estado | capitalize }}</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title text-warning">{{ pedido.NombreComprador }}</h5>
+              <p class="card-text mb-1"><strong>Teléfono:</strong> {{ pedido.TelefonoUsuario }}</p>
+              <p class="card-text"><strong>Dirección:</strong> {{ pedido.Direccion }}</p>
+
+              <hr>
+
+              <h6 class="text-warning">Productos:</h6>
+              <ul class="list-unstyled">
+                {% for producto in pedido.Productos %}
+                  <li class="d-flex align-items-center mb-2">
+                    {% if producto.Imagen %}
+                      <img src="{{ url_for('static', filename=producto.Imagen) }}" alt="{{ producto.Nombre }}" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
+                    {% else %}
+                      <div class="me-3 no-img d-flex align-items-center justify-content-center rounded" style="width:50px; height:50px;">
+                        Sin Img
+                      </div>
+                    {% endif %}
+                    <div>
+                      <strong>{{ producto.Nombre }}</strong> <br>
+                      Cantidad: {{ producto.Cantidad }}
+                    </div>
+                  </li>
+                {% endfor %}
+              </ul>
+
+              <p><strong>Transportista asignado:</strong> {{ pedido.TransportistaNombre or 'No asignado' }}</p>
+              <p><strong>Hora llegada:</strong> {{ pedido.HoraLlegada.strftime('%Y-%m-%d %H:%M') if pedido.HoraLlegada else 'No asignada' }}</p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info" role="alert">
+      No hay pedidos en proceso.
     </div>
   {% endif %}
 </div>

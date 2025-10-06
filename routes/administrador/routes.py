@@ -210,6 +210,7 @@ def borrar_direccion(id_direccion):
 
 def get_pedidos_pendientes_usuario(usuario_id):
     pedidos = Pedido.query.filter_by(Estado='pendiente', ID_Usuario=usuario_id).all()
+    pedidos_en_proceso = Pedido.query.filter_by(Estado='en proceso').all()
     
     pedidos_enriquecidos = []
     for pedido in pedidos:
@@ -269,21 +270,24 @@ def get_usuario_actual():
 
 
 @admin.route('/ver_pedidos')
-@login_required
 def ver_pedidos():
-    if current_user.Rol != 'admin':
-        flash("No tienes permiso para acceder a esta página.", "danger")
-        return redirect(url_for('index'))
+    pedidos_pendientes = Pedido.query.filter_by(Estado='pendiente').all()
+    pedidos_en_proceso = Pedido.query.filter_by(Estado='en proceso').all()
 
-    pedidos = get_todos_los_pedidos()
+    # Opcional: cargar nombre de transportista para pedidos en proceso
+    for pedido in pedidos_en_proceso:
+        if pedido.ID_Empleado:
+            transportista = Usuario.query.get(pedido.ID_Empleado)
+            pedido.TransportistaNombre = transportista.Nombre if transportista else 'No asignado'
+        else:
+            pedido.TransportistaNombre = 'No asignado'
+
     usuarios_transportistas = Usuario.query.filter_by(Rol='transportista').all()
 
-    return render_template(
-        "administrador/ver_pedidos.html",
-        usuario=current_user,
-        pedidos=pedidos,
-        usuarios_transportistas=usuarios_transportistas 
-    )
+    return render_template('administrador/ver_pedidos.html', 
+                           pedidos_pendientes=pedidos_pendientes,
+                           pedidos_en_proceso=pedidos_en_proceso,
+                           usuarios_transportistas=usuarios_transportistas)
 
 
 
@@ -599,29 +603,25 @@ def agregar_compra():
 
 @admin.route('/asignar_transportista/<int:id_pedido>', methods=['POST'])
 def asignar_transportista(id_pedido):
+    pedido = Pedido.query.get_or_404(id_pedido)
+
     transportista_id = request.form.get('transportista_id')
     hora_llegada_str = request.form.get('hora_llegada')
 
     if not transportista_id or not hora_llegada_str:
-        flash('Todos los campos son obligatorios.', 'danger')
-        return redirect(url_for('admin.listado_pedidos'))
+        flash('Por favor, completa todos los campos.', 'warning')
+        return redirect(url_for('admin.ver_pedidos'))
 
-    try:
-        hora_llegada = datetime.strptime(hora_llegada_str, '%Y-%m-%dT%H:%M')
-        pedido = Pedido.query.get(id_pedido)
+    # Convertir la hora_llegada de string a datetime
+    from datetime import datetime
+    hora_llegada = datetime.strptime(hora_llegada_str, '%Y-%m-%dT%H:%M')
 
-        if pedido:
-            pedido.ID_Empleado = int(transportista_id)  # Aquí se asigna el transportista como empleado
-            pedido.HoraLlegada = hora_llegada
-            pedido.Estado = 'en proceso'  # Puedes cambiar según lógica de tu app
+    # Actualizar datos en el pedido
+    pedido.ID_Empleado = int(transportista_id)
+    pedido.HoraLlegada = hora_llegada
+    pedido.Estado = 'en proceso'  # Cambiar estado al asignar
 
-            db.session.commit()
-            flash('Transportista asignado correctamente.', 'success')
-        else:
-            flash('Pedido no encontrado.', 'danger')
+    db.session.commit()
 
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error al asignar transportista: {str(e)}', 'danger')
-
+    flash('Transportista asignado correctamente.', 'success')
     return redirect(url_for('admin.ver_pedidos'))
