@@ -40,33 +40,33 @@
         <div class="col-md-6 mb-4">
           <div class="card shadow-sm">
             <div class="card-body">
-              <h5 class="card-title">Pedido #{{ pedido.get('id_pedido', 'N/A') }}</h5>
-              <p><strong>Estado:</strong> {{ pedido.get('Estado', 'Desconocido') }}</p>
-              <p><strong>Cliente:</strong> {{ pedido.get('NombreComprador', 'Desconocido') }}</p>
-              <p><strong>Teléfono:</strong> {{ pedido.get('TelefonoUsuario', 'Desconocido') }}</p>
-              <p><strong>Dirección:</strong> {{ pedido.get('Direccion', 'Desconocida') }}</p>
+              <h5 class="card-title">Pedido #{{ pedido['ID_Pedido'] }}</h5>
+              <p><strong>Estado:</strong> {{ pedido['Estado'] }}</p>
+              <p><strong>Cliente:</strong> {{ pedido['NombreComprador'] }}</p>
+              <p><strong>Teléfono:</strong> {{ pedido['TelefonoUsuario'] }}</p>
+              <p><strong>Dirección:</strong> {{ pedido['Direccion'] }}</p>
 
               <h6 class="mt-3">Productos:</h6>
               <ul>
-                {% for producto in pedido.get('Productos', []) %}
-                  <li>{{ producto.get('Nombre', 'Producto') }} - Cantidad: {{ producto.get('Cantidad', 0) }}</li>
+                {% for producto in pedido['Productos'] %}
+                  <li>{{ producto['Nombre'] }} - Cantidad: {{ producto['Cantidad'] }}</li>
                 {% endfor %}
               </ul>
 
-              <form method="POST" action="{{ url_for('admin.asignar_transportista', id_pedido=pedido.get('id_pedido')) }}">
+              <form method="POST" action="{{ url_for('admin.asignar_transportista', id_pedido=pedido['ID_Pedido']) }}">
                 <div class="mb-3">
-                  <label for="transportista_{{ pedido.get('id_pedido') }}" class="form-label">Asignar Transportista:</label>
-                  <select name="transportista_id" id="transportista_{{ pedido.get('id_pedido') }}" class="form-select" required>
+                  <label for="transportista_{{ pedido['ID_Pedido'] }}" class="form-label">Asignar Transportista:</label>
+                  <select name="transportista_id" id="transportista_{{ pedido['ID_Pedido'] }}" class="form-select" required>
                     <option value="" disabled selected>Selecciona un transportista</option>
                     {% for usuario in usuarios_transportistas %}
-                      <option value="{{ usuario.get('ID_Usuario') }}">{{ usuario.get('Nombre') }}</option>
+                      <option value="{{ usuario['ID_Usuario'] }}">{{ usuario['Nombre'] }}</option>
                     {% endfor %}
                   </select>
                 </div>
 
                 <div class="mb-3">
-                  <label for="hora_llegada_{{ pedido.get('id_pedido') }}" class="form-label">Hora de llegada:</label>
-                  <input type="datetime-local" name="hora_llegada" id="hora_llegada_{{ pedido.get('id_pedido') }}" class="form-control" required>
+                  <label for="hora_llegada_{{ pedido['ID_Pedido'] }}" class="form-label">Hora de llegada:</label>
+                  <input type="datetime-local" name="hora_llegada" id="hora_llegada_{{ pedido['ID_Pedido'] }}" class="form-control" required>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Asignar</button>
