@@ -48,6 +48,7 @@ async function cargarProveedores(){
     try {
         const res = await fetch('/admin/api/proveedores');
         const data = await res.json();
+        if(!Array.isArray(data)) throw new Error("JSON inválido");
         tabla.innerHTML = '';
         data.forEach(p => {
             tabla.innerHTML += `
@@ -89,7 +90,7 @@ form.addEventListener('submit', async e=>{
         });
         const data = await res.json();
         if(res.ok){
-            mostrarAlerta(data.mensaje, 'success');
+            mostrarAlerta(data.mensaje,'success');
             form.reset();
             cargarProveedores();
         } else mostrarAlerta(data.mensaje,'danger');
@@ -102,12 +103,10 @@ form.addEventListener('submit', async e=>{
 async function eliminar(id){
     if(!confirm("¿Seguro que deseas eliminar este proveedor?")) return;
     try{
-        const res = await fetch(`/admin/api/proveedores/${id}`,{method:'DELETE'});
+        const res = await fetch(`/admin/api/proveedores/${id}`, {method:'DELETE'});
         const data = await res.json();
-        if(res.ok){
-            mostrarAlerta(data.mensaje,'success');
-            cargarProveedores();
-        } else mostrarAlerta(data.mensaje,'danger');
+        mostrarAlerta(data.mensaje, res.ok ? 'success':'danger');
+        cargarProveedores();
     } catch(e){
         mostrarAlerta("Error en conexión ❌",'danger');
     }
@@ -117,9 +116,9 @@ function editar(id){
     alert("Función de edición aún no implementada (ID: "+id+")");
 }
 
-function mostrarAlerta(mensaje,tipo){
+function mostrarAlerta(msg,tipo){
     alerta.className = `alert alert-${tipo}`;
-    alerta.textContent = mensaje;
+    alerta.textContent = msg;
     alerta.style.display='block';
     setTimeout(()=>alerta.style.display='none',3000);
 }

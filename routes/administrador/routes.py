@@ -369,19 +369,15 @@ def estadisticas_reseñas():
 
 
 
-# -----------------------------
-# Vista de proveedores (HTML)
-# -----------------------------
+# Vista de proveedores
 @admin.route('/proveedores', methods=['GET'])
 @login_required
 @role_required("admin")
 def vista_proveedores():
-    return render_template("administrador/proveedores.html")
+    return render_template('administrador/proveedores.html')
 
 
-# -----------------------------
-# API: Obtener proveedores
-# -----------------------------
+# API: Obtener todos los proveedores
 @admin.route('/api/proveedores', methods=['GET'])
 @login_required
 @role_required("admin")
@@ -391,14 +387,14 @@ def obtener_proveedores():
         data = [
             {
                 "id": p.ID_Proveedor,
-                "empresa": p.Nombre_Empresa,
-                "contacto": p.Nombre_Contacto,
-                "cargo": p.Cargo_Contacto,
+                "empresa": p.NombreEmpresa,
+                "contacto": p.NombreContacto,
+                "cargo": p.CargoContacto,
                 "direccion": p.Direccion,
                 "ciudad": p.Ciudad,
-                "pais": p.Pais
-            }
-            for p in proveedores
+                "pais": p.Pais,
+                "telefono": p.Telefono
+            } for p in proveedores
         ]
         return jsonify(data), 200
     except Exception as e:
@@ -406,9 +402,7 @@ def obtener_proveedores():
         return jsonify({"mensaje": "Error interno"}), 500
 
 
-# -----------------------------
 # API: Agregar proveedor
-# -----------------------------
 @admin.route('/api/proveedores', methods=['POST'])
 @login_required
 @role_required("admin")
@@ -419,12 +413,13 @@ def agregar_proveedor():
             return jsonify({"mensaje": "No se recibió JSON válido"}), 400
 
         nuevo = Proveedor(
-            Nombre_Empresa=data.get('empresa'),
-            Nombre_Contacto=data.get('contacto'),
-            Cargo_Contacto=data.get('cargo'),
+            NombreEmpresa=data.get('empresa'),
+            NombreContacto=data.get('contacto'),
+            CargoContacto=data.get('cargo'),
             Direccion=data.get('direccion'),
             Ciudad=data.get('ciudad'),
-            Pais=data.get('pais')
+            Pais=data.get('pais'),
+            Telefono=data.get('telefono')
         )
 
         db.session.add(nuevo)
@@ -436,9 +431,7 @@ def agregar_proveedor():
         return jsonify({"mensaje": "Error al guardar el proveedor ❌"}), 500
 
 
-# -----------------------------
 # API: Editar proveedor
-# -----------------------------
 @admin.route('/api/proveedores/<int:id>', methods=['PUT'])
 @login_required
 @role_required("admin")
@@ -447,24 +440,23 @@ def editar_proveedor(id):
         proveedor = Proveedor.query.get_or_404(id)
         data = request.get_json()
 
-        proveedor.Nombre_Empresa = data.get('empresa', proveedor.Nombre_Empresa)
-        proveedor.Nombre_Contacto = data.get('contacto', proveedor.Nombre_Contacto)
-        proveedor.Cargo_Contacto = data.get('cargo', proveedor.Cargo_Contacto)
+        proveedor.NombreEmpresa = data.get('empresa', proveedor.NombreEmpresa)
+        proveedor.NombreContacto = data.get('contacto', proveedor.NombreContacto)
+        proveedor.CargoContacto = data.get('cargo', proveedor.CargoContacto)
         proveedor.Direccion = data.get('direccion', proveedor.Direccion)
         proveedor.Ciudad = data.get('ciudad', proveedor.Ciudad)
         proveedor.Pais = data.get('pais', proveedor.Pais)
+        proveedor.Telefono = data.get('telefono', proveedor.Telefono)
 
         db.session.commit()
         return jsonify({"mensaje": "Proveedor actualizado correctamente ✅"}), 200
     except Exception as e:
         db.session.rollback()
         print("❌ ERROR PUT PROVEEDOR:", e)
-        return jsonify({"mensaje": "Error al actualizar el proveedor ❌"}), 500
+        return jsonify({"mensaje": "Error al editar el proveedor ❌"}), 500
 
 
-# -----------------------------
 # API: Eliminar proveedor
-# -----------------------------
 @admin.route('/api/proveedores/<int:id>', methods=['DELETE'])
 @login_required
 @role_required("admin")
