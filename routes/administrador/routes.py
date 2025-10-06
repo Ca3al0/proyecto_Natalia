@@ -367,47 +367,21 @@ def estadisticas_reseñas():
         resolucion_json=json.dumps(resolucion_por_mes)
     )
 
-from flask import Blueprint, render_template, request, jsonify
-from flask_login import login_required
-from basedatos.models import db, Proveedor
-from basedatos.decoradores import role_required
 
-admin = Blueprint("admin", __name__, url_prefix="/admin")
 
-# ----------------------------------------------------------
-# 🟢 Página de proveedores
-# ----------------------------------------------------------
-@admin.route('/proveedores')
+# -----------------------------
+# Vista de proveedores (HTML)
+# -----------------------------
+@admin.route('/proveedores', methods=['GET'])
 @login_required
 @role_required("admin")
 def vista_proveedores():
-    return render_template('administrador/proveedores.html')
+    return render_template("administrador/proveedores.html")
 
-# ----------------------------------------------------------
-# 🟢 API: Obtener todos los proveedores
-# ----------------------------------------------------------
-@admin.route('/api/proveedores', methods=['GET'])
-@login_required
-@role_required("admin")
-def obtener_proveedores():
-    proveedores = Proveedor.query.all()
-    data = [
-        {
-            "id": p.ID_Proveedor,
-            "empresa": p.Nombre_Empresa,
-            "contacto": p.Nombre_Contacto,
-            "cargo": p.Cargo_Contacto,
-            "direccion": p.Direccion,
-            "ciudad": p.Ciudad,
-            "pais": p.Pais
-        }
-        for p in proveedores
-    ]
-    return jsonify(data), 200
 
-# ----------------------------------------------------------
-# 🟢 API: Agregar proveedor
-# ----------------------------------------------------------
+# -----------------------------
+# API: Obtener proveedores
+# -----------------------------
 @admin.route('/api/proveedores', methods=['GET'])
 @login_required
 @role_required("admin")
@@ -423,17 +397,48 @@ def obtener_proveedores():
                 "direccion": p.Direccion,
                 "ciudad": p.Ciudad,
                 "pais": p.Pais
-            } for p in proveedores
+            }
+            for p in proveedores
         ]
         return jsonify(data), 200
     except Exception as e:
-        print("❌ ERROR EN GET PROVEEDORES:", e)
+        print("❌ ERROR GET PROVEEDORES:", e)
         return jsonify({"mensaje": "Error interno"}), 500
 
 
-# ----------------------------------------------------------
-# 🟡 API: Editar proveedor
-# ----------------------------------------------------------
+# -----------------------------
+# API: Agregar proveedor
+# -----------------------------
+@admin.route('/api/proveedores', methods=['POST'])
+@login_required
+@role_required("admin")
+def agregar_proveedor():
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"mensaje": "No se recibió JSON válido"}), 400
+
+        nuevo = Proveedor(
+            Nombre_Empresa=data.get('empresa'),
+            Nombre_Contacto=data.get('contacto'),
+            Cargo_Contacto=data.get('cargo'),
+            Direccion=data.get('direccion'),
+            Ciudad=data.get('ciudad'),
+            Pais=data.get('pais')
+        )
+
+        db.session.add(nuevo)
+        db.session.commit()
+        return jsonify({"mensaje": "Proveedor agregado correctamente ✅"}), 201
+    except Exception as e:
+        db.session.rollback()
+        print("❌ ERROR POST PROVEEDOR:", e)
+        return jsonify({"mensaje": "Error al guardar el proveedor ❌"}), 500
+
+
+# -----------------------------
+# API: Editar proveedor
+# -----------------------------
 @admin.route('/api/proveedores/<int:id>', methods=['PUT'])
 @login_required
 @role_required("admin")
@@ -441,22 +446,25 @@ def editar_proveedor(id):
     try:
         proveedor = Proveedor.query.get_or_404(id)
         data = request.get_json()
+
         proveedor.Nombre_Empresa = data.get('empresa', proveedor.Nombre_Empresa)
         proveedor.Nombre_Contacto = data.get('contacto', proveedor.Nombre_Contacto)
         proveedor.Cargo_Contacto = data.get('cargo', proveedor.Cargo_Contacto)
         proveedor.Direccion = data.get('direccion', proveedor.Direccion)
         proveedor.Ciudad = data.get('ciudad', proveedor.Ciudad)
         proveedor.Pais = data.get('pais', proveedor.Pais)
+
         db.session.commit()
         return jsonify({"mensaje": "Proveedor actualizado correctamente ✅"}), 200
     except Exception as e:
         db.session.rollback()
-        print("❌ Error al editar proveedor:", e)
-        return jsonify({"mensaje": "Error al editar proveedor ❌"}), 500
+        print("❌ ERROR PUT PROVEEDOR:", e)
+        return jsonify({"mensaje": "Error al actualizar el proveedor ❌"}), 500
 
-# ----------------------------------------------------------
-# 🔴 API: Eliminar proveedor
-# ----------------------------------------------------------
+
+# -----------------------------
+# API: Eliminar proveedor
+# -----------------------------
 @admin.route('/api/proveedores/<int:id>', methods=['DELETE'])
 @login_required
 @role_required("admin")
@@ -468,5 +476,5 @@ def eliminar_proveedor(id):
         return jsonify({"mensaje": "Proveedor eliminado ✅"}), 200
     except Exception as e:
         db.session.rollback()
-        print("❌ Error al eliminar proveedor:", e)
+        print("❌ ERROR DELETE PROVEEDOR:", e)
         return jsonify({"mensaje": "Error al eliminar proveedor ❌"}), 500
