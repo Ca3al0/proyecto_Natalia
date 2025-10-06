@@ -444,9 +444,11 @@ def editar_proveedor(id):
 
 
 # ----------------------------------------------------------
-# 🔴 API: Eliminar proveedor
+# 🔴 API: ELIMINAR PROVEEDOR
 # ----------------------------------------------------------
 @admin.route('/api/proveedores/<int:id>', methods=['DELETE'])
+@login_required
+@role_required("admin")
 def eliminar_proveedor(id):
     proveedor = Proveedor.query.get_or_404(id)
     db.session.delete(proveedor)
