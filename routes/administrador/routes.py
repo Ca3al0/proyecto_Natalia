@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from datetime import datetime, timedelta
 from flask import current_app
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido,DetallePedido,DetalleCompra,Carrito,Imagenes,Comentario,Calificacion,Estado,Calificacion,CalificacionProducto,CalificacionProveedor,CalificacionProducto,CalificacionProveedor
 from werkzeug.security import generate_password_hash
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
@@ -205,6 +205,19 @@ def borrar_direccion(id_direccion):
 
     return redirect(url_for("admin.actualizacion_datos"))
 
+def get_usuario_actual():
+    user_id = session.get('user_id')
+    if user_id:
+        return Usuario.query.get(user_id)
+    return None
+
+# Obtener direcciones del usuario
+def get_direcciones(usuario_id):
+    return Direccion.query.filter_by(ID_Usuario=usuario_id).all()
+
+# Obtener pedidos del usuario
+def get_pedidos_usuario(usuario_id):
+    return Pedido.query.filter_by(ID_Usuario=usuario_id).all()
 
 @admin.route('/admin/perfil')  # ✅ CORRECTO, si estás usando Blueprint 'admin'
 def perfil():
