@@ -472,7 +472,7 @@ def eliminar_proveedor(id):
         return jsonify({"mensaje": "Error al eliminar proveedor ❌"}), 500
 
 
-# ✅ Obtener todas las compras
+# Obtener todas las compras
 @admin.route('/api/compras', methods=['GET'])
 @login_required
 def obtener_compras():
@@ -483,18 +483,19 @@ def obtener_compras():
             "id": c.ID_Compra,
             "producto": c.Producto,
             "cantidad": c.Cantidad,
-            "proveedor": c.proveedor.NombreEmpresa,
+            "proveedor": c.proveedor.NombreEmpresa,  # muestra nombre
             "fecha": c.Fecha.strftime('%Y-%m-%d')
         })
     return jsonify(data), 200
 
-# ✅ Agregar nueva compra
+# Agregar nueva compra
 @admin.route('/api/compras', methods=['POST'])
 @login_required
 def agregar_compra():
     try:
         data = request.get_json()
-        proveedor = Proveedor.query.filter_by(NombreEmpresa=data['proveedor']).first()
+        # Buscar proveedor por ID
+        proveedor = Proveedor.query.get(data['proveedor_id'])
         if not proveedor:
             return jsonify({"mensaje": "Proveedor no encontrado"}), 404
 
