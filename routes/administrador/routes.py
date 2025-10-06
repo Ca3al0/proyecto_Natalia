@@ -2,7 +2,7 @@ import os
 import json
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify,session
 from flask_login import login_required, current_user
-from datetime import datetime, timedelta
+from datetime import date,datetime, timedelta
 from flask import current_app
 from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido
 from werkzeug.security import generate_password_hash
