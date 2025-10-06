@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash
 from basedatos.models import db, Usuario, Notificaciones, Direccion, Calendario,Pedido, Producto, Resena, Detalle_Pedido, Pagos
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
-from datetime import datetime
+from datetime import date,datetime
 from flask import render_template
 from sqlalchemy import text
 
