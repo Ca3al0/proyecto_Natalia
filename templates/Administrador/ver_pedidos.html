@@ -50,7 +50,7 @@
                   <li>{{ producto['nombre'] }} - Cantidad: {{ producto['cantidad'] }}</li>
                 {% endfor %}
               </ul>
-              <form method="POST" action="{{ url_for('admin.asignar_transportista', id_pedido=pedido['ID_Pedido']) }}">
+              <form method="POST" action="{{ url_for('admin.asignar_transportista', id_pedido=pedido.ID_Pedido) }}">
                 <div class="mb-3">
                   <label for="transportista_{{ pedido['ID_Pedido'] }}" class="form-label">Asignar Transportista:</label>
                   <select name="transportista_id" id="transportista_{{ pedido['ID_Pedido'] }}" class="form-select" required>
