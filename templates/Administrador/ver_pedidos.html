@@ -41,40 +41,40 @@
         <div class="col">
           <div class="card shadow-sm h-100 border-success">
             <div class="card-header d-flex justify-content-between align-items-center">
-              <strong>Pedido #{{ pedido.ID }}</strong>
+              <strong>Pedido #{{ pedido.ID_Pedido }}</strong>
               <span class="badge badge-estado rounded-pill">{{ pedido.Estado | capitalize }}</span>
             </div>
             <div class="card-body">
               <h5 class="card-title text-success">{{ pedido.NombreComprador }}</h5>
-              <p class="card-text mb-1"><strong>Teléfono:</strong> {{ pedido.TelefonoUsuario }}</p>
-              <p class="card-text"><strong>Dirección:</strong> {{ pedido.Direccion }}</p>
+              {# Si tienes teléfono en otro lado, ajusta aquí #}
+              {# <p class="card-text mb-1"><strong>Teléfono:</strong> {{ pedido.TelefonoUsuario }}</p> #}
+              <p class="card-text"><strong>Dirección:</strong> {{ pedido.Destino }}</p>
 
               <hr>
 
               <h6 class="text-success">Productos:</h6>
               <ul class="list-unstyled">
-                {% for producto in pedido.Productos %}
-                  <li class="d-flex align-items-center mb-2">
-                    {% if producto.Imagen %}
-                      <img src="{{ url_for('static', filename=producto.Imagen) }}" alt="{{ producto.Nombre }}" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
-                    {% else %}
-                      <div class="me-3 no-img d-flex align-items-center justify-content-center rounded" style="width:50px; height:50px;">
-                        Sin Img
-                      </div>
-                    {% endif %}
-                    <div>
-                      <strong>{{ producto.Nombre }}</strong> <br>
-                      Cantidad: {{ producto.Cantidad }}
-                    </div>
-                  </li>
-                {% endfor %}
-              </ul>
+  {% for detalle in pedido.detalles_pedido %}
+    <li class="d-flex align-items-center mb-2">
+      {% if detalle.producto.ImagenPrincipal %}
+        <img src="{{ url_for('static', filename=detalle.producto.ImagenPrincipal) }}" alt="Imagen de {{ detalle.producto.NombreProducto }}" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
+      {% else %}
+        <img src="{{ url_for('static', filename='img/catalogo.png') }}" alt="Imagen no disponible" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
+      {% endif %}
+      <div>
+        <strong>{{ detalle.producto.NombreProducto }}</strong> <br>
+        Cantidad: {{ detalle.Cantidad }}
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+
 
               <!-- Formulario para asignar transportista -->
-              <form class="form-assign" method="POST" action="{{ url_for('admin.asignar_transportista', id_pedido=pedido.ID) }}">
+              <form class="form-assign" method="POST" action="{{ url_for('admin.asignar_transportista', id_pedido=pedido.ID_Pedido) }}">
                 <div class="mb-3">
-                  <label for="transportista_{{ pedido.ID }}" class="form-label">Transportista:</label>
-                  <select name="transportista_id" id="transportista_{{ pedido.ID }}" class="form-select" required>
+                  <label for="transportista_{{ pedido.ID_Pedido }}" class="form-label">Transportista:</label>
+                  <select name="transportista_id" id="transportista_{{ pedido.ID_Pedido }}" class="form-select" required>
                     <option value="" disabled selected>Selecciona transportista</option>
                     {% for usuario in usuarios_transportistas %}
                       <option value="{{ usuario.ID_Usuario }}">{{ usuario.Nombre }}</option>
@@ -82,8 +82,8 @@
                   </select>
                 </div>
                 <div class="mb-3">
-                  <label for="hora_llegada_{{ pedido.ID }}" class="form-label">Hora de llegada:</label>
-                  <input type="datetime-local" name="hora_llegada" id="hora_llegada_{{ pedido.ID }}" class="form-control" required>
+                  <label for="hora_llegada_{{ pedido.ID_Pedido }}" class="form-label">Hora de llegada:</label>
+                  <input type="datetime-local" name="hora_llegada" id="hora_llegada_{{ pedido.ID_Pedido }}" class="form-control" required>
                 </div>
                 <button type="submit" class="btn btn-success w-100">Asignar</button>
               </form>
@@ -99,53 +99,51 @@
   {% endif %}
 
   <!-- Pedidos en Proceso -->
-  <h3 class="mb-3">Pedidos en Proceso</h3>
-  {% if pedidos_en_proceso %}
-    <div class="row row-cols-1 row-cols-md-2 g-4">
-      {% for pedido in pedidos_en_proceso %}
-        <div class="col">
-          <div class="card shadow-sm h-100 border-warning">
-            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #f57c00; color: white;">
-              <strong>Pedido #{{ pedido.ID }}</strong>
-              <span class="badge badge-estado rounded-pill">{{ pedido.Estado | capitalize }}</span>
-            </div>
-            <div class="card-body">
-              <h5 class="card-title text-warning">{{ pedido.NombreComprador }}</h5>
-              <p class="card-text mb-1"><strong>Teléfono:</strong> {{ pedido.TelefonoUsuario }}</p>
-              <p class="card-text"><strong>Dirección:</strong> {{ pedido.Direccion }}</p>
+<h3 class="mb-3">Pedidos en Proceso</h3>
+{% if pedidos_en_proceso %}
+  <div class="row row-cols-1 row-cols-md-2 g-4">
+    {% for pedido in pedidos_en_proceso %}
+      <div class="col">
+        <div class="card shadow-sm h-100 border-success">
+          <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #388e3c; color: white;">
+            <strong>Pedido #{{ pedido.ID_Pedido }}</strong>
+            <span class="badge badge-estado rounded-pill" style="background-color: #a5d6a7; color: #1b5e20;">{{ pedido.Estado | capitalize }}</span>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title text-success">{{ pedido.NombreComprador }}</h5>
+            <p class="card-text"><strong>Dirección:</strong> {{ pedido.Destino }}</p>
 
-              <hr>
+            <hr>
 
-              <h6 class="text-warning">Productos:</h6>
-              <ul class="list-unstyled">
-                {% for producto in pedido.Productos %}
-                  <li class="d-flex align-items-center mb-2">
-                    {% if producto.Imagen %}
-                      <img src="{{ url_for('static', filename=producto.Imagen) }}" alt="{{ producto.Nombre }}" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
-                    {% else %}
-                      <div class="me-3 no-img d-flex align-items-center justify-content-center rounded" style="width:50px; height:50px;">
-                        Sin Img
-                      </div>
-                    {% endif %}
-                    <div>
-                      <strong>{{ producto.Nombre }}</strong> <br>
-                      Cantidad: {{ producto.Cantidad }}
-                    </div>
-                  </li>
-                {% endfor %}
-              </ul>
+            <h6 class="text-success">Productos:</h6>
+            <ul class="list-unstyled">
+              {% for detalle in pedido.detalles_pedido %}
+                <li class="d-flex align-items-center mb-2">
+                  {% if detalle.producto.ImagenPrincipal %}
+                    <img src="{{ url_for('static', filename=detalle.producto.ImagenPrincipal) }}" alt="Imagen de {{ detalle.producto.NombreProducto }}" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
+                  {% else %}
+                    <img src="{{ url_for('static', filename='img/catalogo.png') }}" alt="Imagen no disponible" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
+                  {% endif %}
+                  <div>
+                    <strong>{{ detalle.producto.NombreProducto }}</strong> <br>
+                    Cantidad: {{ detalle.Cantidad }}
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
 
-              <p><strong>Transportista asignado:</strong> {{ pedido.TransportistaNombre or 'No asignado' }}</p>
-              <p><strong>Hora llegada:</strong> {{ pedido.HoraLlegada.strftime('%Y-%m-%d %H:%M') if pedido.HoraLlegada else 'No asignada' }}</p>
-            </div>
+            <p><strong>Transportista asignado:</strong> {{ pedido.TransportistaNombre or 'No asignado' }}</p>
+            <p><strong>Hora llegada:</strong> {{ pedido.HoraLlegada.strftime('%Y-%m-%d %H:%M') if pedido.HoraLlegada else 'No asignada' }}</p>
           </div>
         </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="alert alert-info" role="alert">
-      No hay pedidos en proceso.
-    </div>
-  {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info" role="alert">
+    No hay pedidos en proceso.
+  </div>
+{% endif %}
+
 </div>
 {% endblock %}
