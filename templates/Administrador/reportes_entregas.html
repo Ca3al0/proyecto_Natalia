@@ -7,51 +7,182 @@
 
 {% block head %}
   {{ super() }}
+  <!-- Asegúrate de cargar Bootstrap antes de los estilos personalizados -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
-    .table thead {
-      background-color: #2e7d32;
-      color: white;
+    :root {
+      --primary-green: #5f8f3f;
+      --secondary-green: #4e7b33;
+      --light-green: #6c9a50;
+      --accent-green: #7cb342;
+      --bg-cream: #f8f6f0;
+      --text-dark: #2c3e50;
+      --shadow-light: rgba(0, 0, 0, 0.08);
+      --shadow-medium: rgba(0, 0, 0, 0.15);
     }
-    .table tbody tr:hover {
-      background-color: #c8e6c9;
+
+    /* Estilos generales */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: var(--bg-cream);
+      margin: 0;
+    }
+
+    /* Estilos para el contenedor de la tabla */
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px var(--shadow-light);
+    }
+
+    /* Estilo para los títulos */
+    h2 {
+      text-align: center;
+      color: var(--primary-green);
+      margin-bottom: 30px;
+      font-size: 2rem;
+      font-weight: 700;
+      position: relative;
+    }
+
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-green), var(--primary-green));
+      border-radius: 2px;
+    }
+
+    /* Tabla */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 16px;
+      font-size: 15px;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      color: var(--primary-green);
+      font-weight: 600;
+      border-bottom: 2px solid var(--accent-green);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Estilo para los botones dentro de la tabla */
+    .table button {
+      padding: 8px 16px;
+      border-radius: 50px;
+      border: none;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #4CAF50, #81C784);
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    .table button:hover {
+      background: linear-gradient(135deg, #81C784, #4CAF50);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 18px rgba(76, 175, 80, 0.4);
+    }
+
+    .table button:active {
+      transform: scale(0.95);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+    }
+
+    /* Alertas */
+    .alert-info {
+      background-color: #e8f5e9;
+      color: var(--primary-green);
+      border-radius: 10px;
+      padding: 15px;
+      font-weight: 500;
+      margin-top: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+
+      thead {
+        display: none;
+      }
+
+      tr {
+        margin-bottom: 20px;
+        box-shadow: 0 3px 10px var(--shadow-light);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+
+      td {
+        padding: 12px;
+        text-align: right;
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: var(--primary-green);
+      }
     }
   </style>
 {% endblock %}
 
 {% block content %}
 <div class="container my-4">
-  <h2 class="mb-4 text-center text-success">Reporte de Entregas Realizadas</h2>
+  <h2 class="mb-4 text-success">Reporte de Entregas Realizadas</h2>
 
   {% if pedidos_entregados %}
-  <table class="table table-striped table-bordered">
-    <thead>
-      <tr>
-        <th>Pedido #</th>
-        <th>Cliente</th>
-        <th>Fecha Entrega</th>
-        <th>Productos</th>
-        <th>Transportista</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for pedido in pedidos_entregados %}
-      <tr>
-        <td>{{ pedido.ID_Pedido }}</td>
-        <td>{{ pedido.NombreComprador }}</td>
-        <td>{{ pedido.FechaEntrega.strftime('%Y-%m-%d %H:%M') if pedido.FechaEntrega else 'N/A' }}</td>
-        <td>
-          <ul class="mb-0">
-            {% for detalle in pedido.detalles_pedido %}
-              <li>{{ detalle.producto.NombreProducto }} (x{{ detalle.Cantidad }})</li>
-            {% endfor %}
-          </ul>
-        </td>
-        <td>{{ pedido.TransportistaNombre or 'No asignado' }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th>Pedido #</th>
+          <th>Cliente</th>
+          <th>Fecha Entrega</th>
+          <th>Productos</th>
+          <th>Transportista</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pedido in pedidos_entregados %}
+          <tr>
+            <td>{{ pedido.ID_Pedido }}</td>
+            <td>{{ pedido.NombreComprador }}</td>
+            <td>{{ pedido.FechaEntrega.strftime('%Y-%m-%d %H:%M') if pedido.FechaEntrega else 'N/A' }}</td>
+            <td>
+              <ul class="mb-0">
+                {% for detalle in pedido.detalles_pedido %}
+                  <li>{{ detalle.producto.NombreProducto }} (x{{ detalle.Cantidad }})</li>
+                {% endfor %}
+              </ul>
+            </td>
+            <td>{{ pedido.TransportistaNombre or 'No asignado' }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   {% else %}
     <div class="alert alert-info">No hay entregas registradas.</div>
   {% endif %}

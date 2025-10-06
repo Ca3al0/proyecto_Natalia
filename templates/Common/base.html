@@ -17,22 +17,7 @@
 
     {% block extra_css %}{% endblock %}
 
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        main {
-            flex: 1;
-        }
-    </style>
+   
 </head>
 <body>
 
@@ -50,7 +35,7 @@
     {% endblock %}
 
     <!-- ✅ Scripts de Bootstrap (necesarios para modales, botones, etc.) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
 
     <!-- Bloque adicional para JS de cada página -->
     {% block scripts %}{% endblock %}

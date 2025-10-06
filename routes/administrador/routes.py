@@ -631,13 +631,28 @@ def asignar_transportista(id_pedido):
     transportista_id = request.form.get('transportista_id')
     hora_llegada_str = request.form.get('hora_llegada')
 
+    # Verificar que todos los campos estén completos
     if not transportista_id or not hora_llegada_str:
         flash('Por favor, completa todos los campos.', 'warning')
         return redirect(url_for('admin.ver_pedidos'))
 
+    # Verificar si el transportista existe en la base de datos
+    transportista = Usuario.query.get(transportista_id)
+    if not transportista:
+        flash('El transportista no existe.', 'danger')
+        return redirect(url_for('admin.ver_pedidos'))
+
     # Convertir la hora_llegada de string a datetime
-    from datetime import datetime
-    hora_llegada = datetime.strptime(hora_llegada_str, '%Y-%m-%dT%H:%M')
+    try:
+        hora_llegada = datetime.strptime(hora_llegada_str, '%Y-%m-%dT%H:%M')
+    except ValueError:
+        flash('El formato de la hora de llegada no es válido.', 'danger')
+        return redirect(url_for('admin.ver_pedidos'))
+
+    # Verificar si el pedido ya está en proceso
+    if pedido.Estado == 'en proceso':
+        flash('Este pedido ya tiene un transportista asignado.', 'warning')
+        return redirect(url_for('admin.ver_pedidos'))
 
     # Actualizar datos en el pedido
     pedido.ID_Empleado = int(transportista_id)
@@ -646,16 +661,20 @@ def asignar_transportista(id_pedido):
 
     db.session.commit()
 
-    flash('Transportista asignado correctamente.', 'success')
+    flash(f'Transportista {transportista.Nombre} asignado al pedido #{id_pedido} correctamente.', 'success')
     return redirect(url_for('admin.ver_pedidos'))
 
+# Ruta para mostrar los reportes de entregas realizadas
 @admin.route('/reportes')
 def reporte_entregas():
     pedidos_entregados = Pedido.query.filter_by(Estado='entregado').all()
 
+    # Optimización: Cargar todos los transportistas de una vez
+    transportistas = {usuario.ID_Usuario: usuario for usuario in Usuario.query.filter_by(Rol='transportista').all()}
+
     for pedido in pedidos_entregados:
         if pedido.ID_Empleado:
-            transportista = Usuario.query.filter_by(ID_Usuario=pedido.ID_Empleado, Rol='transportista').first()
+            transportista = transportistas.get(pedido.ID_Empleado)
             if transportista:
                 pedido.TransportistaNombre = f"{transportista.ID_Usuario} - {transportista.Nombre}"
             else:
