@@ -158,6 +158,8 @@ class Novedades(db.Model):
     ID_Producto = db.Column(db.Integer, db.ForeignKey('Producto.ID_Producto'), nullable=False)
 
 # ------------------ Pedido ------------------
+from datetime import datetime
+
 class Pedido(db.Model):
     __tablename__ = 'Pedido'
 
@@ -169,13 +171,20 @@ class Pedido(db.Model):
     Destino = db.Column(db.String(200))
     Descuento = db.Column(db.Float)
     ID_Usuario = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
+
+    # Empleado que registra o transportista asignado
     ID_Empleado = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'))
 
+    # 🕓 Nuevo campo: hora de llegada asignada
+    HoraLlegada = db.Column(db.DateTime)
+
+    # Relaciones
     pagos = db.relationship('Pagos', backref='pedido', lazy=True)
     detalles_pedido = db.relationship('Detalle_Pedido', backref='pedido', lazy=True)
     firmas = db.relationship('Firmas', backref='pedido', lazy=True)
     comentarios = db.relationship('Comentarios', backref='pedido', lazy=True)
     calendario = db.relationship('Calendario', backref='pedido', lazy=True)
+
 
 # ------------------ Pagos ------------------
 class Pagos(db.Model):
