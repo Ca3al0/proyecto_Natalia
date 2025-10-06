@@ -310,3 +310,4 @@ def get_direcciones():
             "info": d.InfoAdicional
         })
     return jsonify(data)
+
