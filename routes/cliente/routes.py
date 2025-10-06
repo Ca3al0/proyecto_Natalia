@@ -236,28 +236,45 @@ def comparar():
     productos = Producto.query.all()  # o la consulta que tengas
     return render_template('cliente/comparar.html', productos=productos)
 
-
 @cliente.route('/api/pedidos', methods=['POST'])
 @login_required
 def crear_pedido():
     try:
         data = request.get_json()
         productos_ids = data.get('productos', [])
-        if not productos_ids:
-            return jsonify({"mensaje":"No se recibieron productos"}), 400
+        cantidades = data.get('cantidades', [])
 
-        for pid in productos_ids:
-            pedido = Pedido(
-                UsuarioID=current_user.ID_Usuario,
-                ProductoID=int(pid),
-                Cantidad=1,  # puedes mejorar para permitir cantidad
-                Fecha=datetime.now()
+        if not productos_ids:
+            return jsonify({"mensaje": "No se recibieron productos"}), 400
+
+        # Crear pedido
+        pedido = Pedido(
+            NombreComprador=current_user.Nombre,
+            Estado='pendiente',
+            FechaPedido=date.today(),
+            ID_Usuario=current_user.ID_Usuario
+        )
+        db.session.add(pedido)
+        db.session.flush()  # para obtener ID_Pedido antes del commit
+
+        # Agregar productos al detalle del pedido
+        for idx, pid in enumerate(productos_ids):
+            producto = Producto.query.get(pid)
+            if not producto:
+                continue
+            cantidad = cantidades[idx] if cantidades and len(cantidades) > idx else 1
+            detalle = Detalle_Pedido(
+                ID_Pedido=pedido.ID_Pedido,
+                ID_Producto=producto.ID_Producto,
+                Cantidad=cantidad,
+                PrecioUnidad=producto.PrecioUnidad
             )
-            db.session.add(pedido)
+            db.session.add(detalle)
+
         db.session.commit()
-        return jsonify({"mensaje":"Pedido registrado correctamente"}), 201
+        return jsonify({"mensaje": "Pedido registrado correctamente"}), 201
 
     except Exception as e:
         db.session.rollback()
         print("Error al registrar pedido:", e)
-        return jsonify({"mensaje":"Error al registrar pedido"}), 500
+        return jsonify({"mensaje": "Error al registrar pedido"}), 500
