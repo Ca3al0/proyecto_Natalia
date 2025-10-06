@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (res.ok) {
                 mostrarMensaje('Compra registrada correctamente ✅', 'success');
                 modalCompra.hide();
-                setTimeout(() => window.location.href = '/cliente/pedidos', 1500);
+                setTimeout(() => window.location.href = '', 1500);
             } else {
                 mostrarMensaje(data.mensaje || 'Error al registrar la compra ❌', 'danger');
             }
