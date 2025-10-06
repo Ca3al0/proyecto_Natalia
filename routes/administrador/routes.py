@@ -597,4 +597,21 @@ def agregar_compra():
         return jsonify({"mensaje": "Error al registrar compra ❌"}), 500
     
 
+@admin.route('/asignar_transportista/<int:id_pedido>', methods=['POST'])
+@login_required
+def asignar_transportista(id_pedido):
+    # Lógica para asignar transportista
+    id_transportista = request.form.get('transportista_id')
+    hora_llegada = request.form.get('hora_llegada')
+
+    # Validaciones simples (puedes mejorar)
+    if not id_transportista or not hora_llegada:
+        flash("Datos incompletos para asignar transportista", "danger")
+        return redirect(url_for('admin.ver_pedidos'))
+
+    # Aquí deberías actualizar el pedido en la base de datos
+    # por ejemplo: PedidoModel.asignar_transportista(id_pedido, id_transportista, hora_llegada)
+
+    flash("Transportista asignado correctamente ✅", "success")
+    return redirect(url_for('admin.ver_pedidos'))
 
