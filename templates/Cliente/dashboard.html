@@ -6,13 +6,16 @@
 {% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/roles.css') }}">
+
+<!-- Estilos -->
+
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
 
+<!-- Flash messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
-      <div class="alert alert-{{ category }} flash-small d-flex align-items-center" role="alert">
+      <div class="alert alert-{{ category }} flash-small d-flex align-items-center mt-3" role="alert">
         {% if category == 'success' %}
           <i class="bi bi-check-circle-fill me-2"></i>
         {% elif category == 'danger' %}
@@ -27,7 +30,6 @@
     {% endfor %}
   {% endif %}
 {% endwith %}
-
 
 <!-- Carrusel principal -->
 <div id="carouselEjemplo" class="carousel slide" data-bs-ride="carousel">
@@ -164,10 +166,10 @@
     </div>
   </div>
 </section>
-{% endblock %}
 
-{% block extra_js %}
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url_for('static', filename='js/actualizacion.js') }}"></script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
 {% endblock %}
