@@ -63,7 +63,7 @@ def load_user(user_id):
 app.register_blueprint(auth)
 app.register_blueprint(cliente)
 app.register_blueprint(admin)
-
+app.register_blueprint(transportista)
 # ------------------ RUTAS PÚBLICAS ------------------ #
 @app.route("/")
 def index():
