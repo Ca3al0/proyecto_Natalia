@@ -95,6 +95,8 @@ def pedidos_admin():
     for p in pedidos:
         print(f"Pedido {p.ID} con productos: {p.Productos}")
     return render_template('administrador/admin_actualizacion_datos.html', pedidos=pedidos)
+
+
 # ------------------ TEMPLATE FILTER ------------------ #
 @app.template_filter("dict_get")
 def dict_get(d, key):

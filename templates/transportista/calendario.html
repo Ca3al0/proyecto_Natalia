@@ -29,6 +29,11 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
+
+        /* Cursor pointer en eventos */
+        .fc-event {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -64,7 +69,7 @@
 
                 eventDidMount: function(info) {
                     // Estilos personalizados según el tipo de evento
-                    const tipo = info.event.extendedProps.tipo?.toLowerCase();
+                    const tipo = info.event.extendedProps.tipo ? info.event.extendedProps.tipo.toLowerCase() : '';
 
                     if (tipo === 'instalación') {
                         info.el.style.backgroundColor = '#007bff'; // azul
@@ -73,6 +78,9 @@
                         info.el.style.backgroundColor = '#28a745'; // verde
                         info.el.style.color = '#fff';
                     }
+
+                    // Asegurar que el cursor sea pointer
+                    info.el.style.cursor = 'pointer';
                 }
             });
 
