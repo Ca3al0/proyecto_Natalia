@@ -98,7 +98,9 @@ def login():
                 rutas_por_rol = {
                     'admin': 'admin.dashboard', 
                     'cliente': 'cliente.dashboard',
-                    'transportista': 'transportista.dashboard'
+                    'transportista': 'transportista.dashboard',
+                    'instalador': 'transportista.dashboard'
+
                 }
 
                 ruta = rutas_por_rol.get(usuario.Rol)
