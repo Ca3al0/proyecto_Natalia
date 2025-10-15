@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calendario de Entregas e Instalaciones</title>
+
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+
+    <!-- Estilos personalizados -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f8f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        #calendar {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <h2>📅 Calendario de Entregas e Instalaciones</h2>
+    <div id="calendar"></div>
+
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+
+    <!-- Cargar idioma español -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'es',  // Cargar idioma
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: '/transportista/api/calendario',  // Tu endpoint JSON
+
+                eventClick: function(info) {
+                    const title = info.event.title || 'Sin título';
+                    const location = info.event.extendedProps.location || 'Ubicación no especificada';
+                    const tipo = info.event.extendedProps.tipo || 'Evento';
+                    alert(`📝 Tipo: ${tipo}\n📦 Evento: ${title}\n📍 Ubicación: ${location}`);
+                },
+
+                eventDidMount: function(info) {
+                    // Estilo personalizado opcional por tipo de evento
+                    if (info.event.extendedProps.tipo === 'instalación') {
+                        info.el.style.backgroundColor = '#007bff'; // azul
+                        info.el.style.color = '#fff';
+                    } else if (info.event.extendedProps.tipo === 'entrega') {
+                        info.el.style.backgroundColor = '#28a745'; // verde
+                        info.el.style.color = '#fff';
+                    }
+                }
+            });
+            calendar.render();
+        });
+    </script>
+</body>
+</html>
