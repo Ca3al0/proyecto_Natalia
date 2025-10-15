@@ -91,7 +91,7 @@ def login():
                 login_user(usuario)
                 flash("Inicio de sesión exitoso", "success")
 
-                # Guardar nombre completo y bandera en sesión para modal
+            
                 session['username'] = f"{usuario.Nombre} {usuario.Apellido or ''}".strip()
                 session['show_welcome_modal'] = True
 
@@ -115,7 +115,7 @@ def login():
         else:
             flash("Correo o contraseña incorrectos", "danger")
 
-        # Mantener correo en el formulario si falla login
+   
         return render_template('login.html', correo=correo)
 
     return render_template('login.html')
@@ -167,28 +167,28 @@ def reset_password(token):
             flash('Completa ambos campos.', 'warning')
             return render_template('reset_password.html', token=token)
 
-        # Validación: contraseñas coinciden
+    
         if new_password != confirm_password:
             flash('Las contraseñas no coinciden.', 'warning')
             return render_template('reset_password.html', token=token)
 
-        # Validación de política de seguridad
+       
         error = validar_password(new_password)
         if error:
             flash(error, 'warning')
             return render_template('reset_password.html', token=token)
 
-        # Buscar usuario
+       
         user = Usuario.query.filter_by(Correo=email).first()
         if not user:
             flash('Usuario no encontrado.', 'danger')
             return redirect(url_for('auth.forgot_password'))
 
-        # Actualizar contraseña
+    
         user.Contraseña = generate_password_hash(new_password)
         db.session.commit()
 
-        # Crear notificación
+       
         crear_notificacion(
             user_id=user.ID_Usuario,
             titulo="Contraseña actualizada",

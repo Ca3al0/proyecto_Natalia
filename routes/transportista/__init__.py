@@ -1,6 +1,10 @@
 from flask import Blueprint
 
-transportista = Blueprint('transportista', __name__, url_prefix='/transportista', template_folder='../../templates')
+transportista  = Blueprint(
+    'transportista',  
+    __name__,
+    template_folder='templates',
+    url_prefix='/transportista'
+)
 
-# Importar rutas después de definir el blueprint
-from . import routes
+from . import routes  

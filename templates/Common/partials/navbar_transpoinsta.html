@@ -1,0 +1,71 @@
+{% block navbar %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<nav class="navbar navbar-expand-lg fixed-top bg-light shadow-sm" style="z-index: 1050;">
+  <div class="container-fluid px-4">
+    <!-- Logo -->
+    <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="{{ url_for('admin.dashboard') }}">
+      Panel Transportista - Instalador
+    </a>
+
+    <!-- Botón responsive -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
+      aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarMain">
+      <!-- Buscador -->
+      <div class="search-container mx-auto d-none d-md-block">
+        <input class="form-control rounded-pill border-success-subtle" type="search"
+          placeholder="¿Qué estás buscando hoy?" aria-label="Buscar">
+      </div>
+
+      <!-- Iconos -->
+      <div class="d-flex align-items-center gap-3 ms-auto text-primary">
+        <!-- Favoritos -->
+        <a href="#" class="nav-icon"><i class="bi bi-heart fs-4"></i></a>
+
+       
+        <!-- Usuario Dropdown -->
+        <div class="dropdown">
+          <a class="nav-icon dropdown-toggle" href="#" id="dropdownUser" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            <i class="bi bi-person fs-4"></i>
+          </a>
+
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser" style="width: 250px;">
+            {% if current_user.is_authenticated %}
+            <li class="px-3 py-2 d-flex align-items-center">
+              <div class="rounded-circle bg-light border text-dark fw-bold d-flex align-items-center justify-content-center me-2"
+                style="width: 45px; height: 45px; font-size: 16px;">
+                {{ current_user.Nombre[0]|upper }}{{ current_user.Apellido[0]|upper }}
+              </div>
+              <strong class="text-uppercase">{{ current_user.Nombre }} {{ current_user.Apellido }}</strong>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">👤 Perfil</a></li>
+            <li><a class="dropdown-item" href="#">⭐ Calendario</a></li>
+            <li><a class="dropdown-item" href="#">🔔 Notificaciones</a></li>
+            <li><a class="dropdown-item" href="#">🏢 Proveedores</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li class="px-3">
+              <a href="{{ url_for('auth.logout') }}" class="btn btn-success w-100">Cerrar sesión</a>
+            </li>
+            {% else %}
+            <li><a class="dropdown-item" href="{{ url_for('auth.login') }}">Iniciar sesión</a></li>
+            {% endif %}
+          </ul>
+        </div>
+
+        <!-- Carrito -->
+        <a href="#" class="nav-icon position-relative">
+          <i class="bi bi-cart fs-4"></i>
+          <span class="cart-badge bg-danger text-white" id="cart-count">0</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+{% endblock %}
