@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, jsonify
 from flask_login import login_required
 from basedatos.models import db, Calendario, Pedido, Usuario
 from basedatos.decoradores import role_required
-import datetime  # Importar el módulo completo para usar date, time, datetime
+import datetime, time  
 
 from . import transportista
 reviews = []
@@ -26,11 +26,9 @@ def api_calendario():
         usuario = Usuario.query.get(c.ID_Usuario)
         nombre_usuario = f"{usuario.Nombre} {usuario.Apellido or ''}".strip() if usuario else "Desconocido"
 
-        # Construir fecha y hora en ISO 8601
         if isinstance(c.Fecha, datetime.date) and isinstance(c.Hora, datetime.time):
-            start = datetime.datetime.combine(c.Fecha, c.Hora).isoformat()
+            start = datetime.combine(c.Fecha, c.Hora).isoformat()
         else:
-            # Fallback si no son tipos datetime
             start = f"{c.Fecha}T{c.Hora}"
 
         eventos.append({
@@ -42,29 +40,32 @@ def api_calendario():
             "usuario": nombre_usuario
         })
 
-    # Obtener pedidos con fecha de entrega no asociados al calendario
+    # Obtener pedidos con FechaEntrega != None
     pedidos_con_fecha = Pedido.query.filter(Pedido.FechaEntrega != None).all()
-    ids_en_calendario = {c.ID_Pedido for c in calendarios if c.ID_Pedido is not None}
 
     for p in pedidos_con_fecha:
-        if p.ID_Pedido not in ids_en_calendario:
-            usuario = Usuario.query.get(p.ID_Usuario)
-            nombre_usuario = f"{usuario.Nombre} {usuario.Apellido or ''}".strip() if usuario else "Desconocido"
+        usuario = Usuario.query.get(p.ID_Usuario)
+        nombre_usuario = f"{usuario.Nombre} {usuario.Apellido or ''}".strip() if usuario else "Desconocido"
 
-            hora = p.HoraLlegada if p.HoraLlegada else datetime.time(12, 0, 0)
-            if isinstance(p.FechaEntrega, datetime.date) and isinstance(hora, datetime.time):
-                start = datetime.datetime.combine(p.FechaEntrega, hora).isoformat()
-            else:
-                start = f"{p.FechaEntrega}T{hora}"
+        # Como no hay hora, ponemos una hora fija 12:00:00
+        hora_fija = time(12, 0, 0)
 
-            eventos.append({
-                "id": f"pedido-{p.ID_Pedido}",
-                "title": f"Entrega - Pedido #{p.ID_Pedido}",
-                "start": start,
-                "location": p.Destino or "Sin dirección",
-                "tipo": "Entrega",
-                "usuario": nombre_usuario
-            })
+        if isinstance(p.FechaEntrega, datetime.date):
+            start = datetime.combine(p.FechaEntrega, hora_fija).isoformat()
+        else:
+            start = f"{p.FechaEntrega}T12:00:00"
+
+        # Tipo del evento basado en Instalacion
+        tipo_evento = "Instalación" if p.Instalacion else "Entrega"
+
+        eventos.append({
+            "id": f"pedido-{p.ID_Pedido}",
+            "title": f"{tipo_evento} - Pedido #{p.ID_Pedido}",
+            "start": start,
+            "location": p.Destino or "Sin dirección",
+            "tipo": tipo_evento,
+            "usuario": nombre_usuario
+        })
 
     return jsonify(eventos)
 
