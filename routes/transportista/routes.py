@@ -1,9 +1,8 @@
 from flask import Blueprint, render_template, jsonify
 from flask_login import login_required
-from basedatos.models import db, Calendario,Pedido, Usuario
+from basedatos.models import db, Calendario, Pedido, Usuario
 from basedatos.decoradores import role_required
-from datetime import datetime
-
+import datetime  # Importar el módulo completo para usar date, time, datetime
 
 from . import transportista
 reviews = []
@@ -68,7 +67,6 @@ def api_calendario():
             })
 
     return jsonify(eventos)
-
 
 @transportista.route('/calendario')
 @login_required

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Calendario de Entregas e Instalaciones</title>
 
     <!-- FullCalendar CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
 
     <!-- Estilos personalizados -->
     <style>
@@ -56,8 +56,13 @@
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                events: '/transportista/api/calendario',
-
+                events: {
+                    url: '/transportista/api/calendario',
+                    failure: function() {
+                        console.error('Error cargando eventos');
+                        alert('No se pudieron cargar los eventos del calendario');
+                    }
+                },
                 eventClick: function(info) {
                     const title = info.event.title || 'Sin título';
                     const location = info.event.extendedProps.location || 'Ubicación no especificada';
@@ -66,7 +71,6 @@
 
                     alert(`📝 Tipo: ${tipo}\n📦 Evento: ${title}\n👤 Cliente: ${usuario}\n📍 Ubicación: ${location}`);
                 },
-
                 eventDidMount: function(info) {
                     // Estilos personalizados según el tipo de evento
                     const tipo = info.event.extendedProps.tipo ? info.event.extendedProps.tipo.toLowerCase() : '';
@@ -79,7 +83,7 @@
                         info.el.style.color = '#fff';
                     }
 
-                    // Asegurar que el cursor sea pointer
+                    // Cursor pointer para indicar interactividad
                     info.el.style.cursor = 'pointer';
                 }
             });
