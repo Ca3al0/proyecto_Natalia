@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, jsonify
 from flask_login import login_required
 from basedatos.models import db, Calendario, Pedido, Usuario
 from basedatos.decoradores import role_required
-import datetime, time  
+from datetime import datetime, date, time
 
 from . import transportista
 reviews = []
@@ -26,7 +26,7 @@ def api_calendario():
         usuario = Usuario.query.get(c.ID_Usuario)
         nombre_usuario = f"{usuario.Nombre} {usuario.Apellido or ''}".strip() if usuario else "Desconocido"
 
-        if isinstance(c.Fecha, datetime.date) and isinstance(c.Hora, datetime.time):
+        if isinstance(c.Fecha, date) and isinstance(c.Hora, time):
             start = datetime.combine(c.Fecha, c.Hora).isoformat()
         else:
             start = f"{c.Fecha}T{c.Hora}"
@@ -47,15 +47,13 @@ def api_calendario():
         usuario = Usuario.query.get(p.ID_Usuario)
         nombre_usuario = f"{usuario.Nombre} {usuario.Apellido or ''}".strip() if usuario else "Desconocido"
 
-        # Como no hay hora, ponemos una hora fija 12:00:00
         hora_fija = time(12, 0, 0)
 
-        if isinstance(p.FechaEntrega, datetime.date):
+        if isinstance(p.FechaEntrega, date):
             start = datetime.combine(p.FechaEntrega, hora_fija).isoformat()
         else:
             start = f"{p.FechaEntrega}T12:00:00"
 
-        # Tipo del evento basado en Instalacion
         tipo_evento = "Instalación" if p.Instalacion else "Entrega"
 
         eventos.append({
