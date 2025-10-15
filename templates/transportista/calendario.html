@@ -37,8 +37,7 @@
 
     <!-- FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-
-    <!-- Cargar idioma español -->
+    <!-- Idioma español -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
 
     <script>
@@ -46,32 +45,37 @@
             const calendarEl = document.getElementById('calendar');
             const calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                locale: 'es',  // Cargar idioma
+                locale: 'es',
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                events: '/transportista/api/calendario',  // Tu endpoint JSON
+                events: '/transportista/api/calendario',
 
                 eventClick: function(info) {
                     const title = info.event.title || 'Sin título';
                     const location = info.event.extendedProps.location || 'Ubicación no especificada';
                     const tipo = info.event.extendedProps.tipo || 'Evento';
-                    alert(`📝 Tipo: ${tipo}\n📦 Evento: ${title}\n📍 Ubicación: ${location}`);
+                    const usuario = info.event.extendedProps.usuario || 'Desconocido';
+
+                    alert(`📝 Tipo: ${tipo}\n📦 Evento: ${title}\n👤 Cliente: ${usuario}\n📍 Ubicación: ${location}`);
                 },
 
                 eventDidMount: function(info) {
-                    // Estilo personalizado opcional por tipo de evento
-                    if (info.event.extendedProps.tipo === 'instalación') {
+                    // Estilos personalizados según el tipo de evento
+                    const tipo = info.event.extendedProps.tipo?.toLowerCase();
+
+                    if (tipo === 'instalación') {
                         info.el.style.backgroundColor = '#007bff'; // azul
                         info.el.style.color = '#fff';
-                    } else if (info.event.extendedProps.tipo === 'entrega') {
+                    } else if (tipo === 'entrega') {
                         info.el.style.backgroundColor = '#28a745'; // verde
                         info.el.style.color = '#fff';
                     }
                 }
             });
+
             calendar.render();
         });
     </script>
