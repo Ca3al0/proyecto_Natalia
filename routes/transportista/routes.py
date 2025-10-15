@@ -20,8 +20,9 @@ def dashboard():
 def api_calendario():
     eventos = []
 
-    # Obtener eventos del calendario
+    # Eventos del calendario (si los usas)
     calendarios = Calendario.query.all()
+
     for c in calendarios:
         usuario = Usuario.query.get(c.ID_Usuario)
         nombre_usuario = f"{usuario.Nombre} {usuario.Apellido or ''}".strip() if usuario else "Desconocido"
@@ -40,21 +41,21 @@ def api_calendario():
             "usuario": nombre_usuario
         })
 
-    # Obtener pedidos con FechaEntrega != None
-    pedidos_con_fecha = Pedido.query.filter(Pedido.FechaEntrega != None).all()
+    # Pedidos con fecha de entrega definida
+    pedidos_con_fecha = Pedido.query.filter(Pedido.FechaEntrega.isnot(None)).all()
 
     for p in pedidos_con_fecha:
         usuario = Usuario.query.get(p.ID_Usuario)
         nombre_usuario = f"{usuario.Nombre} {usuario.Apellido or ''}".strip() if usuario else "Desconocido"
 
-        hora_fija = time(12, 0, 0)
+        hora_fija = time(12, 0, 0)  
 
         if isinstance(p.FechaEntrega, date):
             start = datetime.combine(p.FechaEntrega, hora_fija).isoformat()
         else:
             start = f"{p.FechaEntrega}T12:00:00"
 
-        tipo_evento = "Instalación" if p.Instalacion else "Entrega"
+        tipo_evento = "Instalación" if p.Instalacion == 1 else "Entrega"
 
         eventos.append({
             "id": f"pedido-{p.ID_Pedido}",
