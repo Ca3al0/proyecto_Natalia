@@ -59,9 +59,8 @@ def api_calendario():
         elif p.HoraLlegada:
             fecha_evento = p.HoraLlegada.date()
         else:
-            continue  # Sin fecha no lo añadimos
+            continue  
 
-        # Hora base del evento
         hora_evento = p.HoraLlegada.time() if p.HoraLlegada else time(12, 0, 0)
 
         start = datetime.combine(fecha_evento, hora_evento).isoformat()
