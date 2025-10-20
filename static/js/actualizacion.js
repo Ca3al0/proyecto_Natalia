@@ -1,15 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // ---------- Menús ----------
+  
   const menuPerfil = document.getElementById('menu-perfil');
   const menuDirecciones = document.getElementById('menu-direcciones');
   const menuPedidos = document.getElementById('menu-pedidos');
 
-  // ---------- Secciones ----------
   const seccionPerfil = document.getElementById('seccion-perfil');
   const seccionDirecciones = document.getElementById('seccion-direcciones');
   const seccionPedidos = document.getElementById('seccion-pedidos');
 
-  // Función para ocultar todas las secciones y desactivar los menús
+
   function ocultarSecciones() {
     seccionPerfil.style.display = 'none';
     seccionDirecciones.style.display = 'none';
@@ -20,28 +19,28 @@ document.addEventListener('DOMContentLoaded', () => {
     menuPedidos.classList.remove('active');
   }
 
-  // Mostrar sección Perfil
+ 
   menuPerfil.addEventListener('click', () => {
     ocultarSecciones();
     seccionPerfil.style.display = 'block';
     menuPerfil.classList.add('active');
   });
 
-  // Mostrar sección Direcciones
+ 
   menuDirecciones.addEventListener('click', () => {
     ocultarSecciones();
     seccionDirecciones.style.display = 'block';
     menuDirecciones.classList.add('active');
   });
 
-  // Mostrar sección Pedidos
+  
   menuPedidos.addEventListener('click', () => {
     ocultarSecciones();
     seccionPedidos.style.display = 'block';
     menuPedidos.classList.add('active');
   });
 
-  // ---------- Modal de confirmación para borrar dirección ----------
+  
   let urlBorrar = null;
   const modalBorrar = new bootstrap.Modal(document.getElementById('modalConfirmarBorrar'));
 
@@ -52,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Formulario oculto para enviar POST al borrar
+ 
   const formBorrar = document.createElement('form');
   formBorrar.method = 'POST';
   formBorrar.style.display = 'none';
@@ -63,5 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
       formBorrar.action = urlBorrar;
       formBorrar.submit();
     }
+  });
+
+  
+  const modalPedido = document.getElementById('modalPedido');
+  modalPedido.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget;
+    const pedidoId = button.getAttribute('data-id');
+    const contenido = document.getElementById('detalle-pedido-contenido');
+    contenido.innerHTML = `<p class="text-muted">Cargando detalles del pedido #${pedidoId}...</p>`;
+    
+
   });
 });

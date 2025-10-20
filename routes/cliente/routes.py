@@ -47,11 +47,16 @@ def ver_notificaciones_cliente():
 # ---------- PERFIL Y DIRECCIONES ----------
 @cliente.route("/actualizacion_datos", methods=["GET", "POST"])
 @login_required
-@role_required("cliente","admin")
+@role_required("cliente", "admin")
 def actualizacion_datos():
     usuario = current_user
     direcciones = Direccion.query.filter_by(ID_Usuario=usuario.ID_Usuario).all()
-    notificaciones = Notificaciones.query.filter_by(ID_Usuario=usuario.ID_Usuario).order_by(Notificaciones.Fecha.desc()).all()
+    notificaciones = Notificaciones.query.filter_by(
+        ID_Usuario=usuario.ID_Usuario
+    ).order_by(Notificaciones.Fecha.desc()).all()
+
+    # 🔹 Traemos todos los pedidos del usuario actual
+    pedidos = Pedido.query.filter_by(ID_Usuario=usuario.ID_Usuario).order_by(Pedido.Fecha.desc()).all()
 
     if request.method == "POST":
         nombre = request.form.get("nombre", "").strip()
@@ -86,6 +91,7 @@ def actualizacion_datos():
         "cliente/actualizacion_datos.html",
         usuario=usuario,
         direcciones=direcciones,
+        pedidos=pedidos,  
         notificaciones=notificaciones
     )
 
@@ -141,10 +147,14 @@ def borrar_direccion(id_direccion):
 @cliente.route('/perfil')
 @login_required
 def perfil():
-    usuario = current_user
-    direcciones = usuario.direcciones
-    pedidos = Pedido.query.filter_by(ID_Usuario=usuario.ID_Usuario).order_by(Pedido.FechaPedido.desc()).all()
-    return render_template('cliente/perfil.html', usuario=usuario, direcciones=direcciones, pedidos=pedidos)
+    return redirect(url_for('cliente.actualizacion_datos'))
+
+@cliente.route('/pedido/detalle/<int:id_pedido>')
+@login_required
+def detalle_pedido(id_pedido):
+    pedido = Pedido.query.get_or_404(id_pedido)
+    detalles = Detalle_Pedido.query.filter_by(ID_Pedido=id_pedido).all()
+    return render_template('cliente/modal_detalle_pedido.html', pedido=pedido, detalles=detalles)
 
 # ---------- AGENDAR_INSTALACION ----------
 
