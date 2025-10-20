@@ -156,29 +156,21 @@ def detalle_pedido(id_pedido):
     detalles = Detalle_Pedido.query.filter_by(ID_Pedido=id_pedido).all()
     return render_template('cliente/modal_detalle_pedido.html', pedido=pedido, detalles=detalles)
 
-@cliente.route('/pedido_detalle/<int:id_pedido>')
-@login_required
-def pedido_detalle(id_pedido):
 
+
+@cliente.route("/pedido/<int:id_pedido>/detalle")
+def ver_detalle_pedido(id_pedido):
     pedido = Pedido.query.get_or_404(id_pedido)
 
-   
-    if pedido.ID_Usuario != current_user.ID_Usuario:
-        flash("⚠️ No tienes permiso para ver este pedido.", "warning")
-        return redirect(url_for('cliente.actualizacion_datos'))
-
-
     detalles = (
-        Detalle_Pedido.query
-        .filter_by(ID_Pedido=id_pedido)
-        .join(Producto)  
-        .add_entity(Producto)
+        db.session.query(Detalle_Pedido, Producto)
+        .join(Producto, Detalle_Pedido.ID_Producto == Producto.ID_Producto)
+        .filter(Detalle_Pedido.ID_Pedido == id_pedido)
         .all()
     )
 
-    # 4️⃣ Renderizar la plantilla parcial (AJAX)
     return render_template(
-        'cliente/common/partials/detalle_pedido.html',
+        "cliente/common/partials/detalle_pedido.html",
         pedido=pedido,
         detalles=detalles
     )
