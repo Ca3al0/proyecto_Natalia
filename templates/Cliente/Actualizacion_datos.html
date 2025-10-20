@@ -143,61 +143,7 @@
   </div>
 </div>
 
-<!-- Modal Detalle Pedido -->
-<div class="modal fade" id="modalPedido" tabindex="-1" aria-labelledby="modalPedidoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content p-4 rounded-4">
-      <div class="modal-header border-0">
-        <h5 class="modal-title fw-bold" id="modalPedidoLabel">DETALLE DEL PEDIDO</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body">
-        {% if pedido %}
-          <div class="mb-3">
-            <strong>Pedido #{{ pedido.ID_Pedido }}</strong><br>
-            <small>Fecha: {{ pedido.FechaPedido.strftime('%d/%m/%Y') if pedido.FechaPedido else 'Sin fecha' }}</small><br>
-            <span class="badge bg-success">{{ pedido.Estado }}</span><br>
-            <small><b>Dirección:</b> {{ pedido.Destino }}</small>
-          </div>
 
-          <hr>
-
-          {% for detalle in pedido.detalles %}
-            {% set producto = detalle.producto %}
-            <div class="list-group-item d-flex align-items-center justify-content-between mb-2 p-2 border rounded-3">
-              <div class="d-flex align-items-center">
-                {% if producto.ImagenPrincipal %}
-                  <img src="{{ url_for('static', filename=producto.ImagenPrincipal) }}" 
-                       alt="{{ producto.NombreProducto }}" 
-                       class="me-3 rounded" 
-                       style="width:70px; height:70px; object-fit:cover;">
-                {% else %}
-                  <img src="{{ url_for('static', filename='img/catalogo.png') }}" 
-                       alt="Imagen no disponible" 
-                       class="me-3 rounded" 
-                       style="width:70px; height:70px; object-fit:cover;">
-                {% endif %}
-                <div>
-                  <strong>{{ producto.NombreProducto }}</strong><br>
-                  <small>Cantidad: {{ detalle.Cantidad }}</small><br>
-                  <small>Precio: ${{ '%.2f'|format(detalle.PrecioUnidad) }}</small>
-                </div>
-              </div>
-              <div>
-                <strong>$ {{ '%.2f'|format(detalle.Cantidad * detalle.PrecioUnidad) }}</strong>
-              </div>
-            </div>
-          {% endfor %}
-
-          <hr>
-          <h5 class="text-end mt-3">Total: ${{ '%.2f'|format(pedido.detalles | sum(attribute='subtotal')) }}</h5>
-        {% else %}
-          <p class="text-muted">No se encontraron detalles para este pedido.</p>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-</div>
 
 
 <!-- Modal Agregar Dirección -->
