@@ -56,7 +56,7 @@ def actualizacion_datos():
     ).order_by(Notificaciones.Fecha.desc()).all()
 
     # 🔹 Traemos todos los pedidos del usuario actual
-    pedidos = Pedido.query.filter_by(ID_Usuario=usuario.ID_Usuario).order_by(Pedido.Fecha.desc()).all()
+    pedidos = Pedido.query.filter_by(ID_Usuario=usuario.ID_Usuario).order_by(Pedido.FechaPedido.desc()).all()
 
     if request.method == "POST":
         nombre = request.form.get("nombre", "").strip()
