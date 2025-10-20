@@ -178,7 +178,7 @@ class Pedido(db.Model):
     HoraLlegada = db.Column(db.DateTime)
 
     pagos = db.relationship('Pagos', backref='pedido', lazy=True)
-    detalles_pedido = db.relationship('Detalle_Pedido', backref='pedido', lazy=True)
+    detalles_pedido = db.relationship('Detalle_Pedido', back_populates='producto', lazy=True)
     firmas = db.relationship('Firmas', backref='pedido', lazy=True)
     comentarios = db.relationship('Comentarios', backref='pedido', lazy=True)
     calendario = db.relationship('Calendario', backref='pedido', lazy=True)
@@ -203,7 +203,7 @@ class Detalle_Pedido(db.Model):
     PrecioUnidad = db.Column(db.Float)
 
    
-    producto = db.relationship('Producto', backref='detalles_pedido')
+    producto = db.relationship('Producto', back_populates='detalles_pedido')
 
     @property
     def subtotal(self):
