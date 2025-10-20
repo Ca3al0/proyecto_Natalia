@@ -149,35 +149,24 @@ def borrar_direccion(id_direccion):
 def perfil():
     return redirect(url_for('cliente.actualizacion_datos'))
 
-@cliente.route('/pedido/detalle/<int:id_pedido>')
-@login_required
-def detalle_pedido(id_pedido):
-    pedido = Pedido.query.get_or_404(id_pedido)
-    detalles = Detalle_Pedido.query.filter_by(ID_Pedido=id_pedido).all()
-    return render_template('cliente/modal_detalle_pedido.html', pedido=pedido, detalles=detalles)
-
-
 
 @cliente.route("/pedido/<int:id_pedido>/detalle")
+@login_required
 def ver_detalle_pedido(id_pedido):
     pedido = Pedido.query.get_or_404(id_pedido)
 
     try:
-        detalles = (
-            db.session.query(Detalle_Pedido, Producto)
-            .join(Producto, Detalle_Pedido.ID_Producto == Producto.ID_Producto)
-            .filter(Detalle_Pedido.ID_Pedido == id_pedido)
-            .all()
-        )
+        detalles = pedido.detalles_pedido  # Relación definida en el modelo
     except Exception as e:
-        print(e)
+        print("Error detalles pedido:", e)
         detalles = []
-    
+
     return render_template(
         "Common/partials/detalle_pedido.html",
         pedido=pedido,
         detalles=detalles
     )
+
 
 
 

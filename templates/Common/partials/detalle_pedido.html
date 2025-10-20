@@ -1,40 +1,73 @@
-<div class="p-3">
-  <h5 class="mb-3">🧾 Pedido #{{ pedido.ID_Pedido }}</h5>
+<style>
 
-  <p><strong>Estado:</strong> {{ pedido.Estado|capitalize }}</p>
-  <p><strong>Fecha del pedido:</strong> {{ pedido.FechaPedido.strftime('%d/%m/%Y') if pedido.FechaPedido else 'No registrada' }}</p>
-  <p><strong>Fecha estimada de entrega:</strong> {{ pedido.FechaEntrega.strftime('%d/%m/%Y') if pedido.FechaEntrega else 'Pendiente' }}</p>
-  <p><strong>Destino:</strong> {{ pedido.Destino }}</p>
+.card:hover {
+  transform: translateY(-4px);
+  transition: 0.3s ease-in-out;
+  border-color: #28a745;
+}
+
+
+.modal-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+</style>
+div class="p-4 bg-success bg-opacity-10 rounded-4 mx-auto" style="max-width: 800px;">
+
+  <div class="text-center mb-4">
+    <h5 class="fw-bold text-success">🧾 Pedido #{{ pedido.ID_Pedido }}</h5>
+  </div>
+
+
+  <div class="row text-center mb-3">
+    <div class="col-md-4 mb-2">
+      <p class="mb-0 text-success"><strong>Fecha pedido:</strong></p>
+      <p class="mb-0">{{ pedido.FechaPedido.strftime('%d/%m/%Y') if pedido.FechaPedido else 'No registrada' }}</p>
+    </div>
+    <div class="col-md-4 mb-2">
+      <p class="mb-0 text-success"><strong>Entrega estimada:</strong></p>
+      <p class="mb-0">{{ pedido.FechaEntrega.strftime('%d/%m/%Y') if pedido.FechaEntrega else 'Pendiente' }}</p>
+    </div>
+    <div class="col-md-4 mb-2">
+      <p class="mb-0 text-success"><strong>Destino:</strong></p>
+      <p class="mb-0">{{ pedido.Destino }}</p>
+    </div>
+  </div>
 
   <hr>
 
-  <h6>🪑 Productos:</h6>
-  <div class="row">
-    {% for detalle, producto in detalles %}
-      <div class="col-md-6 mb-3">
-        <div class="card h-100 shadow-sm">
-          {% if producto.ImagenPrincipal %}
-            <img src="{{ url_for('static', filename=producto.ImagenPrincipal) }}" class="card-img-top" alt="{{ producto.NombreProducto }}">
-          {% else %}
-            <img src="{{ url_for('static', filename='img/catalogo.png') }}" class="card-img-top" alt="Imagen no disponible">
-          {% endif %}
 
+  <h6 class="text-center mb-3 text-success">🪑 Productos</h6>
+  <div class="row justify-content-center">
+    {% for detalle in detalles %}
+      <div class="col-md-6 mb-3">
+        <div class="card h-100 shadow-sm border-0 rounded-3 text-center border-success">
+          <img src="{{ url_for('static', filename=detalle.producto.ImagenPrincipal or 'img/catalogo.png') }}" 
+               class="card-img-top img-fluid rounded-top-3" 
+               alt="{{ detalle.producto.NombreProducto }}">
           <div class="card-body">
-            <h6 class="card-title">{{ producto.NombreProducto }}</h6>
-            <p>Cantidad: {{ detalle.Cantidad }}</p>
-            <p>Precio unidad: ${{ "%.2f"|format(detalle.PrecioUnidad) }}</p>
-            <p><strong>Subtotal:</strong> ${{ "%.2f"|format(detalle.Cantidad * detalle.PrecioUnidad) }}</p>
+            <h6 class="card-title text-truncate text-success">{{ detalle.producto.NombreProducto }}</h6>
+            <p class="mb-1 text-success"><strong>Cantidad:</strong> {{ detalle.Cantidad }}</p>
+            <p class="mb-1 text-success"><strong>Precio unidad:</strong> ${{ "%.2f"|format(detalle.PrecioUnidad) }}</p>
+            <p class="mb-0 fw-bold text-success"><strong>Subtotal:</strong> ${{ "%.2f"|format(detalle.subtotal) }}</p>
           </div>
         </div>
       </div>
     {% else %}
-      <p class="text-muted">No hay productos en este pedido.</p>
+      <p class="text-muted text-center">No hay productos en este pedido.</p>
     {% endfor %}
   </div>
 
   <hr>
-  <p class="text-end fw-bold">
-    Total del pedido:
-    ${{ "%.2f"|format(sum(detalle.Cantidad * detalle.PrecioUnidad for detalle, producto in detalles)) }}
+
+
+  <p class="text-center fw-bold fs-5 text-success">
+    Total del pedido: ${{ detalles|sum(attribute='subtotal')|round(2) }}
   </p>
+    <div class="modal-footer border-0 justify-content-center">
+        <button type="button" class="btn btn-outline-success" data-bs-dismiss="modal">Rastrear</button>
+      </div>
 </div>
