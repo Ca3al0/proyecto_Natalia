@@ -1,30 +1,44 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // ---------- Alternar secciones Perfil / Direcciones ----------
+  // ---------- Menús ----------
   const menuPerfil = document.getElementById('menu-perfil');
   const menuDirecciones = document.getElementById('menu-direcciones');
+  const menuPedidos = document.getElementById('menu-pedidos');
 
+  // ---------- Secciones ----------
   const seccionPerfil = document.getElementById('seccion-perfil');
   const seccionDirecciones = document.getElementById('seccion-direcciones');
+  const seccionPedidos = document.getElementById('seccion-pedidos');
 
-  // Función para ocultar todas las secciones
+  // Función para ocultar todas las secciones y desactivar los menús
   function ocultarSecciones() {
     seccionPerfil.style.display = 'none';
     seccionDirecciones.style.display = 'none';
+    seccionPedidos.style.display = 'none';
 
     menuPerfil.classList.remove('active');
     menuDirecciones.classList.remove('active');
+    menuPedidos.classList.remove('active');
   }
 
+  // Mostrar sección Perfil
   menuPerfil.addEventListener('click', () => {
     ocultarSecciones();
     seccionPerfil.style.display = 'block';
     menuPerfil.classList.add('active');
   });
 
+  // Mostrar sección Direcciones
   menuDirecciones.addEventListener('click', () => {
     ocultarSecciones();
     seccionDirecciones.style.display = 'block';
     menuDirecciones.classList.add('active');
+  });
+
+  // Mostrar sección Pedidos
+  menuPedidos.addEventListener('click', () => {
+    ocultarSecciones();
+    seccionPedidos.style.display = 'block';
+    menuPedidos.classList.add('active');
   });
 
   // ---------- Modal de confirmación para borrar dirección ----------
