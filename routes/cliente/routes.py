@@ -162,18 +162,23 @@ def detalle_pedido(id_pedido):
 def ver_detalle_pedido(id_pedido):
     pedido = Pedido.query.get_or_404(id_pedido)
 
-    detalles = (
-        db.session.query(Detalle_Pedido, Producto)
-        .join(Producto, Detalle_Pedido.ID_Producto == Producto.ID_Producto)
-        .filter(Detalle_Pedido.ID_Pedido == id_pedido)
-        .all()
-    )
-
+    try:
+        detalles = (
+            db.session.query(Detalle_Pedido, Producto)
+            .join(Producto, Detalle_Pedido.ID_Producto == Producto.ID_Producto)
+            .filter(Detalle_Pedido.ID_Pedido == id_pedido)
+            .all()
+        )
+    except Exception as e:
+        print(e)
+        detalles = []
+    
     return render_template(
-        "cliente/common/partials/detalle_pedido.html",
+        "Common/partials/detalle_pedido.html",
         pedido=pedido,
         detalles=detalles
     )
+
 
 
 
