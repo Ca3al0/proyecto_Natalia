@@ -138,6 +138,13 @@ def borrar_direccion(id_direccion):
 
     return redirect(url_for("cliente.actualizacion_datos"))
 
+@cliente.route('/perfil')
+@login_required
+def perfil():
+    usuario = current_user
+    direcciones = usuario.direcciones
+    pedidos = Pedido.query.filter_by(ID_Usuario=usuario.ID_Usuario).order_by(Pedido.FechaPedido.desc()).all()
+    return render_template('cliente/perfil.html', usuario=usuario, direcciones=direcciones, pedidos=pedidos)
 
 # ---------- AGENDAR_INSTALACION ----------
 
