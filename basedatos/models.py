@@ -165,26 +165,23 @@ class Pedido(db.Model):
 
     ID_Pedido = db.Column(db.Integer, primary_key=True, autoincrement=True)
     NombreComprador = db.Column(db.String(100))
-    Estado = db.Column(db.Enum('pendiente','en proceso','en reparto','entregado'))
+    Estado = db.Column(db.Enum('pendiente', 'en proceso', 'en reparto', 'entregado'))
     FechaPedido = db.Column(db.Date)
     FechaEntrega = db.Column(db.Date)
     Destino = db.Column(db.String(200))
     Descuento = db.Column(db.Float)
     ID_Usuario = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
 
-    # Empleado que registra o transportista asignado
+   
     ID_Empleado = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'))
 
-    # 🕓 Nuevo campo: hora de llegada asignada
     HoraLlegada = db.Column(db.DateTime)
 
-    # Relaciones
     pagos = db.relationship('Pagos', backref='pedido', lazy=True)
     detalles_pedido = db.relationship('Detalle_Pedido', backref='pedido', lazy=True)
     firmas = db.relationship('Firmas', backref='pedido', lazy=True)
     comentarios = db.relationship('Comentarios', backref='pedido', lazy=True)
     calendario = db.relationship('Calendario', backref='pedido', lazy=True)
-
 
 # ------------------ Pagos ------------------
 class Pagos(db.Model):
@@ -205,6 +202,12 @@ class Detalle_Pedido(db.Model):
     Cantidad = db.Column(db.Integer)
     PrecioUnidad = db.Column(db.Float)
 
+   
+    producto = db.relationship('Producto', backref='detalles_pedido')
+
+    @property
+    def subtotal(self):
+        return self.Cantidad * self.PrecioUnidad
 # ------------------ Firmas ------------------
 class Firmas(db.Model):
     __tablename__ = 'Firmas'
