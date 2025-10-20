@@ -1,0 +1,40 @@
+<div class="p-3">
+  <h5 class="mb-3">🧾 Pedido #{{ pedido.ID_Pedido }}</h5>
+
+  <p><strong>Estado:</strong> {{ pedido.Estado|capitalize }}</p>
+  <p><strong>Fecha del pedido:</strong> {{ pedido.FechaPedido.strftime('%d/%m/%Y') if pedido.FechaPedido else 'No registrada' }}</p>
+  <p><strong>Fecha estimada de entrega:</strong> {{ pedido.FechaEntrega.strftime('%d/%m/%Y') if pedido.FechaEntrega else 'Pendiente' }}</p>
+  <p><strong>Destino:</strong> {{ pedido.Destino }}</p>
+
+  <hr>
+
+  <h6>🪑 Productos:</h6>
+  <div class="row">
+    {% for detalle, producto in detalles %}
+      <div class="col-md-6 mb-3">
+        <div class="card h-100 shadow-sm">
+          {% if producto.ImagenPrincipal %}
+            <img src="{{ url_for('static', filename=producto.ImagenPrincipal) }}" class="card-img-top" alt="{{ producto.NombreProducto }}">
+          {% else %}
+            <img src="{{ url_for('static', filename='img/catalogo.png') }}" class="card-img-top" alt="Imagen no disponible">
+          {% endif %}
+
+          <div class="card-body">
+            <h6 class="card-title">{{ producto.NombreProducto }}</h6>
+            <p>Cantidad: {{ detalle.Cantidad }}</p>
+            <p>Precio unidad: ${{ "%.2f"|format(detalle.PrecioUnidad) }}</p>
+            <p><strong>Subtotal:</strong> ${{ "%.2f"|format(detalle.Cantidad * detalle.PrecioUnidad) }}</p>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <p class="text-muted">No hay productos en este pedido.</p>
+    {% endfor %}
+  </div>
+
+  <hr>
+  <p class="text-end fw-bold">
+    Total del pedido:
+    ${{ "%.2f"|format(sum(detalle.Cantidad * detalle.PrecioUnidad for detalle, producto in detalles)) }}
+  </p>
+</div>
