@@ -74,7 +74,7 @@ def ver_notificaciones():
         ids = request.form.getlist("ids")
         if not ids:
             flash("❌ No seleccionaste ninguna notificación", "warning")
-            return redirect(url_for("admin.ver_notificaciones"))
+            return redirect(url_for("cliente.ver_notificaciones"))
 
         try:
             ids_int = [int(i) for i in ids if str(i).isdigit()]
