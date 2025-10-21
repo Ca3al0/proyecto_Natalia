@@ -283,6 +283,70 @@ document.addEventListener('DOMContentLoaded', function () {
     transform: translateY(-1px);
 }
 </style>
+<script>
+function abrirRegistroFotografico(idEvento) {
+    // Contenido del formulario
+    const formHtml = `
+        <h3>Registro Fotográfico</h3>
+        <form id="registroForm">
+            <div style="margin-bottom:15px;">
+                <label><strong>Fotos Antes:</strong></label><br>
+                <input type="file" id="fotosAntes" multiple accept="image/*">
+            </div>
+            <div style="margin-bottom:15px;">
+                <label><strong>Fotos Después:</strong></label><br>
+                <input type="file" id="fotosDespues" multiple accept="image/*">
+            </div>
+            <div style="text-align:right;">
+                <button type="submit" style="
+                    background-color:#28a745;
+                    color:#fff;
+                    border:none;
+                    padding:8px 16px;
+                    border-radius:8px;
+                    cursor:pointer;
+                    font-weight:600;
+                ">Guardar Registro</button>
+            </div>
+        </form>
+    `;
+
+    openModal('Registro Fotográfico', formHtml);
+
+    // Manejar submit del formulario
+    const form = document.getElementById('registroForm');
+    form.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        const fotosAntes = document.getElementById('fotosAntes').files;
+        const fotosDespues = document.getElementById('fotosDespues').files;
+
+        // Aquí puedes enviar los archivos al backend usando fetch o AJAX
+        // Por ahora, mostramos un resumen en el modal
+        let resumen = `<h4>Registro Completado</h4>`;
+        resumen += `<p><strong>Fotos Antes:</strong> ${fotosAntes.length} archivo(s) subido(s)</p>`;
+        resumen += `<p><strong>Fotos Después:</strong> ${fotosDespues.length} archivo(s) subido(s)</p>`;
+
+        modalBody.innerHTML = resumen;
+    });
+}
+</script>
+
+<style>
+/* Botones del formulario dentro del modal */
+#registroForm button {
+    transition: all 0.2s ease;
+}
+#registroForm button:hover {
+    background-color: #1e7e34;
+    transform: translateY(-1px);
+}
+#registroForm input[type="file"] {
+    padding: 5px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+</style>
 
 
 {% endblock %}
