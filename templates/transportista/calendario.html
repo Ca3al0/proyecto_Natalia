@@ -46,7 +46,7 @@
     <div class="modal-content">
         <div class="modal-header">Registro Fotográfico</div>
         <div class="modal-body">
-            <form id="registroFotograficoForm" enctype="multipart/form-data" method="POST" action="/transportista/guardar-registro">
+            <form id="registroFotograficoForm">
                 <!-- Antes -->
                 <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
                     <label><strong>Fotos Antes:</strong></label><br>
@@ -64,10 +64,28 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" onclick="document.getElementById('registroFotograficoModal').style.display='none'">Cancelar</button>
+                    <button type="button" onclick="cerrarRegistro()">Cancelar</button>
                     <button type="submit">Guardar Registro</button>
                 </div>
             </form>
+
+            <!-- Preview registro -->
+            <div id="registroPreview" style="display:none; margin-top:20px;">
+                <h4>Registro Guardado</h4>
+                <div id="previewAntes">
+                    <h5>Antes</h5>
+                    <div id="imagenesAntes"></div>
+                    <p id="descripcionAntes"></p>
+                </div>
+                <div id="previewDespues">
+                    <h5>Después</h5>
+                    <div id="imagenesDespues"></div>
+                    <p id="descripcionDespues"></p>
+                </div>
+                 <div class="modal-footer">
+            <button onclick="closeModal()">Cerrar</button>
+        </div>
+            </div>
         </div>
     </div>
 </div>
@@ -132,11 +150,60 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
 }
 .modal-footer-btn:hover { background-color:#1e7e34; transform:translateY(-1px); }
 </style>
+<style>
+/* Preview Registro Fotográfico */
+#registroPreview h4 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+#registroPreview h5 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #555;
+}
+
+#imagenesAntes, #imagenesDespues {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+#imagenesAntes img, #imagenesDespues img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #28a745;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#imagenesAntes img:hover, #imagenesDespues img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+#descripcionAntes, #descripcionDespues {
+    font-size: 14px;
+    color: #333;
+    padding: 6px 10px;
+    border-left: 3px solid #28a745;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+}
+</style>
+
 
 <script>
 const modal = document.getElementById("eventModal");
 const modalTitle = document.getElementById("modalTitle");
 const modalBody = document.getElementById("modalBody");
+const registroModal = document.getElementById("registroFotograficoModal");
 
 function openModal(title, body) {
     modalTitle.textContent = title;
@@ -144,12 +211,20 @@ function openModal(title, body) {
     modal.style.display = "block";
 }
 function closeModal() { modal.style.display = "none"; }
+
 function abrirRegistroFotografico(idEvento) {
-    document.getElementById('registroFotograficoModal').style.display='block';
+    registroModal.style.display = "block";
+    // Reset form y preview
+    document.getElementById('registroFotograficoForm').reset();
+    document.getElementById('registroPreview').style.display='none';
+    document.getElementById('registroFotograficoForm').style.display='block';
 }
+
+function cerrarRegistro() { registroModal.style.display='none'; }
 
 window.onclick = function(event) {
     if(event.target==modal) closeModal();
+    if(event.target==registroModal) cerrarRegistro();
 }
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -188,6 +263,47 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     });
     calendar.render();
+});
+
+// Registro Fotográfico preview
+document.getElementById('registroFotograficoForm').addEventListener('submit', function(e){
+    e.preventDefault();
+
+    const form = e.target;
+    const fotosAntes = form.querySelector('input[name="fotos_antes"]').files;
+    const fotosDespues = form.querySelector('input[name="fotos_despues"]').files;
+    const descAntes = form.querySelector('textarea[name="desc_antes"]').value;
+    const descDespues = form.querySelector('textarea[name="desc_despues"]').value;
+
+    // Mostrar imágenes Antes
+    const contAntes = document.getElementById('imagenesAntes');
+    contAntes.innerHTML='';
+    for(let i=0;i<fotosAntes.length;i++){
+        const img=document.createElement('img');
+        img.src = URL.createObjectURL(fotosAntes[i]);
+        img.style.width='100px';
+        img.style.margin='5px';
+        img.style.borderRadius='6px';
+        contAntes.appendChild(img);
+    }
+    document.getElementById('descripcionAntes').textContent = descAntes;
+
+    // Mostrar imágenes Después
+    const contDespues = document.getElementById('imagenesDespues');
+    contDespues.innerHTML='';
+    for(let i=0;i<fotosDespues.length;i++){
+        const img=document.createElement('img');
+        img.src = URL.createObjectURL(fotosDespues[i]);
+        img.style.width='100px';
+        img.style.margin='5px';
+        img.style.borderRadius='6px';
+        contDespues.appendChild(img);
+    }
+    document.getElementById('descripcionDespues').textContent = descDespues;
+
+    // Ocultar formulario y mostrar preview
+    form.style.display='none';
+    document.getElementById('registroPreview').style.display='block';
 });
 </script>
 
