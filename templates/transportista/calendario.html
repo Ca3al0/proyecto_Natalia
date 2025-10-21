@@ -285,17 +285,16 @@ document.addEventListener('DOMContentLoaded', function () {
 </style>
 <script>
 function abrirRegistroFotografico(idEvento) {
-    // Contenido del formulario
     const formHtml = `
         <h3>Registro Fotográfico</h3>
         <form id="registroForm">
             <div style="margin-bottom:15px;">
                 <label><strong>Fotos Antes:</strong></label><br>
-                <input type="file" id="fotosAntes" multiple accept="image/*">
+                <input type="file" id="fotosAntes" multiple accept="image/*" capture="environment">
             </div>
             <div style="margin-bottom:15px;">
                 <label><strong>Fotos Después:</strong></label><br>
-                <input type="file" id="fotosDespues" multiple accept="image/*">
+                <input type="file" id="fotosDespues" multiple accept="image/*" capture="environment">
             </div>
             <div style="text-align:right;">
                 <button type="submit" style="
@@ -313,7 +312,6 @@ function abrirRegistroFotografico(idEvento) {
 
     openModal('Registro Fotográfico', formHtml);
 
-    // Manejar submit del formulario
     const form = document.getElementById('registroForm');
     form.addEventListener('submit', function(e){
         e.preventDefault();
@@ -321,11 +319,28 @@ function abrirRegistroFotografico(idEvento) {
         const fotosAntes = document.getElementById('fotosAntes').files;
         const fotosDespues = document.getElementById('fotosDespues').files;
 
-        // Aquí puedes enviar los archivos al backend usando fetch o AJAX
-        // Por ahora, mostramos un resumen en el modal
+        // Aquí podrías enviar los archivos al backend usando fetch + FormData
+
+        // Mostrar resumen con miniaturas
         let resumen = `<h4>Registro Completado</h4>`;
-        resumen += `<p><strong>Fotos Antes:</strong> ${fotosAntes.length} archivo(s) subido(s)</p>`;
-        resumen += `<p><strong>Fotos Después:</strong> ${fotosDespues.length} archivo(s) subido(s)</p>`;
+
+        resumen += `<p><strong>Fotos Antes:</strong> ${fotosAntes.length} archivo(s)</p>`;
+        if(fotosAntes.length > 0){
+            resumen += `<div style="display:flex; flex-wrap:wrap;">`;
+            for(let i=0;i<fotosAntes.length;i++){
+                resumen += `<img src="${URL.createObjectURL(fotosAntes[i])}" style="width:80px;height:80px;object-fit:cover;margin:4px;border-radius:6px;">`;
+            }
+            resumen += `</div>`;
+        }
+
+        resumen += `<p><strong>Fotos Después:</strong> ${fotosDespues.length} archivo(s)</p>`;
+        if(fotosDespues.length > 0){
+            resumen += `<div style="display:flex; flex-wrap:wrap;">`;
+            for(let i=0;i<fotosDespues.length;i++){
+                resumen += `<img src="${URL.createObjectURL(fotosDespues[i])}" style="width:80px;height:80px;object-fit:cover;margin:4px;border-radius:6px;">`;
+            }
+            resumen += `</div>`;
+        }
 
         modalBody.innerHTML = resumen;
     });
@@ -347,6 +362,7 @@ function abrirRegistroFotografico(idEvento) {
     border: 1px solid #ccc;
 }
 </style>
+
 
 
 {% endblock %}
