@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, jsonify
 from flask_login import login_required
+from sqlalchemy import or_
 from basedatos.models import db, Calendario, Pedido, Usuario
 from basedatos.decoradores import role_required
-from datetime import datetime, date, time
+from datetime import datetime, time
 
 from . import transportista
-reviews = []
 
 # ---------- DASHBOARD ----------
 @transportista.route("/")
@@ -21,62 +21,66 @@ def dashboard():
 def api_calendario():
     eventos = []
 
-    # Eventos del calendario
-    calendarios = Calendario.query.all()
-    for c in calendarios:
-        usuario = Usuario.query.get(c.ID_Usuario)
-        nombre_usuario = f"{usuario.Nombre} {usuario.Apellido or ''}".strip() if usuario else "Desconocido"
+    try:
+        # --- Eventos de Calendario ---
+        calendarios = db.session.query(Calendario, Usuario)\
+            .join(Usuario, Calendario.ID_Usuario == Usuario.ID_Usuario, isouter=True).all()
 
-        if isinstance(c.Fecha, date) and isinstance(c.Hora, time):
-            start = datetime.combine(c.Fecha, c.Hora).isoformat()
-        else:
-            start = f"{c.Fecha}T{c.Hora}"
+        for c, u in calendarios:
+            nombre_usuario = f"{u.Nombre} {u.Apellido or ''}".strip() if u else "Desconocido"
 
-        eventos.append({
-            "id": f"cal-{c.ID_Calendario}",
-            "title": f"{c.Tipo} - Pedido #{c.ID_Pedido}",
-            "start": start,
-            "location": c.Ubicacion or "Sin ubicación",
-            "tipo": c.Tipo,
-            "usuario": nombre_usuario
-        })
+            try:
+                start = datetime.combine(c.Fecha, c.Hora).isoformat()
+            except Exception:
+                start = f"{c.Fecha}T{c.Hora}"  # fallback
 
-    # Pedidos con FechaEntrega o HoraLlegada definida
-    pedidos_con_fecha = Pedido.query.filter(
-        or_(
-            Pedido.FechaEntrega.isnot(None),
-            Pedido.HoraLlegada.isnot(None)
-        )
-    ).all()
+            eventos.append({
+                "id": f"cal-{c.ID_Calendario}",
+                "title": f"{c.Tipo} - Pedido #{c.ID_Pedido}",
+                "start": start,
+                "location": c.Ubicacion or "Sin ubicación",
+                "tipo": c.Tipo or "Evento",
+                "usuario": nombre_usuario
+            })
 
-    for p in pedidos_con_fecha:
-        usuario = Usuario.query.get(p.ID_Usuario)
-        nombre_usuario = f"{usuario.Nombre} {usuario.Apellido or ''}".strip() if usuario else "Desconocido"
+        # --- Pedidos con FechaEntrega o HoraLlegada ---
+        pedidos = Pedido.query.filter(
+            or_(
+                Pedido.FechaEntrega.isnot(None),
+                Pedido.HoraLlegada.isnot(None)
+            )
+        ).all()
 
-        # Fecha base del evento
-        if p.FechaEntrega:
-            fecha_evento = p.FechaEntrega
-        elif p.HoraLlegada:
-            fecha_evento = p.HoraLlegada.date()
-        else:
-            continue  
+        for p in pedidos:
+            usuario = Usuario.query.get(p.ID_Usuario)
+            nombre_usuario = f"{usuario.Nombre} {usuario.Apellido or ''}".strip() if usuario else "Desconocido"
 
-        hora_evento = p.HoraLlegada.time() if p.HoraLlegada else time(12, 0, 0)
+            # Fecha y hora del evento
+            fecha_evento = p.FechaEntrega or (p.HoraLlegada.date() if p.HoraLlegada else None)
+            hora_evento = p.HoraLlegada.time() if p.HoraLlegada else time(12, 0)
 
-        start = datetime.combine(fecha_evento, hora_evento).isoformat()
+            if fecha_evento:
+                start = datetime.combine(fecha_evento, hora_evento).isoformat()
+            else:
+                continue  # saltar si no hay fecha
 
-        tipo_evento = "Instalación" if p.Instalacion == 1 else "Entrega"
+            tipo_evento = "Instalación" if getattr(p, "Instalacion", 0) == 1 else "Entrega"
 
-        eventos.append({
-            "id": f"pedido-{p.ID_Pedido}",
-            "title": f"{tipo_evento} - Pedido #{p.ID_Pedido}",
-            "start": start,
-            "location": p.Destino or "Sin dirección",
-            "tipo": tipo_evento,
-            "usuario": nombre_usuario
-        })
+            eventos.append({
+                "id": f"pedido-{p.ID_Pedido}",
+                "title": f"{tipo_evento} - Pedido #{p.ID_Pedido}",
+                "start": start,
+                "location": getattr(p, "Destino", "Sin dirección"),
+                "tipo": tipo_evento,
+                "usuario": nombre_usuario
+            })
 
-    return jsonify(eventos)
+        return jsonify(eventos)
+
+    except Exception as e:
+        print("Error en /api/calendario:", e)
+        return jsonify({"error": str(e)}), 500
+
 
 @transportista.route('/calendario')
 @login_required
