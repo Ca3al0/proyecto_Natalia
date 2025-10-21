@@ -7,6 +7,7 @@
 
 {% block content %}
 
+<link rel="stylesheet" href="{{ url_for('static', filename='css/calendario.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
 
 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -48,19 +49,19 @@
         <div class="modal-body">
             <form id="registroFotograficoForm">
                 <!-- Antes -->
-                <div class="registro-section">
+                <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
                     <label><strong>Fotos Antes:</strong></label><br>
                     <input type="file" name="fotos_antes" multiple accept="image/*" capture="environment"><br><br>
                     <label><strong>Descripción Antes:</strong></label><br>
-                    <textarea name="desc_antes" rows="3"></textarea>
+                    <textarea name="desc_antes" rows="3" style="width:100%;border-radius:6px;border:1px solid #ccc;padding:5px;"></textarea>
                 </div>
 
                 <!-- Después -->
-                <div class="registro-section">
+                <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
                     <label><strong>Fotos Después:</strong></label><br>
                     <input type="file" name="fotos_despues" multiple accept="image/*" capture="environment"><br><br>
                     <label><strong>Descripción Después:</strong></label><br>
-                    <textarea name="desc_despues" rows="3"></textarea>
+                    <textarea name="desc_despues" rows="3" style="width:100%;border-radius:6px;border:1px solid #ccc;padding:5px;"></textarea>
                 </div>
 
                 <div class="modal-footer">
@@ -94,138 +95,7 @@
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+<script src="{{ url_for('static', filename='js/calendario.js') }}"></script>
 
-<style>
-/* General */
-body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-
-/* Calendario */
-#calendar { max-width:1000px; margin:40px auto; padding:25px; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border:2px solid #28a745; }
-.fc .fc-toolbar { background-color:#f8f9fa; border:1px solid #28a745; border-radius:8px; padding:6px 10px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center; }
-.fc .fc-toolbar-title { font-size:22px; font-weight:bold; color:#333; }
-.fc .fc-button { background-color:#28a745; color:#fff; border-radius:6px; border:none; font-weight:500; padding:5px 12px; margin-right:4px; cursor:pointer; }
-.fc .fc-button:hover, .fc .fc-button.fc-button-active { background-color:#1e7e34; }
-.fc .fc-daygrid-day { border-radius:10px; transition: background 0.2s; }
-.fc .fc-daygrid-day:hover { background: rgba(40,167,69,0.1); }
-.fc-event { border-radius:10px; padding:6px 10px; font-size:14px; font-weight:500; }
-
-/* Modal */
-.modal { display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.35);}
-.modal-content { background-color:#fff; margin:8% auto; padding:25px 30px; border-radius:14px; max-width:480px; box-shadow:0 6px 20px rgba(0,0,0,0.12);}
-.modal-header { font-size:20px; margin-bottom:12px; font-weight:600; color:#333;}
-.modal-body { font-size:15px; margin-bottom:12px; color:#555;}
-.modal-footer { text-align:right; }
-.modal-footer button { background-color:#28a745; border:none; color:#fff; padding:7px 14px; border-radius:8px; font-weight:500; font-size:14px; cursor:pointer; margin-left:5px; }
-.modal-footer button:hover { background-color:#1e7e34; transform:translateY(-1px); }
-
-/* Registro Fotográfico */
-.registro-section { margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px; }
-.registro-section textarea { width:100%; border-radius:6px; border:1px solid #ccc; padding:5px; }
-
-/* Preview Registro Fotográfico */
-#registroPreview h4 { font-size:20px; font-weight:600; margin-bottom:15px; color:#333; }
-#registroPreview h5 { font-size:16px; font-weight:500; margin-bottom:8px; color:#555; }
-#imagenesAntes, #imagenesDespues { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:10px; }
-#imagenesAntes img, #imagenesDespues img { width:120px; height:120px; object-fit:cover; border-radius:10px; border:2px solid #28a745; box-shadow:0 2px 6px rgba(0,0,0,0.15); transition: transform 0.2s, box-shadow 0.2s; }
-#imagenesAntes img:hover, #imagenesDespues img:hover { transform:scale(1.05); box-shadow:0 4px 12px rgba(0,0,0,0.25); }
-#descripcionAntes, #descripcionDespues { font-size:14px; color:#333; padding:6px 10px; border-left:3px solid #28a745; background-color:#f8f9fa; border-radius:6px; }
-</style>
-
-<script>
-// Modal general
-const modal = document.getElementById("eventModal");
-const modalTitle = document.getElementById("modalTitle");
-const modalBody = document.getElementById("modalBody");
-const registroModal = document.getElementById("registroFotograficoModal");
-
-function openModal(title, body){ modalTitle.textContent=title; modalBody.innerHTML=body; modal.style.display="block"; }
-function closeModal(){ modal.style.display="none"; }
-
-// Registro Fotográfico
-function abrirRegistroFotografico(idEvento){
-    registroModal.style.display='block';
-    document.getElementById('registroFotograficoForm').reset();
-    document.getElementById('registroPreview').style.display='none';
-    document.getElementById('registroFotograficoForm').style.display='block';
-}
-
-function cerrarRegistro(){ registroModal.style.display='none'; }
-
-window.onclick = function(event){
-    if(event.target==modal) closeModal();
-    if(event.target==registroModal) cerrarRegistro();
-}
-
-// FullCalendar
-document.addEventListener('DOMContentLoaded', function(){
-    const calendarEl = document.getElementById('calendar');
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView:'dayGridMonth',
-        locale:'es',
-        headerToolbar:{left:'prev,next today', center:'title', right:'dayGridMonth,timeGridWeek,timeGridDay'},
-        events:{ url:'/transportista/api/calendario', failure:function(){ openModal('Error','No se pudieron cargar los eventos del calendario'); } },
-        eventClick:function(info){
-            const tipo=(info.event.extendedProps.tipo||'Evento').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-            const usuario=info.event.extendedProps.usuario||'Desconocido';
-            const location=info.event.extendedProps.location||'Ubicación no especificada';
-            const title=info.event.title||'Sin título';
-            const idEvento=info.event.id||'';
-
-            let body=`<p><strong>Tipo:</strong> ${tipo}</p>
-                      <p><strong>Evento:</strong> ${title}</p>
-                      <p><strong>Cliente:</strong> ${usuario}</p>
-                      <p><strong>Ubicación:</strong> ${location}</p>`;
-
-            if(tipo==='instalacion'){
-                body+=`<div style="margin-top:15px; text-align:center;">
-                        <button class="modal-footer-btn" onclick="abrirRegistroFotografico('${idEvento}')">Registro Fotográfico</button>
-                       </div>`;
-            }
-
-            openModal(title, body);
-        },
-        eventDidMount:function(info){
-            const tipo=(info.event.extendedProps.tipo||'').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
-            info.el.dataset.tipo=tipo;
-            info.el.style.cursor='pointer';
-        }
-    });
-    calendar.render();
-});
-
-// Preview Registro Fotográfico
-document.getElementById('registroFotograficoForm').addEventListener('submit', function(e){
-    e.preventDefault();
-    const form = e.target;
-    const fotosAntes = form.querySelector('input[name="fotos_antes"]').files;
-    const fotosDespues = form.querySelector('input[name="fotos_despues"]').files;
-    const descAntes = form.querySelector('textarea[name="desc_antes"]').value;
-    const descDespues = form.querySelector('textarea[name="desc_despues"]').value;
-
-    // Imágenes Antes
-    const contAntes = document.getElementById('imagenesAntes');
-    contAntes.innerHTML='';
-    for(let i=0;i<fotosAntes.length;i++){
-        const img=document.createElement('img');
-        img.src = URL.createObjectURL(fotosAntes[i]);
-        contAntes.appendChild(img);
-    }
-    document.getElementById('descripcionAntes').textContent = descAntes;
-
-    // Imágenes Después
-    const contDespues = document.getElementById('imagenesDespues');
-    contDespues.innerHTML='';
-    for(let i=0;i<fotosDespues.length;i++){
-        const img=document.createElement('img');
-        img.src = URL.createObjectURL(fotosDespues[i]);
-        contDespues.appendChild(img);
-    }
-    document.getElementById('descripcionDespues').textContent = descDespues;
-
-    // Mostrar preview
-    form.style.display='none';
-    document.getElementById('registroPreview').style.display='block';
-});
-</script>
 
 {% endblock %}
