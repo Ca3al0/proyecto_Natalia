@@ -1,23 +1,23 @@
 .flash-small {
-  display: inline-flex;        /* para que solo ocupe lo necesario */
+  display: inline-flex;       
   align-items: center;
-  max-width: 300px;           /* ancho máximo */
-  padding: 6px 12px;          /* más compacto */
-  font-size: 13px;            /* texto más pequeño */
+  max-width: 300px;           
+  padding: 6px 12px;          
+  font-size: 13px;           
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   opacity: 0.95;
   transition: all 0.3s ease;
-  margin: 5px;                 /* espacio entre flashes */
+  margin: 5px;                
 }
 
-/* Colores según categoría */
+
 .alert-success { background: #4e9f50; color: #fff; }
 .alert-danger  { background: #d43f3f; color: #fff; }
 .alert-warning { background: #e0b800; color: #2c3e50; }
 .alert-info    { background: #2a9fd6; color: #fff; }
 
-/* Animación */
+
 .flash-small {
   animation: slideIn 0.3s ease-out;
 }
@@ -25,4 +25,68 @@
 @keyframes slideIn {
   from { opacity: 0; transform: translateY(-5px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+
+.flash-small {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    margin-top: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+
+.flash-small i {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+
+.flash-small.alert-success {
+    background-color: #e6f4ea;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.flash-small.alert-danger {
+    background-color: #fdecea;
+    color: #c62828;
+    border: 1px solid #f5c6cb;
+}
+
+.flash-small.alert-warning {
+    background-color: #fff4e5;
+    color: #f57c00;
+    border: 1px solid #ffe0b2;
+}
+
+.flash-small.alert-info {
+    background-color: #e8f4fd;
+    color: #0277bd;
+    border: 1px solid #b3e5fc;
+}
+
+/* Animaciones al aparecer/desaparecer */
+.flash-small.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.flash-small.hide {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* Botón de cerrar opcional */
+.flash-small button.close-alert {
+    background: none;
+    border: none;
+    margin-left: auto;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: inherit;
 }
