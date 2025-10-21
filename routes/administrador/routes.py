@@ -310,8 +310,6 @@ def ver_pedidos():
                            usuarios_transportistas=usuarios_transportistas)
 
 
-
-
 # ---------- AGREGAR PRODUCTO ----------
 
 @admin.route('/admin/agregar-producto', methods=['GET', 'POST'])
