@@ -114,7 +114,7 @@ def actualizacion_datos():
         if not nombre or not apellido or not correo:
             flash("⚠️ Los campos Nombre, Apellido y Correo son obligatorios.", "warning")
         else:
-            # Verificar si el correo ya existe para otro usuario
+          
             usuario_existente = Usuario.query.filter(
                 Usuario.Correo == correo,
                 Usuario.ID_Usuario != usuario.ID_Usuario
@@ -276,18 +276,16 @@ def ver_pedidos():
     pedidos_pendientes = Pedido.query.filter_by(Estado='pendiente').all()
     pedidos_en_proceso = Pedido.query.filter_by(Estado='en proceso').all()
 
-    # Actualizar pedidos en proceso que ya llegaron para pasar a entregado
     for pedido in pedidos_en_proceso:
         if pedido.HoraLlegada and pedido.HoraLlegada <= now:
             pedido.Estado = 'entregado'
             db.session.add(pedido)
     db.session.commit()
 
-    # Recargar listas
+ 
     pedidos_en_proceso = Pedido.query.filter_by(Estado='en proceso').all()
     pedidos_entregados = Pedido.query.filter_by(Estado='entregado').all()
 
-    # Cargar transportista para en proceso
     for pedido in pedidos_en_proceso:
         if pedido.ID_Empleado:
             transportista = Usuario.query.get(pedido.ID_Empleado)
@@ -295,7 +293,7 @@ def ver_pedidos():
         else:
             pedido.TransportistaNombre = 'No asignado'
 
-    # Igual para entregados (opcional)
+  
     for pedido in pedidos_entregados:
         if pedido.ID_Empleado:
             transportista = Usuario.query.get(pedido.ID_Empleado)
@@ -330,20 +328,19 @@ def agregar_producto():
         id_proveedor = int(request.form['proveedor'])
         id_categoria = int(request.form['categoria'])
 
-        # Manejo seguro de imagen
-        imagen = request.files.get('imagen_principal')  # evita KeyError
-        imagen_ruta = 'img/default.png'  # Valor por defecto
+   
+        imagen = request.files.get('imagen_principal')  
+        imagen_ruta = 'img/default.png'  
 
         if imagen and imagen.filename != '':
             filename = secure_filename(imagen.filename)
             ruta_img = os.path.join(current_app.static_folder, 'img', filename)
 
-            # Guardar imagen en /static/img/
+           
             imagen.save(ruta_img)
 
             imagen_ruta = f'img/{filename}'
 
-        # Crear nuevo producto
         nuevo = Producto(
             NombreProducto=nombre,
             Stock=stock,
@@ -403,7 +400,7 @@ def estadisticas_reseñas():
 
     reseñas_filtradas = query.all()
 
-    # Calcular distribución de calificaciones
+    
     rating_distribution = {str(i): 0 for i in range(1, 6)}
     total_respuestas = len(reseñas_filtradas)
     respuestas_positivas = 0
@@ -420,7 +417,7 @@ def estadisticas_reseñas():
 
     porcentaje_positivas = round((respuestas_positivas / total_respuestas) * 100, 2) if total_respuestas else 0
 
-    # Datos de productos
+ 
     productos_data = []
     productos = Producto.query.all()
 
@@ -436,7 +433,7 @@ def estadisticas_reseñas():
                 'cantidad': cantidad
             })
 
-    # Compras por mes - ejemplo, adapta según modelo real
+   
     from sqlalchemy import func
     compras_por_mes = (
         db.session.query(
@@ -449,7 +446,7 @@ def estadisticas_reseñas():
         .all()
     )
 
-    # Simulación de resolución de problemas - reemplaza con datos reales si tienes
+   
     resolucion_por_mes = {
         "2023-05": 12,
         "2023-06": 17,
@@ -476,7 +473,6 @@ def estadisticas_reseñas():
 
 
 
-# Vista de proveedores
 @admin.route('/proveedores', methods=['GET'])
 @login_required
 @role_required("admin")
@@ -484,7 +480,7 @@ def vista_proveedores():
     return render_template('administrador/proveedores.html')
 
 
-# API: Obtener todos los proveedores
+
 @admin.route('/api/proveedores', methods=['GET'])
 @login_required
 @role_required("admin")
@@ -509,7 +505,7 @@ def obtener_proveedores():
         return jsonify({"mensaje": "Error interno"}), 500
 
 
-# API: Agregar proveedor
+
 @admin.route('/api/proveedores', methods=['POST'])
 @login_required
 @role_required("admin")
@@ -538,7 +534,7 @@ def agregar_proveedor():
         return jsonify({"mensaje": "Error al guardar el proveedor ❌"}), 500
 
 
-# API: Editar proveedor
+
 @admin.route('/api/proveedores/<int:id>', methods=['PUT'])
 @login_required
 @role_required("admin")
@@ -563,7 +559,7 @@ def editar_proveedor(id):
         return jsonify({"mensaje": "Error al editar el proveedor ❌"}), 500
 
 
-# API: Eliminar proveedor
+
 @admin.route('/api/proveedores/<int:id>', methods=['DELETE'])
 @login_required
 @role_required("admin")
@@ -579,7 +575,7 @@ def eliminar_proveedor(id):
         return jsonify({"mensaje": "Error al eliminar proveedor ❌"}), 500
 
 
-# Obtener todas las compras
+
 @admin.route('/api/compras', methods=['GET'])
 @login_required
 def obtener_compras():
@@ -590,7 +586,7 @@ def obtener_compras():
             "id": c.ID_Compra,
             "producto": c.Producto,
             "cantidad": c.Cantidad,
-            "proveedor": c.proveedor.NombreEmpresa,  # muestra nombre
+            "proveedor": c.proveedor.NombreEmpresa,  
             "fecha": c.Fecha.strftime('%Y-%m-%d')
         })
     return jsonify(data), 200
@@ -600,12 +596,12 @@ def obtener_compras():
 def agregar_compra():
     try:
         data = request.get_json()
-        # Buscar proveedor por ID
+      
         proveedor = Proveedor.query.get(data['proveedor_id'])
         if not proveedor:
             return jsonify({"mensaje": "Proveedor no encontrado"}), 404
 
-        # Convertir string fecha a datetime.date
+       
         fecha_obj = datetime.strptime(data['fecha'], '%Y-%m-%d').date()
 
         nueva = Compra(
@@ -631,45 +627,45 @@ def asignar_transportista(id_pedido):
     transportista_id = request.form.get('transportista_id')
     hora_llegada_str = request.form.get('hora_llegada')
 
-    # Verificar que todos los campos estén completos
+
     if not transportista_id or not hora_llegada_str:
         flash('Por favor, completa todos los campos.', 'warning')
         return redirect(url_for('admin.ver_pedidos'))
 
-    # Verificar si el transportista existe en la base de datos
+  
     transportista = Usuario.query.get(transportista_id)
     if not transportista:
         flash('El transportista no existe.', 'danger')
         return redirect(url_for('admin.ver_pedidos'))
 
-    # Convertir la hora_llegada de string a datetime
+ 
     try:
         hora_llegada = datetime.strptime(hora_llegada_str, '%Y-%m-%dT%H:%M')
     except ValueError:
         flash('El formato de la hora de llegada no es válido.', 'danger')
         return redirect(url_for('admin.ver_pedidos'))
 
-    # Verificar si el pedido ya está en proceso
+   
     if pedido.Estado == 'en proceso':
         flash('Este pedido ya tiene un transportista asignado.', 'warning')
         return redirect(url_for('admin.ver_pedidos'))
 
-    # Actualizar datos en el pedido
+   
     pedido.ID_Empleado = int(transportista_id)
     pedido.HoraLlegada = hora_llegada
-    pedido.Estado = 'en proceso'  # Cambiar estado al asignar
+    pedido.Estado = 'en proceso'  
 
     db.session.commit()
 
     flash(f'Transportista {transportista.Nombre} asignado al pedido #{id_pedido} correctamente.', 'success')
     return redirect(url_for('admin.ver_pedidos'))
 
-# Ruta para mostrar los reportes de entregas realizadas
+
 @admin.route('/reportes')
 def reporte_entregas():
     pedidos_entregados = Pedido.query.filter_by(Estado='entregado').all()
 
-    # Optimización: Cargar todos los transportistas de una vez
+    
     transportistas = {usuario.ID_Usuario: usuario for usuario in Usuario.query.filter_by(Rol='transportista').all()}
 
     for pedido in pedidos_entregados:
