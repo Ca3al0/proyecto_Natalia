@@ -45,6 +45,88 @@
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+<!-- Modal Registro Fotográfico -->
+<div id="registroFotograficoModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            Registro Fotográfico
+        </div>
+        <div class="modal-body">
+            <form id="registroFotograficoForm" enctype="multipart/form-data" method="POST" action="/transportista/guardar-registro">
+                <!-- Sección Antes -->
+                <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
+                    <label><strong>Fotos Antes:</strong></label><br>
+                    <input type="file" name="fotos_antes" multiple accept="image/*" capture="environment"><br><br>
+                    <label><strong>Descripción Antes:</strong></label><br>
+                    <textarea name="desc_antes" rows="3" style="width:100%;border-radius:6px;border:1px solid #ccc;padding:5px;"></textarea>
+                </div>
+
+                <!-- Sección Después -->
+                <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
+                    <label><strong>Fotos Después:</strong></label><br>
+                    <input type="file" name="fotos_despues" multiple accept="image/*" capture="environment"><br><br>
+                    <label><strong>Descripción Después:</strong></label><br>
+                    <textarea name="desc_despues" rows="3" style="width:100%;border-radius:6px;border:1px solid #ccc;padding:5px;"></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" onclick="document.getElementById('registroFotograficoModal').style.display='none'">
+                        Cancelar
+                    </button>
+                    <button type="submit">
+                        Guardar Registro
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos del modal */
+#registroFotograficoModal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.35);
+}
+
+#registroFotograficoModal .modal-content {
+    background-color: #fff;
+    margin: 8% auto;
+    padding: 25px 30px;
+    border-radius: 14px;
+    max-width: 480px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+
+.modal-footer {
+    text-align: right;
+}
+
+.modal-footer button {
+    background-color: #28a745;
+    border: none;
+    color: #fff;
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin-left: 5px;
+}
+
+.modal-footer button:hover {
+    background-color: #1e7e34;
+    transform: translateY(-1px);
+}
+</style>
+
 
 <style>
 /* === Estilos generales y calendario === */
@@ -172,6 +254,7 @@ h2 { text-align: center; margin-top: 20px; color: #333; }
 }
 </style>
 
+
 <script>
 const modal = document.getElementById("eventModal");
 const modalTitle = document.getElementById("modalTitle");
@@ -283,86 +366,6 @@ document.addEventListener('DOMContentLoaded', function () {
     transform: translateY(-1px);
 }
 </style>
-<script>
-function abrirRegistroFotografico(idEvento) {
-    const formHtml = `
-        <h3>Registro Fotográfico</h3>
-        <form id="registroForm">
-            <div style="margin-bottom:15px;">
-                <label><strong>Fotos Antes:</strong></label><br>
-                <input type="file" id="fotosAntes" multiple accept="image/*" capture="environment">
-            </div>
-            <div style="margin-bottom:15px;">
-                <label><strong>Fotos Después:</strong></label><br>
-                <input type="file" id="fotosDespues" multiple accept="image/*" capture="environment">
-            </div>
-            <div style="text-align:right;">
-                <button type="submit" style="
-                    background-color:#28a745;
-                    color:#fff;
-                    border:none;
-                    padding:8px 16px;
-                    border-radius:8px;
-                    cursor:pointer;
-                    font-weight:600;
-                ">Guardar Registro</button>
-            </div>
-        </form>
-    `;
-
-    openModal('Registro Fotográfico', formHtml);
-
-    const form = document.getElementById('registroForm');
-    form.addEventListener('submit', function(e){
-        e.preventDefault();
-
-        const fotosAntes = document.getElementById('fotosAntes').files;
-        const fotosDespues = document.getElementById('fotosDespues').files;
-
-        // Aquí podrías enviar los archivos al backend usando fetch + FormData
-
-        // Mostrar resumen con miniaturas
-        let resumen = `<h4>Registro Completado</h4>`;
-
-        resumen += `<p><strong>Fotos Antes:</strong> ${fotosAntes.length} archivo(s)</p>`;
-        if(fotosAntes.length > 0){
-            resumen += `<div style="display:flex; flex-wrap:wrap;">`;
-            for(let i=0;i<fotosAntes.length;i++){
-                resumen += `<img src="${URL.createObjectURL(fotosAntes[i])}" style="width:80px;height:80px;object-fit:cover;margin:4px;border-radius:6px;">`;
-            }
-            resumen += `</div>`;
-        }
-
-        resumen += `<p><strong>Fotos Después:</strong> ${fotosDespues.length} archivo(s)</p>`;
-        if(fotosDespues.length > 0){
-            resumen += `<div style="display:flex; flex-wrap:wrap;">`;
-            for(let i=0;i<fotosDespues.length;i++){
-                resumen += `<img src="${URL.createObjectURL(fotosDespues[i])}" style="width:80px;height:80px;object-fit:cover;margin:4px;border-radius:6px;">`;
-            }
-            resumen += `</div>`;
-        }
-
-        modalBody.innerHTML = resumen;
-    });
-}
-</script>
-
-<style>
-/* Botones del formulario dentro del modal */
-#registroForm button {
-    transition: all 0.2s ease;
-}
-#registroForm button:hover {
-    background-color: #1e7e34;
-    transform: translateY(-1px);
-}
-#registroForm input[type="file"] {
-    padding: 5px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
-</style>
-
 
 
 {% endblock %}
