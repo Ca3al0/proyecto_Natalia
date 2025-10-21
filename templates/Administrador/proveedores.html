@@ -56,7 +56,7 @@
             </div>
         </div>
 
-        <!-- PANEL COMPRAS -->
+      
         <div class="col-12">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
@@ -105,6 +105,7 @@ const formCompra = document.getElementById('formCompra');
 const tablaCompras = document.getElementById('tablaCompras');
 
 let proveedorEditando = null; 
+let proveedoresCache = []; 
 
 function mostrarAlerta(msg, tipo){
     alerta.className = `alert alert-${tipo}`;
@@ -113,12 +114,12 @@ function mostrarAlerta(msg, tipo){
     setTimeout(()=>alerta.style.display='none',3000);
 }
 
-
 async function cargarProveedores(){
     try {
         const res = await fetch('/admin/api/proveedores');
         const data = await res.json();
         if(!Array.isArray(data)) throw new Error("JSON inválido");
+        proveedoresCache = data;
         tablaProveedores.innerHTML = '';
         selectProveedor.innerHTML = '';
         data.forEach(p => {
@@ -146,6 +147,24 @@ async function cargarProveedores(){
     }
 }
 
+function editarProveedor(id){
+    const p = proveedoresCache.find(x => x.id === id);
+    if(!p){
+        mostrarAlerta("Proveedor no encontrado", "danger");
+        return;
+    }
+
+    document.getElementById('empresa').value = p.empresa || '';
+    document.getElementById('contacto').value = p.contacto || '';
+    document.getElementById('cargo').value = p.cargo || '';
+    document.getElementById('direccion').value = p.direccion || '';
+    document.getElementById('ciudad').value = p.ciudad || '';
+    document.getElementById('pais').value = p.pais || '';
+
+    proveedorEditando = id;
+    formProveedor.querySelector('button[type="submit"]').textContent = "Actualizar Proveedor";
+    mostrarAlerta("Editando proveedor, modifica los campos y presiona 'Actualizar Proveedor'", "info");
+}
 
 formProveedor.addEventListener('submit', async e => {
     e.preventDefault();
@@ -186,30 +205,6 @@ formProveedor.addEventListener('submit', async e => {
     }
 });
 
-
-async function editarProveedor(id){
-    try {
-        const res = await fetch(`/admin/api/proveedores/${id}`);
-        if(!res.ok) throw new Error(`Error al obtener proveedor: ${res.status}`);
-        const p = await res.json();
-
-        document.getElementById('empresa').value = p.empresa || '';
-        document.getElementById('contacto').value = p.contacto || '';
-        document.getElementById('cargo').value = p.cargo || '';
-        document.getElementById('direccion').value = p.direccion || '';
-        document.getElementById('ciudad').value = p.ciudad || '';
-        document.getElementById('pais').value = p.pais || '';
-
-        proveedorEditando = id;
-        formProveedor.querySelector('button[type="submit"]').textContent = "Actualizar Proveedor";
-        mostrarAlerta("Editando proveedor, modifica los campos y presiona 'Actualizar Proveedor'", "info");
-    } catch(e){
-        mostrarAlerta("Error al cargar proveedor: " + e.message, 'danger');
-        console.error(e);
-    }
-}
-
-
 async function eliminarProveedor(id){
     if(!confirm("¿Desea eliminar este proveedor?")) return;
     try {
@@ -223,7 +218,7 @@ async function eliminarProveedor(id){
     }
 }
 
-
+// COMPRAS
 async function cargarCompras(){
     try {
         const res = await fetch('/admin/api/compras');
@@ -243,7 +238,6 @@ async function cargarCompras(){
         console.error(e);
     }
 }
-
 
 formCompra.addEventListener('submit', async e => {
     e.preventDefault();
@@ -270,7 +264,6 @@ formCompra.addEventListener('submit', async e => {
         console.error(e);
     }
 });
-
 
 cargarProveedores();
 </script>
