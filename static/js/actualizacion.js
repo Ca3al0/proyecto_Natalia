@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const seccionDirecciones = document.getElementById('seccion-direcciones');
   const seccionPedidos = document.getElementById('seccion-pedidos');
 
-  // Función para ocultar secciones
+
   function ocultarSecciones() {
     seccionPerfil.style.display = 'none';
     seccionDirecciones.style.display = 'none';
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     menuPedidos.classList.remove('active');
   }
 
-  // Mostrar cada sección al hacer clic
+  
   menuPerfil.addEventListener('click', () => {
     ocultarSecciones();
     seccionPerfil.style.display = 'block';
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     menuPedidos.classList.add('active');
   });
 
-  // --- BORRAR DIRECCIÓN ---
+
   let urlBorrar = null;
   const modalBorrar = new bootstrap.Modal(document.getElementById('modalConfirmarBorrar'));
 
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-// --- VER DETALLES DE PEDIDO ---
+
 const modalPedido = document.getElementById('modalPedido');
 
 modalPedido.addEventListener('show.bs.modal', event => {
@@ -69,17 +69,16 @@ modalPedido.addEventListener('show.bs.modal', event => {
   const pedidoId = button.getAttribute('data-id');
   const contenido = document.getElementById('detalle-pedido-contenido');
 
-  // Muestra mensaje mientras carga
+  
   contenido.innerHTML = `<p class="text-muted">Cargando detalles del pedido #${pedidoId}...</p>`;
 
-  // 🔗 Petición al servidor para obtener el detalle del pedido
   fetch(`/cliente/pedido/${pedidoId}/detalle`)
     .then(response => {
       if (!response.ok) throw new Error('Error al obtener los detalles del pedido.');
       return response.text();
     })
     .then(html => {
-      contenido.innerHTML = html; // Inserta el HTML del detalle del pedido
+      contenido.innerHTML = html; 
     })
     .catch(error => {
       contenido.innerHTML = `<p class="text-danger">❌ No se pudieron cargar los detalles: ${error.message}</p>`;

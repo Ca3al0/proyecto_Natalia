@@ -16,7 +16,7 @@
     <div id="alerta" class="alert text-center" style="display:none;"></div>
 
     <div class="row g-4">
-        <!-- PANEL PROVEEDORES -->
+       
         <div class="col-12">
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-body">
@@ -96,7 +96,7 @@
 
 {% block scripts %}
 <script>
-// VARIABLES
+
 const formProveedor = document.getElementById('formProveedor');
 const tablaProveedores = document.getElementById('tablaProveedores');
 const selectProveedor = document.getElementById('selectProveedor');
@@ -105,7 +105,7 @@ const alerta = document.getElementById('alerta');
 const formCompra = document.getElementById('formCompra');
 const tablaCompras = document.getElementById('tablaCompras');
 
-// CARGAR PROVEEDORES
+
 async function cargarProveedores(){
     try {
         const res = await fetch('/admin/api/proveedores');
@@ -128,17 +128,17 @@ async function cargarProveedores(){
                     <button class="btn btn-danger btn-sm" onclick="eliminarProveedor(${p.id})">Eliminar</button>
                 </td>
             </tr>`;
-            // Guardamos ID en value, no nombre
+      
             selectProveedor.innerHTML += `<option value="${p.id}">${p.empresa}</option>`;
         });
-        cargarCompras(); // recargar compras al cargar proveedores
+        cargarCompras(); 
     } catch(e){
-        mostrarAlerta("Error al cargar proveedores ❌", "danger");
+        mostrarAlerta("Error al cargar proveedores ", "danger");
         console.error(e);
     }
 }
 
-// GUARDAR COMPRA
+
 formCompra.addEventListener('submit', async e => {
     e.preventDefault();
     const compra = {
@@ -160,12 +160,12 @@ formCompra.addEventListener('submit', async e => {
             formCompra.reset();
         }
     } catch(e){
-        mostrarAlerta("Error al guardar la compra ❌", 'danger');
+        mostrarAlerta("Error al guardar la compra ", 'danger');
         console.error(e);
     }
 });
 
-// CARGAR COMPRAS
+
 async function cargarCompras(){
     try {
         const res = await fetch('/admin/api/compras');
@@ -181,12 +181,12 @@ async function cargarCompras(){
             </tr>`;
         });
     } catch(e){
-        mostrarAlerta("Error al cargar compras ❌", 'danger');
+        mostrarAlerta("Error al cargar compras ", 'danger');
         console.error(e);
     }
 }
 
-// ALERTAS
+
 function mostrarAlerta(msg,tipo){
     alerta.className = `alert alert-${tipo}`;
     alerta.textContent = msg;
@@ -194,7 +194,7 @@ function mostrarAlerta(msg,tipo){
     setTimeout(()=>alerta.style.display='none',3000);
 }
 
-// INICIALIZAR
+
 cargarProveedores();
 </script>
 {% endblock %}

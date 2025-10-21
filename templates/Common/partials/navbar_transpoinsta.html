@@ -45,10 +45,10 @@
               <strong class="text-uppercase">{{ current_user.Nombre }} {{ current_user.Apellido }}</strong>
             </li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">👤 Perfil</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('transportista.calendario') }}">⭐ Calendario</a></li>
-            <li><a class="dropdown-item" href="#">🔔 Notificaciones</a></li>
-            <li><a class="dropdown-item" href="#">🏢 Proveedores</a></li>
+            <li><a class="dropdown-item" href="#"> Perfil</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('transportista.calendario') }}">Calendario</a></li>
+            <li><a class="dropdown-item" href="#"> Notificaciones</a></li>
+            <li><a class="dropdown-item" href="#"> Proveedores</a></li>
             <li><hr class="dropdown-divider"></li>
             <li class="px-3">
               <a href="{{ url_for('auth.logout') }}" class="btn btn-success w-100">Cerrar sesión</a>
@@ -59,7 +59,7 @@
           </ul>
         </div>
 
-        <!-- Carrito -->
+       
         <a href="#" class="nav-icon position-relative">
           <i class="bi bi-cart fs-4"></i>
           <span class="cart-badge bg-danger text-white" id="cart-count">0</span>

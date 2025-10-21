@@ -4,31 +4,31 @@
 
 <nav class="navbar navbar-expand-lg fixed-top bg-light shadow-sm" style="z-index: 1050;">
   <div class="container-fluid px-4">
-    <!-- Logo -->
+ 
     <a class="navbar-brand fw-bold text-primary d-flex align-items-center" href="{{ url_for('admin.dashboard') }}">
       Panel Admin
     </a>
 
-    <!-- Botón responsive -->
+  
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
       aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div class="collapse navbar-collapse" id="navbarMain">
-      <!-- Buscador -->
+   
       <div class="search-container mx-auto d-none d-md-block">
         <input class="form-control rounded-pill border-success-subtle" type="search"
           placeholder="¿Qué estás buscando hoy?" aria-label="Buscar">
       </div>
 
-      <!-- Iconos -->
+   
       <div class="d-flex align-items-center gap-3 ms-auto text-primary">
-        <!-- Favoritos -->
+     
         <a href="#" class="nav-icon"><i class="bi bi-heart fs-4"></i></a>
 
        
-        <!-- Usuario Dropdown -->
+       
         <div class="dropdown">
           <a class="nav-icon dropdown-toggle" href="#" id="dropdownUser" role="button" data-bs-toggle="dropdown"
             aria-expanded="false">
@@ -45,12 +45,12 @@
               <strong class="text-uppercase">{{ current_user.Nombre }} {{ current_user.Apellido }}</strong>
             </li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="{{ url_for('admin.actualizacion_datos') }}">👤 Perfil</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('admin.gestion_roles') }}">⚙️ Gestión de roles</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('admin.estadisticas_reseñas') }}">📊 Estadísticas</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('admin.ver_resenas') }}">⭐ Reseñas</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('admin.ver_notificaciones') }}">🔔 Notificaciones</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('admin.vista_proveedores') }}">🏢 Proveedores</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin.actualizacion_datos') }}"> Perfil</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin.gestion_roles') }}"> Gestión de roles</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin.estadisticas_reseñas') }}"> Estadísticas</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin.ver_resenas') }}"> Reseñas</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin.ver_notificaciones') }}"> Notificaciones</a></li>
+            <li><a class="dropdown-item" href="{{ url_for('admin.vista_proveedores') }}"> Proveedores</a></li>
             <li><hr class="dropdown-divider"></li>
             <li class="px-3">
               <a href="{{ url_for('auth.logout') }}" class="btn btn-success w-100">Cerrar sesión</a>
@@ -61,7 +61,7 @@
           </ul>
         </div>
 
-        <!-- Carrito -->
+     
         <a href="#" class="nav-icon position-relative">
           <i class="bi bi-cart fs-4"></i>
           <span class="cart-badge bg-danger text-white" id="cart-count">0</span>
