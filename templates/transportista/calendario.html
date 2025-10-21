@@ -30,7 +30,7 @@
 
 <div id="calendar"></div>
 
-<!-- Modal -->
+<!-- Modal Evento -->
 <div id="eventModal" class="modal">
     <div class="modal-content">
         <div class="modal-header" id="modalTitle"></div>
@@ -41,19 +41,13 @@
     </div>
 </div>
 
-<!-- FullCalendar -->
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
 <!-- Modal Registro Fotográfico -->
 <div id="registroFotograficoModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header">
-            Registro Fotográfico
-        </div>
+        <div class="modal-header">Registro Fotográfico</div>
         <div class="modal-body">
             <form id="registroFotograficoForm" enctype="multipart/form-data" method="POST" action="/transportista/guardar-registro">
-                <!-- Sección Antes -->
+                <!-- Antes -->
                 <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
                     <label><strong>Fotos Antes:</strong></label><br>
                     <input type="file" name="fotos_antes" multiple accept="image/*" capture="environment"><br><br>
@@ -61,7 +55,7 @@
                     <textarea name="desc_antes" rows="3" style="width:100%;border-radius:6px;border:1px solid #ccc;padding:5px;"></textarea>
                 </div>
 
-                <!-- Sección Después -->
+                <!-- Después -->
                 <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
                     <label><strong>Fotos Después:</strong></label><br>
                     <input type="file" name="fotos_despues" multiple accept="image/*" capture="environment"><br><br>
@@ -70,69 +64,22 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" onclick="document.getElementById('registroFotograficoModal').style.display='none'">
-                        Cancelar
-                    </button>
-                    <button type="submit">
-                        Guardar Registro
-                    </button>
+                    <button type="button" onclick="document.getElementById('registroFotograficoModal').style.display='none'">Cancelar</button>
+                    <button type="submit">Guardar Registro</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<style>
-/* Estilos del modal */
-#registroFotograficoModal {
-    display: none;
-    position: fixed;
-    z-index: 999;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.35);
-}
-
-#registroFotograficoModal .modal-content {
-    background-color: #fff;
-    margin: 8% auto;
-    padding: 25px 30px;
-    border-radius: 14px;
-    max-width: 480px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-}
-
-.modal-footer {
-    text-align: right;
-}
-
-.modal-footer button {
-    background-color: #28a745;
-    border: none;
-    color: #fff;
-    padding: 7px 14px;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    margin-left: 5px;
-}
-
-.modal-footer button:hover {
-    background-color: #1e7e34;
-    transform: translateY(-1px);
-}
-</style>
-
+<!-- FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
 
 <style>
-/* === Estilos generales y calendario === */
+/* Estilos generales y calendario */
 body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-h2 { text-align: center; margin-top: 20px; color: #333; }
-
 #calendar {
     max-width: 1000px;
     margin: 40px auto;
@@ -141,7 +88,6 @@ h2 { text-align: center; margin-top: 20px; color: #333; }
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     border: 2px solid #28a745;
 }
-
 .fc .fc-toolbar {
     background-color: #f8f9fa;
     border: 1px solid #28a745;
@@ -151,11 +97,8 @@ h2 { text-align: center; margin-top: 20px; color: #333; }
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
-
 .fc .fc-toolbar-title { font-size: 22px; font-weight: bold; color: #333; }
-
 .fc .fc-button {
     background-color: #28a745;
     color: #fff;
@@ -165,95 +108,30 @@ h2 { text-align: center; margin-top: 20px; color: #333; }
     padding: 5px 12px;
     margin-right: 4px;
     cursor: pointer;
-    transition: all 0.15s ease;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
 }
-
 .fc .fc-button:hover,
-.fc .fc-button.fc-button-active {
-    background-color: #1e7e34;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    transform: translateY(-1px);
+.fc .fc-button.fc-button-active { background-color: #1e7e34; }
+.fc .fc-daygrid-day { border-radius: 10px; transition: background 0.2s; }
+.fc .fc-daygrid-day:hover { background: rgba(40,167,69,0.1); }
+.fc-event { border-radius:10px; padding:6px 10px; font-size:14px; font-weight:500; }
+.fc-event[data-tipo="instalacion"] { background: linear-gradient(135deg, #1a4201, #00911d); color:#fff; }
+.fc-event[data-tipo="entrega"] { background: linear-gradient(135deg, #28a745, #7fff00); color:#fff; }
+
+/* Modal */
+.modal { display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.35);}
+.modal-content { background-color:#fff; margin:8% auto; padding:25px 30px; border-radius:14px; max-width:480px; box-shadow:0 6px 20px rgba(0,0,0,0.12);}
+.modal-header { font-size:20px; margin-bottom:12px; font-weight:600; color:#333;}
+.modal-body { font-size:15px; margin-bottom:12px; color:#555;}
+.modal-footer { text-align:right; }
+.modal-footer button { background-color:#28a745; border:none; color:#fff; padding:7px 14px; border-radius:8px; font-weight:500; font-size:14px; cursor:pointer; margin-left:5px; }
+.modal-footer button:hover { background-color:#1e7e34; transform:translateY(-1px); }
+
+/* Botón Registro Fotográfico */
+.modal-footer-btn {
+    background-color:#28a745; border:none; color:#fff; padding:8px 16px; border-radius:10px; font-weight:600; cursor:pointer;
 }
-
-.fc .fc-daygrid-day {
-    border-radius: 10px;
-    transition: background 0.2s, transform 0.15s;
-}
-
-.fc .fc-daygrid-day:hover {
-    background: rgba(40, 167, 69, 0.1);
-    transform: scale(1.01);
-}
-
-.fc-event {
-    border-radius: 10px;
-    padding: 6px 10px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: transform 0.15s, box-shadow 0.15s;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-
-.fc-event:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-}
-
-.fc-event[data-tipo="instalacion"] { background: linear-gradient(135deg, #1a4201, #00911d); color: #fff; }
-.fc-event[data-tipo="entrega"] { background: linear-gradient(135deg, #28a745, #7fff00); color: #fff; }
-
-/* === Modal === */
-.modal {
-    display: none; 
-    position: fixed; 
-    z-index: 999; 
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.35);
-    transition: all 0.25s ease;
-}
-
-.modal-content {
-    background-color: #fff;
-    margin: 8% auto;
-    padding: 25px 30px;
-    border-radius: 14px;
-    max-width: 480px;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-    animation: fadeIn 0.25s;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-15px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.modal-header { font-size: 20px; margin-bottom: 12px; font-weight: 600; color: #333; }
-.modal-body { font-size: 15px; margin-bottom: 12px; color: #555; }
-.modal-footer { text-align: right; }
-
-.modal-footer button {
-    background-color: #28a745;
-    border: none;
-    color: #fff;
-    padding: 7px 14px;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 14px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-}
-
-.modal-footer button:hover {
-    background-color: #1e7e34;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-}
+.modal-footer-btn:hover { background-color:#1e7e34; transform:translateY(-1px); }
 </style>
-
 
 <script>
 const modal = document.getElementById("eventModal");
@@ -265,107 +143,52 @@ function openModal(title, body) {
     modalBody.innerHTML = body;
     modal.style.display = "block";
 }
-
-function closeModal() {
-    modal.style.display = "none";
-}
-
+function closeModal() { modal.style.display = "none"; }
 function abrirRegistroFotografico(idEvento) {
-    // Redirige al registro fotográfico
-    window.location.href = `/transportista/registro-fotografico/${idEvento}`;
+    document.getElementById('registroFotograficoModal').style.display='block';
 }
 
 window.onclick = function(event) {
-    if (event.target == modal) closeModal();
+    if(event.target==modal) closeModal();
 }
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function(){
     const calendarEl = document.getElementById('calendar');
     const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'es',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        events: {
-            url: '/transportista/api/calendario',
-            failure: function() {
-                console.error('Error cargando eventos');
-                openModal('Error', 'No se pudieron cargar los eventos del calendario');
-            }
-        },
-        eventClick: function(info) {
-            // Normalizamos tipo para evitar problemas de mayúsculas o tildes
-            const tipo = (info.event.extendedProps.tipo || 'Evento')
-                            .toLowerCase()
-                            .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            const usuario = info.event.extendedProps.usuario || 'Desconocido';
-            const location = info.event.extendedProps.location || 'Ubicación no especificada';
-            const title = info.event.title || 'Sin título';
-            const idEvento = info.event.id || '';
+        initialView:'dayGridMonth',
+        locale:'es',
+        headerToolbar:{left:'prev,next today', center:'title', right:'dayGridMonth,timeGridWeek,timeGridDay'},
+        events:{ url:'/transportista/api/calendario', failure:function(){ openModal('Error','No se pudieron cargar los eventos del calendario'); } },
+        eventClick:function(info){
+            const tipo=(info.event.extendedProps.tipo||'Evento').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+            const usuario=info.event.extendedProps.usuario||'Desconocido';
+            const location=info.event.extendedProps.location||'Ubicación no especificada';
+            const title=info.event.title||'Sin título';
+            const idEvento=info.event.id||'';
 
-            let body = `
-                <p><strong>Tipo:</strong> ${tipo}</p>
-                <p><strong>Evento:</strong> ${title}</p>
-                <p><strong>Cliente:</strong> ${usuario}</p>
-                <p><strong>Ubicación:</strong> ${location}</p>
-            `;
+            let body=`<p><strong>Tipo:</strong> ${tipo}</p>
+                      <p><strong>Evento:</strong> ${title}</p>
+                      <p><strong>Cliente:</strong> ${usuario}</p>
+                      <p><strong>Ubicación:</strong> ${location}</p>`;
 
-            // Solo para eventos tipo instalación
-            if(tipo === 'instalacion'){
-                body += `
-                    <div style="margin-top: 15px; text-align: center;">
-                        <button class="modal-footer-btn" onclick="abrirRegistroFotografico('${idEvento}')">
-                            Registro Fotográfico
-                        </button>
-                    </div>
-                `;
+            if(tipo==='instalacion'){
+                body+=`<div style="margin-top:15px; text-align:center;">
+                        <button class="modal-footer-btn" onclick="abrirRegistroFotografico('${idEvento}')">Registro Fotográfico</button>
+                       </div>`;
             }
 
             openModal(title, body);
         },
-        eventDidMount: function(info) {
-            const tipo = (info.event.extendedProps.tipo || '')
-                        .toLowerCase()
-                        .normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-            info.el.dataset.tipo = tipo;
-            info.el.style.cursor = 'pointer';
-
-            if(tipo === 'instalacion'){
-                info.el.style.backgroundColor = '#007bff';
-                info.el.style.color = '#fff';
-            } else if(tipo === 'entrega'){
-                info.el.style.backgroundColor = '#28a745';
-                info.el.style.color = '#fff';
-            }
+        eventDidMount:function(info){
+            const tipo=(info.event.extendedProps.tipo||'').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+            info.el.dataset.tipo=tipo;
+            info.el.style.cursor='pointer';
+            if(tipo==='instalacion'){ info.el.style.backgroundColor='#007bff'; info.el.style.color='#fff'; }
+            else if(tipo==='entrega'){ info.el.style.backgroundColor='#28a745'; info.el.style.color='#fff'; }
         }
     });
-
     calendar.render();
 });
 </script>
-
-<style>
-/* Botón modal para registro fotográfico */
-.modal-footer-btn {
-    background-color: #28a745;
-    border: none;
-    color: #fff;
-    padding: 8px 16px;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-}
-
-.modal-footer-btn:hover {
-    background-color: #1e7e34;
-    transform: translateY(-1px);
-}
-</style>
-
 
 {% endblock %}
