@@ -1,5 +1,6 @@
 {% extends "common/base.html" %}
 {% block title %}Iniciar sesión{% endblock %}
+  {% include "common/partials/navbar.html" %}
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">

@@ -1,0 +1,56 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+<nav class="navbar navbar-expand-lg shadow-sm py-3">
+  <div class="container">
+    <!-- 🔹 Solo el nombre, sin ícono -->
+    <a class="navbar-brand fw-bold text-success" href="#">
+      Casa en el Árbol
+    </a>
+
+    <!-- Botón colapsable (opcional para móviles) -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- 🔹 Sección de íconos -->
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav align-items-center gap-3">
+
+        <!-- ❤️ Favoritos -->
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="bi bi-heart fs-4"></i>
+          </a>
+        </li>
+
+        <!-- 👤 Usuario -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+             data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person fs-4"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+            <li>
+              <a class="dropdown-item" href="{{ url_for('auth.login') }}">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="{{ url_for('auth.register') }}">
+                <i class="bi bi-person-plus me-2"></i>Registrarse
+              </a>
+            </li>
+          </ul>
+        </li>
+
+        <!-- 🛒 Carrito -->
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <i class="bi bi-cart fs-4"></i>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</nav>
