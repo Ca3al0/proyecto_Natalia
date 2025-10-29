@@ -13,48 +13,50 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
-<nav class="navbar navbar-expand-lg bg-white shadow-sm py-3">
-  <div class="container">
-    <a class="navbar-brand fw-bold text-success" href="#">Casa en el Árbol</a>
+<!-- 🌿 NAVBAR -->
+  <nav class="navbar navbar-expand-lg shadow-sm py-3">
+    <div class="container">
+      <a class="navbar-brand" href="#">Casa en el Árbol</a>
 
-    <!-- Botón responsive -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-    <!-- Contenido del navbar -->
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto align-items-center gap-3">
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center gap-3">
 
-        <!-- Ícono de Favoritos -->
-        <li class="nav-item">
-          <a href="#" class="nav-link"><i class="bi bi-heart fs-4"></i></a>
-        </li>
+          <!-- ❤️ Favoritos -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="bi bi-heart fs-4"></i>
+            </a>
+          </li>
 
-        <!-- Dropdown del Usuario -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button"
-             data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person fs-4"></i>
-          </a>
+          <!-- 👤 Usuario con dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person fs-4"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
+              <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-person-plus me-2"></i>Registrarse</a></li>
+              <li><a class="dropdown-item" href="#"><i class="bi bi-key me-2"></i>Recuperar contraseña</a></li>
+            </ul>
+          </li>
 
-          <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="userDropdown">
-            <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión</a></li>
-            <li><a class="dropdown-item" href="#"><i class="bi bi-person-plus me-2"></i>Registrarse</a></li>
-            <li><a class="dropdown-item" href="#"><i class="bi bi-key me-2"></i>Recuperar contraseña</a></li>
-          </ul>
-        </li>
+          <!-- 🛒 Carrito -->
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="bi bi-cart fs-4"></i>
+            </a>
+          </li>
 
-        <!-- Ícono del Carrito -->
-        <li class="nav-item">
-          <a href="#" class="nav-link"><i class="bi bi-cart fs-4"></i></a>
-        </li>
-      </ul>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
 
 

@@ -13,33 +13,6 @@
       overflow-x: hidden;
     }
 
-.navbar-brand {
-  color: #157145 !important;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
-
-.nav-icon {
-  font-size: 1.6rem;
-  color: #57a773;
-  transition: color 0.3s ease, transform 0.2s;
-  text-decoration: none;
-}
-
-.nav-icon:hover {
-  color: #157145;
-  transform: scale(1.1);
-}
-
-.dropdown-menu {
-  border: none;
-  border-radius: 10px;
-}
-
-.badge {
-  font-size: 0.65rem;
-  padding: 0.35em 0.45em;
-}
 
     
     .navbar {
@@ -70,6 +43,40 @@
     }
     .btn-login:hover {
       background-color: var(--verde-oscuro);
+    }
+
+     .navbar {
+      background-color: #ffffff !important;
+    }
+
+    .navbar-brand {
+      color: #157145 !important;
+      font-weight: bold;
+      font-size: 1.3rem;
+    }
+
+    .nav-link {
+      color: #157145 !important;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link:hover {
+      color: #57a773 !important;
+    }
+
+    .dropdown-menu {
+      border: none;
+      border-radius: 10px;
+      background-color: #9bd1e5;
+    }
+
+    .dropdown-item:hover {
+      background-color: #6a8eae;
+      color: white !important;
+    }
+
+    .navbar-toggler {
+      border-color: #157145;
     }
 
     .hero {
