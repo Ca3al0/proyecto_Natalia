@@ -205,7 +205,7 @@
     .custom-footer {
       background:
         linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)),
-        url("{{ url_for('static', filename='salacarrusel.png') }}") no-repeat center center;
+        url("{{ url_for('static', filename='img/salacarrusel.png') }}") no-repeat center center;
       background-size: cover;
       color: white;
     }
@@ -244,8 +244,8 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item"><a href="#" class="btn btn-login ms-2">Iniciar sesión</a></li>
-          <li class="nav-item"><a href="#" class="btn btn-login ms-2">Registrarme</a></li>
+          <li class="nav-item"><a href="{{ url_for('auth.login') }}" class="btn btn-login ms-2">Iniciar sesión</a></li>
+          <li class="nav-item"><a href="{{ url_for('auth.register') }}" class="btn btn-login ms-2">Registrarme</a></li>
         </ul>
       </div>
     </div>
@@ -254,7 +254,7 @@
   <!-- HERO -->
   <section class="hero">
     <video autoplay muted loop playsinline>
-      <source src="{{ url_for('static', filename='video.mp4') }}" type="video/mp4">
+      <source src="{{ url_for('static', filename='img/video.mp4') }}" type="video/mp4">
     </video>
     <div class="overlay"></div>
     <div class="hero-content">
@@ -269,9 +269,9 @@
     <div class="container" data-aos="fade-up">
       <h2 class="text-center mb-4"><b>Cosas que te encantarán</b></h2>
       <div class="row g-4">
-        <div class="col-md-4"><video autoplay muted loop playsinline class="w-100 rounded" style="height:250px;object-fit:cover;"><source src="{{ url_for('static', filename='video1carrusel.mp4') }}"></video></div>
-        <div class="col-md-4"><video autoplay muted loop playsinline class="w-100 rounded" style="height:250px;object-fit:cover;"><source src="{{ url_for('static', filename='video2carrusel.mp4') }}"></video></div>
-        <div class="col-md-4"><video autoplay muted loop playsinline class="w-100 rounded" style="height:250px;object-fit:cover;"><source src="{{ url_for('static', filename='video3carrusel.mp4') }}"></video></div>
+        <div class="col-md-4"><video autoplay muted loop playsinline class="w-100 rounded" style="height:250px;object-fit:cover;"><source src="{{ url_for('static', filename='img/video1carrusel.mp4') }}"></video></div>
+        <div class="col-md-4"><video autoplay muted loop playsinline class="w-100 rounded" style="height:250px;object-fit:cover;"><source src="{{ url_for('static', filename='img/video2carrusel.mp4') }}"></video></div>
+        <div class="col-md-4"><video autoplay muted loop playsinline class="w-100 rounded" style="height:250px;object-fit:cover;"><source src="{{ url_for('static', filename='img/video3carrusel.mp4') }}"></video></div>
       </div>
     </div>
   </section>
@@ -280,10 +280,15 @@
   <section id="historia" class="py-5 bg-white">
     <div class="container">
       <div class="row align-items-center g-4">
-        <div class="col-md-6"><img src="{{ url_for('static', filename='logo.png') }}" alt="Nuestra Historia" class="img-fluid rounded shadow"></div>
+        <div class="col-md-6"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Nuestra Historia" class="img-fluid rounded shadow"></div>
         <div class="col-md-6">
           <h2 class="mb-3">Nuestra Historia</h2>
-          <p>Raíz Muebles nació con la pasión de transformar espacios en hogares llenos de armonía y confort...</p>
+          <p>
+          Raíz Muebles nació con la pasión de transformar espacios en hogares llenos de armonía y confort.
+          Desde nuestros inicios, nos hemos enfocado en combinar diseño contemporáneo con materiales sostenibles,
+          creando muebles que no solo embellecen, sino que también respetan el medio ambiente.
+          Nuestro equipo está comprometido en ofrecer calidad, innovación y cercanía en cada proyecto.
+          </p>
         </div>
       </div>
     </div>
@@ -295,27 +300,27 @@
     <div class="container-fluid px-0">
       <div class="row g-0">
         <div class="col-md-4 col-sm-6 categoria position-relative">
-          <img src="{{ url_for('static', filename='salacarrusel.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
+          <img src="{{ url_for('static', filename='img/salacarrusel.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
           <div class="overlay-cat"><h3>Salas</h3><p>Con diseño y comodidad...</p><a href="#" class="btn btn-light btn-sm rounded-pill">Ver categoría</a></div>
         </div>
         <div class="col-md-4 col-sm-6 categoria position-relative">
-          <img src="{{ url_for('static', filename='imagencarrusel3.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
+          <img src="{{ url_for('static', filename='img/imagencarrusel3.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
           <div class="overlay-cat"><h3>Comedores</h3><p>Escoge el escenario...</p><a href="#" class="btn btn-light btn-sm rounded-pill">Ver categoría</a></div>
         </div>
         <div class="col-md-4 col-sm-6 categoria position-relative">
-          <img src="{{ url_for('static', filename='cama sensilla.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
+          <img src="{{ url_for('static', filename='img/cama sensilla.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
           <div class="overlay-cat"><h3>Dormitorios</h3><p>Tu descanso empieza aquí...</p><a href="#" class="btn btn-light btn-sm rounded-pill">Ver categoría</a></div>
         </div>
         <div class="col-md-4 col-sm-6 categoria position-relative">
-          <img src="{{ url_for('static', filename='Cama doble.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
+          <img src="{{ url_for('static', filename='img/Cama doble.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
           <div class="overlay-cat"><h3>Colchones</h3><p>Tenemos la solución perfecta...</p><a href="#" class="btn btn-light btn-sm rounded-pill">Ver categoría</a></div>
         </div>
         <div class="col-md-4 col-sm-6 categoria position-relative">
-          <img src="{{ url_for('static', filename='imagenindex.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
+          <img src="{{ url_for('static', filename='img/imagenindex.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
           <div class="overlay-cat"><h3>Muebles para TV</h3><p>Muebles funcionales...</p><a href="#" class="btn btn-light btn-sm rounded-pill">Ver categoría</a></div>
         </div>
         <div class="col-md-4 col-sm-6 categoria position-relative">
-          <img src="{{ url_for('static', filename='espejo.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
+          <img src="{{ url_for('static', filename='img/espejo.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
           <div class="overlay-cat"><h3>Infantil y Juvenil</h3><p>Muebles de calidad...</p><a href="#" class="btn btn-light btn-sm rounded-pill">Ver categoría</a></div>
         </div>
       </div>
