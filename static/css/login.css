@@ -1,0 +1,70 @@
+/* Fondo rosado del lado izquierdo */
+.bg-pink {
+  background-color: #f8cdda;
+}
+
+/* Imagen decorativa */
+.blush-img {
+  max-width: 80%;
+  margin-top: 20px;
+}
+
+/* Título de la marca */
+.blush-title {
+  font-family: 'Georgia', serif;
+  font-size: 2.8rem;
+  color: #333;
+}
+
+/* Contenedor del login */
+.login-box {
+  width: 100%;
+  max-width: 400px;
+  background-color: #fff;
+}
+
+/* Campos de texto */
+.input-style {
+  border-radius: 30px;
+  border: 1px solid #ccc;
+  padding: 12px 20px;
+  transition: all 0.3s;
+}
+
+.input-style:focus {
+  border-color: #f8a5c2;
+  box-shadow: 0 0 5px rgba(248, 165, 194, 0.6);
+}
+
+/* Botón principal */
+.btn-pink {
+  background-color: #f8a5c2;
+  color: #fff;
+  border-radius: 30px;
+  transition: background 0.3s;
+}
+
+.btn-pink:hover {
+  background-color: #f78fb3;
+  color: white;
+}
+
+/* Enlaces rosados */
+.text-pink {
+  color: #f78fb3;
+  text-decoration: none;
+}
+
+.text-pink:hover {
+  text-decoration: underline;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .login-container {
+    text-align: center;
+  }
+  .blush-img {
+    display: none;
+  }
+}

@@ -1,56 +1,56 @@
 {% extends "common/base.html" %}
 {% block title %}Iniciar sesión{% endblock %}
 
-{% block navbar %}
-  {% include "common/partials/navbar_cliente.html" %}
-  {% include "common/partials/navbar_secundario.html" %}
-{% endblock %}
-
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 
-<div id="login-overlay" class="auth-overlay">
-  <div class="auth-card">
-    <h3 class="text-center fw-bold text-success mb-4">Bienvenido de vuelta</h3>
+<div class="container-fluid login-container">
+  <div class="row vh-100">
+    <!-- LADO IZQUIERDO -->
+    <div class="col-md-6 d-none d-md-flex flex-column justify-content-center align-items-center bg-pink text-center">
+      <h1 class="fw-bold text-dark blush-title">Blush-Bar</h1>
+      <p class="text-dark-50 fs-5">El secreto de la belleza es ser tú misma</p>
+      <img src="{{ url_for('static', filename='img/22d32e67-18df-4de6-8b37-437c9f7e575a.png') }}" 
+           alt="Decoración Blush Bar" class="img-fluid mt-3 blush-img">
+    </div>
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          <div class="alert alert-dismissible fade show alert-{{ category }}" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <!-- LADO DERECHO -->
+    <div class="col-md-6 d-flex flex-column justify-content-center align-items-center bg-white">
+      <div class="login-box shadow-sm rounded-4 p-5 text-center">
+        <h4 class="fw-bold mb-4">ENTRAR CON E-MAIL Y CONTRASEÑA</h4>
+
+        <!-- Mensajes flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <!-- Formulario -->
+        <form method="POST" action="{{ url_for('auth.login') }}">
+          <div class="mb-3">
+            <input type="email" name="correo" class="form-control form-control-lg input-style" placeholder="Ej.: ejemplo@mail.com" required>
           </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+          <div class="mb-3">
+            <input type="password" name="password" class="form-control form-control-lg input-style" placeholder="Ingrese su contraseña" required>
+          </div>
 
-    <!-- Formulario -->
-    <form method="POST" action="{{ url_for('auth.login') }}">
-      <div class="mb-3">
-        <input type="email" class="form-control auth-input" name="correo" placeholder="Correo electrónico" required
-               value="{{ correo if correo else '' }}">
+          <a href="{{ url_for('auth.forgot_password') }}" class="d-block mb-3 small text-muted">Olvidé mi contraseña</a>
+
+          <button type="submit" class="btn btn-pink w-100 py-2">ENTRAR</button>
+        </form>
+
+        <a href="{{ url_for('index') }}" class="d-block mt-3 text-decoration-none small text-muted">← Volver</a>
+        <p class="mt-3 small text-muted">¿No tiene una cuenta? 
+          <a href="{{ url_for('auth.register') }}" class="text-pink">Regístrese</a>
+        </p>
       </div>
-      <div class="mb-3">
-        <input type="password" class="form-control auth-input" name="password" placeholder="Contraseña" required>
-      </div>
-      <button type="submit" class="btn btn-success w-100 auth-btn">Iniciar Sesión</button>
-    </form>
-
-    <div class="text-center mt-3">
-      <a href="{{ url_for('auth.forgot_password') }}" class="small text-decoration-none">¿Olvidaste tu contraseña?</a>
-    </div>
-    <hr>
-    <div class="text-center">
-      <span class="small">¿No tienes cuenta?</span>
-      <a href="{{ url_for('auth.register') }}" class="small text-primary">Regístrate aquí</a>
-    </div>
-
-    <!-- Botón cerrar -->
-    <div class="close-login-btn">
-      <a href="{{ url_for('index') }}" class="btn btn-outline-secondary mt-3 w-100">Cerrar</a>
     </div>
   </div>
 </div>
-
-<script src="{{ url_for('static', filename='js/formularios.js') }}"></script>
-
 {% endblock %}
