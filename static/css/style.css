@@ -1,5 +1,5 @@
 :root {
-  --celeste-claro: #d1faff;
+  --celeste-claro: #e7fcff;
   --celeste: #d1faff;
   --azul-gris: #d1faffe;
   --verde: #57a773;
@@ -9,7 +9,7 @@
 
 body {
   font-family: 'Poppins', sans-serif;
-  background-color: #fff;
+  background-color: var(--celeste-claro);
   color: #2e2e2e;
   overflow-x: hidden;
 }
