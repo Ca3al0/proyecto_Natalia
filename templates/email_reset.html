@@ -1,50 +1,80 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Recuperación de contraseña</title>
+  <meta charset="UTF-8">
+  <title>Recuperación de contraseña</title>
 </head>
-<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
-    <table align="center" width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; margin-top: 20px; border-radius: 8px; overflow: hidden;">
-        <tr>
-            <td style="padding: 20px 40px;">
-                <h2 style="color: #2c3e50;">Hola {{user_name|capitalize}},</h2>
-                <h4 style="color: #28a745; margin-top: 0;">Recuperar la contraseña</h4>
-                <p style="color: #333;">Sabemos que olvidaste tu contraseña, pero no te preocupes.</p>
-                <p style="color: #333;">Para crear una nueva contraseña e ingresar a tu cuenta, haz clic en el siguiente botón:</p>
+<body style="font-family: 'Segoe UI', Arial, sans-serif;  margin: 0; padding: 30px 0;">
+  <table align="center" width="600" cellpadding="0" cellspacing="0" 
+         style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); overflow: hidden;">
 
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="{{ reset_url }}"
-                       style="background-color: #28a745; color: white; padding: 14px 28px; text-decoration: none; font-weight: bold; border-radius: 6px; font-size: 16px;">
-                        Ingresa aquí
-                    </a>
-                </div>
+    <!-- Encabezado -->
+    <tr>
+      <td align="center" style="background-color: #157145; padding: 25px;">
+        <h1 style="color: #ffffff; font-size: 24px; margin: 0;">Casa en el Árbol</h1>
+      </td>
+    </tr>
 
-                <p style="color: #555;">Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
-                <p style="color: #999; font-size: 12px;">Este enlace expirará en 15 minutos por seguridad.</p>
-            </td>
-        </tr>
-        <tr>
-            <td style="background-color: #f8f9fa; padding: 20px 40px;">
-                <h4 style="margin-bottom: 5px; color: #2c3e50;">Contáctate con nosotros</h4>
-                <p style="font-size: 14px; color: #333;">¿Tienes alguna pregunta? Contáctanos al <strong>3213468134</strong> o escríbenos a: <br>
-                    <a href="mailto:casaenelarbol236@gmail.com" style="color: #28a745;">casaenelarbol236@gmail.com</a>
-                </p>
-                <p style="margin-top: 20px;">
-                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="margin-right: 10px;"></a>
-                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="margin-right: 10px;"></a>
-                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="YouTube" style="margin-right: 10px;"></a>
-                    <a href="#"><img src="https://cdn-icons-png.flaticon.com/24/2111/2111463.png" alt="Instagram"></a>
-                </p>
-            </td>
-        </tr>
-        <tr>
-            <td style="background-color: #28a745; text-align: center; padding: 12px;">
-                <p style="margin: 0; color: white; font-size: 12px;">
-                    Todos los derechos reservados. Copyright © Casa en Arbol 2025
-                </p>
-            </td>
-        </tr>
-    </table>
+    <!-- Contenido principal -->
+    <tr>
+      <td style="padding: 40px; color: #333;">
+        <h2 style="margin-top: 0; color: #157145;">Hola {{ user_name|capitalize }},</h2>
+        <h4 style="color: #57a773; margin-bottom: 15px;">Recuperación de contraseña</h4>
+
+        <p style="font-size: 15px; line-height: 1.6; color: #444;">
+          Sabemos que olvidaste tu contraseña, pero no te preocupes.  
+          Puedes crear una nueva e ingresar nuevamente a tu cuenta.
+        </p>
+
+        <p style="font-size: 15px; line-height: 1.6; color: #444;">
+          Solo debes hacer clic en el siguiente botón para restablecer tu contraseña:
+        </p>
+
+        <!-- Botón -->
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="{{ reset_url }}" 
+             style="background-color: #57a773; color: #ffffff; padding: 14px 32px; 
+                    text-decoration: none; font-weight: bold; border-radius: 8px; 
+                    font-size: 16px; display: inline-block;">
+            Ingresa aqui
+          </a>
+        </div>
+
+        <p style="font-size: 14px; color: #555;">Si no solicitaste este cambio, puedes ignorar este mensaje.</p>
+        <p style="font-size: 12px; color: #6a8eae;"> Este enlace expirará en 15 minutos por motivos de seguridad.</p>
+      </td>
+    </tr>
+
+    <!-- Pie de contacto -->
+    <tr>
+      <td style="background-color: #f4f9fa; padding: 25px 40px; font-size: 14px; color: #333;">
+        <h4 style="margin-bottom: 8px; color: #157145;">Contáctanos</h4>
+        <p style="margin-top: 0;">¿Tienes alguna pregunta? Escríbenos o llámanos:</p>
+        <p style="margin: 5px 0 15px 0;">
+          <strong>321 346 8134</strong><br>
+           <a href="mailto:casaenelarbol236@gmail.com" style="color: #6a8eae; text-decoration: none;">
+            casaenelarbol236@gmail.com
+          </a>
+        </p>
+
+        <div style="margin-top: 10px;">
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/24/733/733547.png" alt="Facebook" style="margin-right: 10px;"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/24/733/733579.png" alt="Twitter" style="margin-right: 10px;"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/24/733/733558.png" alt="YouTube" style="margin-right: 10px;"></a>
+          <a href="#"><img src="https://cdn-icons-png.flaticon.com/24/2111/2111463.png" alt="Instagram"></a>
+        </div>
+      </td>
+    </tr>
+
+    <!-- Derechos -->
+    <tr>
+      <td style="background-color: #9bd1e5; text-align: center; padding: 12px;">
+        <p style="margin: 0; color: #157145; font-size: 12px;">
+          © 2025 Casa en el Árbol — Todos los derechos reservados
+        </p>
+      </td>
+    </tr>
+
+  </table>
 </body>
 </html>
