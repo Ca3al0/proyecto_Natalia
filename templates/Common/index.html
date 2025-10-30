@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (data.status === 'success') {
       formReset.reset();
-      // opcional: volver al login
+      
       setTimeout(() => {
         const modalReset = bootstrap.Modal.getInstance(document.getElementById('modalReset'));
         modalReset.hide();
