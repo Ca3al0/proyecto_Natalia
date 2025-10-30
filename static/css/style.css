@@ -266,3 +266,17 @@ footer {
     text-align: center;
   }
 }
+
+/* Botón verde personalizado para modales */
+.btn-green {
+    background-color: #57a773;
+    color: #ffffff;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-green:hover,
+.btn-green:focus {
+    background-color: #44905c; /* Un tono más oscuro al pasar el mouse */
+    color: #ffffff;
+}
