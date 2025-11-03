@@ -51,7 +51,9 @@ def register():
             mensaje="Tu cuenta se ha creado correctamente."
         )
 
-        return jsonify({'status': 'success', 'message': 'Cuenta creada correctamente. Ahora puedes iniciar sesión.'})
+        # Agregamos mensaje flash y redirección al login
+        flash('Cuenta creada correctamente. Ahora puedes iniciar sesión.', 'success')
+        return jsonify({'status': 'success', 'redirect': url_for('index')})
 
     except Exception as e:
         db.session.rollback()
@@ -104,23 +106,23 @@ def forgot_password():
     try:
         token = s.dumps(email, salt='password-recovery')
         send_reset_email(user_email=email, user_name=user.Nombre, token=token)
-        return jsonify({'status': 'success', 'message': 'Correo enviado para restablecer contraseña.'})
+        # Mensaje para interfaz + borrado del campo vía JS
+        return jsonify({'status': 'success', 'message': 'Correo enviado para restablecer contraseña. El campo se limpiará.'})
     except Exception as e:
         return jsonify({'status': 'danger', 'message': f'Error al enviar correo: {str(e)}'})
 
 
+# ------------------ RESTABLECER CONTRASEÑA ------------------ #
 @auth.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if request.method == 'GET':
         try:
             email = s.loads(token, salt='password-recovery', max_age=3600)
-            # Renderiza el index en la carpeta "common"
             return render_template('common/index.html', token=token, mostrar_modal_reset=True, token_expirado=False)
         except (SignatureExpired, BadSignature):
-            # Si el token no sirve o expiró
             return render_template('common/index.html', mostrar_modal_reset=False, token_expirado=True, token=None)
 
-    # Si el método es POST, procesamos la nueva contraseña
+    # Si el método es POST
     try:
         email = s.loads(token, salt='password-recovery', max_age=3600)
     except (SignatureExpired, BadSignature):
@@ -151,4 +153,6 @@ def reset_password(token):
         mensaje="Tu contraseña ha sido cambiada exitosamente."
     )
 
-    return jsonify({'status': 'success', 'message': 'Contraseña restablecida correctamente. Ahora puedes iniciar sesión.'})
+    # Redirige con mensaje flash
+    flash('Contraseña restablecida correctamente. Ahora puedes iniciar sesión.', 'success')
+    return jsonify({'status': 'success', 'redirect': url_for('index')})
