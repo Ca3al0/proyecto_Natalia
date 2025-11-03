@@ -4,88 +4,60 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Casa en el Árbol</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
+  <!-- Bootstrap y librerías -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+  <!-- Estilos personalizados -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  
 </head>
+
 <body>
 
-
-  <nav class="navbar navbar-expand-lg shadow-sm py-3">
+  <!-- ===================== NAVBAR ===================== -->
+  <nav class="navbar navbar-expand-lg shadow-sm py-3 bg-white fixed-top">
     <div class="container">
-      <a class="navbar-brand" href="#">Casa en el Árbol</a>
-
+      <a class="navbar-brand fw-bold text-success" href="#">Casa en el Árbol</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-center gap-3">
-
-         
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="bi bi-heart fs-4"></i>
-            </a>
-          </li>
-
-          
+          <li class="nav-item"><a href="#" class="nav-link"><i class="bi bi-heart fs-4"></i></a></li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-               data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-person fs-4"></i>
-            </a>
+               data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-person fs-4"></i></a>
             <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-          <li>
-          <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalLogin">
-            <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
-          </a>
-        </li>
-        <li>
-          <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalRegister">
-            <i class="bi bi-person-plus me-2"></i>Registrarse
-          </a>
-        </li>
-
-
+              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalLogin"><i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión</a></li>
+              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalRegister"><i class="bi bi-person-plus me-2"></i>Registrarse</a></li>
             </ul>
           </li>
-
-        
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <i class="bi bi-cart fs-4"></i>
-            </a>
-          </li>
-
+          <li class="nav-item"><a href="#" class="nav-link"><i class="bi bi-cart fs-4"></i></a></li>
         </ul>
       </div>
     </div>
   </nav>
 
-
-
-  <!-- HERO -->
+  <!-- ===================== HERO ===================== -->
   <section class="hero">
     <video autoplay muted loop playsinline>
       <source src="{{ url_for('static', filename='img/video.mp4') }}" type="video/mp4">
     </video>
     <div class="overlay"></div>
-    <div class="hero-content">
+    <div class="hero-content text-center text-white">
       <h1>Muebles que Respiran Naturaleza</h1>
       <p>Diseños que te encantarán, estilo y materiales para cada espacio.</p>
       <a href="#historia" class="btn btn-principal mt-3">Conócenos</a>
     </div>
   </section>
 
-  <!-- VIDEOS -->
+  <!-- ===================== VIDEOS ===================== -->
   <section id="videos" class="py-5 bg-white">
     <div class="container" data-aos="fade-up">
-      <h2 class="text-center mb-4"><b>Cosas que te encantarán</b></h2>
+      <h2 class="text-center mb-4 fw-bold">Cosas que te encantarán</h2>
       <div class="row g-4">
         <div class="col-md-4"><video autoplay muted loop playsinline class="w-100 rounded" style="height:250px;object-fit:cover;"><source src="{{ url_for('static', filename='img/video1carrusel.mp4') }}"></video></div>
         <div class="col-md-4"><video autoplay muted loop playsinline class="w-100 rounded" style="height:250px;object-fit:cover;"><source src="{{ url_for('static', filename='img/video2carrusel.mp4') }}"></video></div>
@@ -94,70 +66,82 @@
     </div>
   </section>
 
-  <!-- HISTORIA -->
+  <!-- ===================== HISTORIA ===================== -->
   <section id="historia" class="py-5 bg-white">
     <div class="container">
       <div class="row align-items-center g-4">
-        <div class="col-md-6"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="Nuestra Historia" class="img-fluid rounded shadow"></div>
         <div class="col-md-6">
-          <h2 class="mb-3">Nuestra Historia</h2>
-          <p>
-         Casa en el arbol nació con la pasión de transformar espacios en hogares llenos de armonía.
-          Desde nuestros inicios, nos hemos enfocado en combinar diseño con materiales sostenibles,
-          creando muebles que no solo embellecen, sino que también respetan el medio ambiente.
-          </p>
+          <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Nuestra Historia" class="img-fluid rounded shadow">
+        </div>
+        <div class="col-md-6">
+          <h2 class="mb-3 fw-bold">Nuestra Historia</h2>
+          <p>Casa en el Árbol nació con la pasión de transformar espacios en hogares llenos de armonía. Desde nuestros inicios, nos hemos enfocado en combinar diseño con materiales sostenibles, creando muebles que no solo embellecen, sino que también respetan el medio ambiente.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CATEGORÍAS -->
-  <section class="categorias">
-    <h2 class="text-center mb-5">Descubre todos los muebles para tener tu hogar soñado</h2>
+  <!-- ===================== CATEGORÍAS ===================== -->
+  <section class="categorias py-5 bg-light">
+    <h2 class="text-center mb-5 fw-bold">Descubre todos los muebles para tener tu hogar soñado</h2>
     <div class="container-fluid px-0">
       <div class="row g-0">
         <div class="col-md-4 col-sm-6 categoria position-relative">
-          <img src="{{ url_for('static', filename='img/sala.png') }}" class="img-fluid w-100 h-100 object-fit-cover">
-          <div class="overlay-cat"><h3>Salas</h3><p></p><a href="#" class="btn btn-light btn-sm rounded-pill">Ver categoría</a></div>
+          <img src="{{ url_for('static', filename='img/sala.png') }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Salas">
+          <div class="overlay-cat text-center"><h3>Salas</h3><a href="#" class="btn btn-light btn-sm rounded-pill mt-2">Ver categoría</a></div>
         </div>
         <div class="col-md-4 col-sm-6 categoria position-relative">
-          <img src="{{ url_for('static', filename='img/comedor.jpg') }}" class="img-fluid w-100 h-100 object-fit-cover">
-          <div class="overlay-cat"><h3>Comedores</h3><p></p><a href="#" class="btn btn-light btn-sm rounded-pill">Ver categoría</a></div>
+          <img src="{{ url_for('static', filename='img/comedor.jpg') }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Comedores">
+          <div class="overlay-cat text-center"><h3>Comedores</h3><a href="#" class="btn btn-light btn-sm rounded-pill mt-2">Ver categoría</a></div>
         </div>
         <div class="col-md-4 col-sm-6 categoria position-relative">
-          <img src="{{ url_for('static', filename='img/dormitorio.jpg') }}" class="img-fluid w-100 h-100 object-fit-cover">
-          <div class="overlay-cat"><h3>Habitaciones</h3><p></p><a href="#" class="btn btn-light btn-sm rounded-pill">Ver categoría</a></div>
+          <img src="{{ url_for('static', filename='img/dormitorio.jpg') }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Habitaciones">
+          <div class="overlay-cat text-center"><h3>Habitaciones</h3><a href="#" class="btn btn-light btn-sm rounded-pill mt-2">Ver categoría</a></div>
         </div>
         <div class="col-md-4 col-sm-6 categoria position-relative">
-          <img src="{{ url_for('static', filename='img/colchones.jpg') }}" class="img-fluid w-100 h-100 object-fit-cover">
-          <div class="overlay-cat"><h3>Camas</h3><p></p><a href="#" class="btn btn-light btn-sm rounded-pill">Ver categoría</a></div>
+          <img src="{{ url_for('static', filename='img/colchones.jpg') }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Camas">
+          <div class="overlay-cat text-center"><h3>Camas</h3><a href="#" class="btn btn-light btn-sm rounded-pill mt-2">Ver categoría</a></div>
         </div>
         <div class="col-md-4 col-sm-6 categoria position-relative">
-          <img src="{{ url_for('static', filename='img/muebles.jpg') }}" class="img-fluid w-100 h-100 object-fit-cover">
-          <div class="overlay-cat"><h3>Muebles</h3><p></p><a href="#" class="btn btn-light btn-sm rounded-pill">Ver categoría</a></div>
+          <img src="{{ url_for('static', filename='img/muebles.jpg') }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Muebles">
+          <div class="overlay-cat text-center"><h3>Muebles</h3><a href="#" class="btn btn-light btn-sm rounded-pill mt-2">Ver categoría</a></div>
         </div>
         <div class="col-md-4 col-sm-6 categoria position-relative">
-          <img src="{{ url_for('static', filename='img/espejos1.jpg') }}" class="img-fluid w-100 h-100 object-fit-cover">
-          <div class="overlay-cat"><h3>Espejos</h3><p></p><a href="#" class="btn btn-light btn-sm rounded-pill">Ver categoría</a></div>
+          <img src="{{ url_for('static', filename='img/espejos1.jpg') }}" class="img-fluid w-100 h-100 object-fit-cover" alt="Espejos">
+          <div class="overlay-cat text-center"><h3>Espejos</h3><a href="#" class="btn btn-light btn-sm rounded-pill mt-2">Ver categoría</a></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- FOOTER -->
+  <!-- ===================== FOOTER ===================== -->
   <footer class="custom-footer">
-    <div class="container py-5">
-      <div class="row text-white">
-        <div class="col-md-4"><h5 class="footer-title">Casa en el Árbol</h5><p>Diseñamos y fabricamos muebles únicos con alma natural.</p></div>
-        <div class="col-md-4"><h5 class="footer-title">Información</h5><ul class="footer-list"><li>Política de privacidad</li><li>Términos y condiciones</li><li>Envíos y devoluciones</li></ul></div>
-        <div class="col-md-4"><h5 class="footer-title">Horario</h5><p>Lunes a Viernes: 9:00 - 6:00<br>Sábados: 10:00 - 4:00</p><p><strong>Email:</strong> casaenelarbol236@gmail.com</p></div>
+    <div class="container py-5 text-white">
+      <div class="row">
+        <div class="col-md-4">
+          <h5 class="footer-title">Casa en el Árbol</h5>
+          <p>Diseñamos y fabricamos muebles únicos con alma natural.</p>
+        </div>
+        <div class="col-md-4">
+          <h5 class="footer-title">Información</h5>
+          <ul class="footer-list list-unstyled">
+            <li><a href="#" class="text-white text-decoration-none">Política de privacidad</a></li>
+            <li><a href="#" class="text-white text-decoration-none">Términos y condiciones</a></li>
+            <li><a href="#" class="text-white text-decoration-none">Envíos y devoluciones</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h5 class="footer-title">Horario</h5>
+          <p>Lunes a Viernes: 9:00 - 6:00<br>Sábados: 10:00 - 4:00</p>
+          <p><strong>Email:</strong> casaenelarbol236@gmail.com</p>
+        </div>
       </div>
     </div>
   </footer>
 
  <!-- ===================== MODALES DE AUTENTICACIÓN ===================== -->
-
-<!-- ===================== MODAL LOGIN ===================== -->
+  <!-- === PEGADOS TAL CUAL ME LOS ENVIASTE === -->
+  <!-- ===================== MODAL LOGIN ===================== -->
 <div class="modal fade" id="modalLogin" tabindex="-1" aria-labelledby="modalLoginLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content rounded-4 overflow-hidden shadow-lg">
@@ -206,222 +190,105 @@
   </div>
 </div>
 
-
-
 <!-- ===================== MODAL REGISTRO ===================== -->
 <div class="modal fade" id="modalRegister" tabindex="-1" aria-labelledby="modalRegisterLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content rounded-4 overflow-hidden shadow-lg">
       <div class="row g-0">
-
-        <!-- LADO IZQUIERDO: IMAGEN -->
         <div class="col-md-6 d-none d-md-block">
-          <img src="{{ url_for('static', filename='img/login.jpg') }}" 
-               alt="Imagen de registro" 
-               class="img-fluid h-100 w-100 object-fit-cover">
+          <img src="{{ url_for('static', filename='img/login.jpg') }}" alt="Imagen de registro" class="img-fluid h-100 w-100 object-fit-cover">
         </div>
-
-        <!-- LADO DERECHO: FORMULARIO -->
         <div class="col-md-6 bg-white p-5 d-flex flex-column justify-content-center">
           <h5 class="fw-bold mb-4 text-center text-accent">CREAR UNA NUEVA CUENTA</h5>
-
           <div id="registerAlert"></div>
-
           <form id="formRegister" method="POST" action="{{ url_for('auth.register') }}">
-            <div class="mb-3">
-              <input type="text" name="name" class="form-control form-control-lg input-style" placeholder="Nombre completo" required>
-            </div>
-            <div class="mb-3">
-              <input type="email" name="email" class="form-control form-control-lg input-style" placeholder="Correo electrónico" required>
-            </div>
-            <div class="mb-3">
-              <input type="tel" name="phone" class="form-control form-control-lg input-style" placeholder="Teléfono" required>
-            </div>
-            <div class="mb-3">
-              <input type="password" name="password" class="form-control form-control-lg input-style" placeholder="Contraseña" required>
-            </div>
-
+            <div class="mb-3"><input type="text" name="name" class="form-control form-control-lg input-style" placeholder="Nombre completo" required></div>
+            <div class="mb-3"><input type="email" name="email" class="form-control form-control-lg input-style" placeholder="Correo electrónico" required></div>
+            <div class="mb-3"><input type="tel" name="phone" class="form-control form-control-lg input-style" placeholder="Teléfono" required></div>
+            <div class="mb-3"><input type="password" name="password" class="form-control form-control-lg input-style" placeholder="Contraseña" required></div>
             <button type="submit" class="btn btn-green w-100 py-2">REGISTRARME</button>
           </form>
-
-          <div class="text-center mt-3">
-            <p class="small text-muted">
-              ¿Ya tienes una cuenta?
-              <a href="#" class="text-green fw-semibold" data-bs-toggle="modal" data-bs-target="#modalLogin" data-bs-dismiss="modal">Inicia sesión</a>
-            </p>
-          </div>
+          <div class="text-center mt-3"><p class="small text-muted">¿Ya tienes una cuenta? <a href="#" class="text-green fw-semibold" data-bs-toggle="modal" data-bs-target="#modalLogin" data-bs-dismiss="modal">Inicia sesión</a></p></div>
         </div>
-
       </div>
     </div>
   </div>
 </div>
-
-
 
 <!-- ===================== MODAL OLVIDÉ CONTRASEÑA ===================== -->
 <div class="modal fade" id="modalForgot" tabindex="-1" aria-labelledby="modalForgotLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content rounded-4 overflow-hidden shadow-lg">
       <div class="row g-0">
-        
-        <!-- LADO IZQUIERDO: IMAGEN -->
         <div class="col-md-6 d-none d-md-block">
-          <img src="{{ url_for('static', filename='img/login.jpg') }}" 
-               alt="Recuperar contraseña" 
-               class="img-fluid h-100 w-100 object-fit-cover">
+          <img src="{{ url_for('static', filename='img/login.jpg') }}" alt="Recuperar contraseña" class="img-fluid h-100 w-100 object-fit-cover">
         </div>
-
-        <!-- LADO DERECHO: FORMULARIO -->
         <div class="col-md-6 bg-white p-5 d-flex flex-column justify-content-center">
           <h5 class="fw-bold mb-4 text-center text-accent">RECUPERAR CONTRASEÑA</h5>
-
           <div id="forgotAlert"></div>
-
           <form id="formForgot" method="post" action="{{ url_for('auth.forgot_password') }}">
-            <div class="mb-3">
-              <input type="email" name="email" class="form-control form-control-lg input-style" 
-                     placeholder="Correo electrónico" required>
-            </div>
-
-            <button type="submit" class="btn btn-green w-100 py-2">
-              ENVIAR ENLACE DE RECUPERACIÓN
-            </button>
+            <div class="mb-3"><input type="email" name="email" class="form-control form-control-lg input-style" placeholder="Correo electrónico" required></div>
+            <button type="submit" class="btn btn-green w-100 py-2">ENVIAR ENLACE DE RECUPERACIÓN</button>
           </form>
-
-          <div class="text-center mt-3">
-            <a href="#" class="text-green small" data-bs-toggle="modal" data-bs-target="#modalLogin" data-bs-dismiss="modal">← Volver al login</a>
-          </div>
+          <div class="text-center mt-3"><a href="#" class="text-green small" data-bs-toggle="modal" data-bs-target="#modalLogin" data-bs-dismiss="modal">← Volver al login</a></div>
         </div>
-
       </div>
     </div>
   </div>
 </div>
-
 
 <!-- ===================== MODAL RESTABLECER CONTRASEÑA ===================== -->
 <div class="modal fade" id="modalReset" tabindex="-1" aria-labelledby="modalResetLabel" aria-hidden="true">
   <div class="modal-dialog modal-md modal-dialog-centered">
     <div class="modal-content rounded-4 shadow-lg p-4">
-
       <h5 class="fw-bold mb-3 text-center text-accent">RESTABLECER CONTRASEÑA</h5>
-
       <div id="resetAlert"></div>
-
       <form id="formReset" method="POST" action="{{ url_for('auth.reset_password', token=token) }}">
-        <div class="mb-3">
-          <input type="password" name="password" class="form-control form-control-lg input-style" placeholder="Nueva contraseña" required>
-        </div>
-        <div class="mb-3">
-          <input type="password" name="confirm_password" class="form-control form-control-lg input-style" placeholder="Confirmar contraseña" required>
-        </div>
+        <div class="mb-3"><input type="password" name="password" class="form-control form-control-lg input-style" placeholder="Nueva contraseña" required></div>
+        <div class="mb-3"><input type="password" name="confirm_password" class="form-control form-control-lg input-style" placeholder="Confirmar contraseña" required></div>
         <button type="submit" class="btn btn-green w-100 py-2">RESTABLECER CONTRASEÑA</button>
       </form>
-
-      <div class="text-center mt-3">
-        <a href="#" class="text-green small" data-bs-toggle="modal" data-bs-target="#modalLogin" data-bs-dismiss="modal">← Volver al login</a>
-      </div>
-
+      <div class="text-center mt-3"><a href="#" class="text-green small" data-bs-toggle="modal" data-bs-target="#modalLogin" data-bs-dismiss="modal">← Volver al login</a></div>
     </div>
   </div>
 </div>
 
 
-
+  <!-- ===================== SCRIPTS ===================== -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-  <script>AOS.init({ duration: 1000, once: true });</script>
   <script>
-document.addEventListener('DOMContentLoaded', () => {
+    AOS.init({ duration: 1000, once: true });
 
-  // ---------------- LOGIN ----------------
-  const formLogin = document.getElementById('formLogin');
-  formLogin?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(formLogin);
-    const response = await fetch(formLogin.action, { method: 'POST', body: formData });
-    const data = await response.json();
+    document.addEventListener('DOMContentLoaded', () => {
+      const handleForm = (formId, alertId) => {
+        const form = document.getElementById(formId);
+        if (!form) return;
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const formData = new FormData(form);
+          try {
+            const response = await fetch(form.action, { method: 'POST', body: formData });
+            const data = await response.json();
+            const alertBox = document.getElementById(alertId);
+            if (data.success) {
+              alertBox.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+              form.reset();
+            } else {
+              alertBox.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+            }
+          } catch (err) {
+            console.error(err);
+          }
+        });
+      };
 
-    const alertDiv = document.getElementById('loginAlert');
-    alertDiv.innerHTML = `<div class="alert alert-${data.status} alert-dismissible fade show" role="alert">
-      ${data.message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>`;
-
-    if (data.status === 'success' && data.redirect) {
-      setTimeout(() => window.location.href = data.redirect, 1000);
-    }
-  });
-
-  // ---------------- REGISTER ----------------
-  const formRegister = document.getElementById('formRegister');
-  formRegister?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(formRegister);
-    const response = await fetch(formRegister.action, { method: 'POST', body: formData });
-    const data = await response.json();
-
-    const alertDiv = document.getElementById('registerAlert');
-    alertDiv.innerHTML = `<div class="alert alert-${data.status} alert-dismissible fade show" role="alert">
-      ${data.message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>`;
-
-    if (data.status === 'success') {
-      formRegister.reset();
-    }
-  });
-
-  // ---------------- FORGOT PASSWORD ----------------
-  const formForgot = document.getElementById('formForgot');
-  formForgot?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(formForgot);
-    const response = await fetch(formForgot.action, { method: 'POST', body: formData });
-    const data = await response.json();
-
-    const alertDiv = document.getElementById('forgotAlert');
-    alertDiv.innerHTML = `<div class="alert alert-${data.status} alert-dismissible fade show" role="alert">
-      ${data.message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>`;
-
-    if (data.status === 'success') {
-      formForgot.reset();
-    }
-  });
-
-  // ---------------- RESET PASSWORD ----------------
-  const formReset = document.getElementById('formReset');
-  formReset?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(formReset);
-    const response = await fetch(formReset.action, { method: 'POST', body: formData });
-    const data = await response.json();
-
-    const alertDiv = document.getElementById('resetAlert');
-    alertDiv.innerHTML = `<div class="alert alert-${data.status} alert-dismissible fade show" role="alert">
-      ${data.message}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>`;
-
-    if (data.status === 'success') {
-      formReset.reset();
-      
-      setTimeout(() => {
-        const modalReset = bootstrap.Modal.getInstance(document.getElementById('modalReset'));
-        modalReset.hide();
-        const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
-        modalLogin.show();
-      }, 1500);
-    }
-  });
-
-});
-</script>
-
-
+      handleForm('formLogin', 'loginAlert');
+      handleForm('formRegister', 'registerAlert');
+      handleForm('formForgot', 'forgotAlert');
+      handleForm('formReset', 'resetAlert');
+    });
+  </script>
 
 </body>
 </html>
