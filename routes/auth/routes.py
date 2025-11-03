@@ -111,17 +111,16 @@ def forgot_password():
 
 @auth.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
-    # Si el usuario entra desde el enlace del correo (GET)
     if request.method == 'GET':
         try:
-            # Validamos que el token sea válido y no haya expirado
             email = s.loads(token, salt='password-recovery', max_age=3600)
-            # Mostramos la página principal con el modal activo
-            return render_template('common/index.html', token=token, mostrar_modal_reset=True)
+            # Renderiza el index en la carpeta "common"
+            return render_template('common/index.html', token=token, mostrar_modal_reset=True, token_expirado=False)
         except (SignatureExpired, BadSignature):
-            return render_template('common/index.html', token=None, mostrar_modal_reset=False, token_expirado=True)
+            # Si el token no sirve o expiró
+            return render_template('common/index.html', mostrar_modal_reset=False, token_expirado=True, token=None)
 
-    # Si el usuario envía el formulario (POST)
+    # Si el método es POST, procesamos la nueva contraseña
     try:
         email = s.loads(token, salt='password-recovery', max_age=3600)
     except (SignatureExpired, BadSignature):
@@ -132,7 +131,6 @@ def reset_password(token):
 
     if not new_password or not confirm_password:
         return jsonify({'status': 'warning', 'message': 'Completa ambos campos.'})
-
     if new_password != confirm_password:
         return jsonify({'status': 'warning', 'message': 'Las contraseñas no coinciden.'})
 
