@@ -20,22 +20,30 @@
   <nav class="navbar navbar-expand-lg shadow-sm py-3 bg-white fixed-top">
     <div class="container">
       <a class="navbar-brand fw-bold text-success" href="#">Casa en el Árbol</a>
+
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
               aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
+
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-center gap-3">
-          <li class="nav-item"><a href="#" class="nav-link"><i class="bi bi-heart fs-4"></i></a></li>
+          <li class="nav-item">
+            <a href="#" class="nav-link"><i class="bi bi-heart fs-4"></i></a>
+          </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-               data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-person fs-4"></i></a>
+               data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-person fs-4"></i>
+            </a>
             <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
               <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalLogin"><i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión</a></li>
               <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalRegister"><i class="bi bi-person-plus me-2"></i>Registrarse</a></li>
             </ul>
           </li>
-          <li class="nav-item"><a href="#" class="nav-link"><i class="bi bi-cart fs-4"></i></a></li>
+          <li class="nav-item">
+            <a href="#" class="nav-link"><i class="bi bi-cart fs-4"></i></a>
+          </li>
         </ul>
       </div>
     </div>
@@ -139,7 +147,7 @@
     </div>
   </footer>
 
- <!-- ===================== MODALES DE AUTENTICACIÓN ===================== -->
+  <!-- ===================== MODALES DE AUTENTICACIÓN ===================== -->
   <!-- === PEGADOS TAL CUAL ME LOS ENVIASTE === -->
   <!-- ===================== MODAL LOGIN ===================== -->
 <div class="modal fade" id="modalLogin" tabindex="-1" aria-labelledby="modalLoginLabel" aria-hidden="true">
@@ -253,42 +261,56 @@
   </div>
 </div>
 
-
   <!-- ===================== SCRIPTS ===================== -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init({ duration: 1000, once: true });</script>
+
+  <!-- === SCRIPT PRINCIPAL PARA FORMULARIOS === -->
   <script>
-    AOS.init({ duration: 1000, once: true });
+  document.addEventListener('DOMContentLoaded', () => {
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const handleForm = (formId, alertId) => {
-        const form = document.getElementById(formId);
-        if (!form) return;
-        form.addEventListener('submit', async (e) => {
-          e.preventDefault();
-          const formData = new FormData(form);
-          try {
-            const response = await fetch(form.action, { method: 'POST', body: formData });
-            const data = await response.json();
-            const alertBox = document.getElementById(alertId);
-            if (data.success) {
-              alertBox.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
-              form.reset();
-            } else {
-              alertBox.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
-            }
-          } catch (err) {
-            console.error(err);
-          }
-        });
-      };
+    const handleForm = (formId, alertId) => {
+      const form = document.getElementById(formId);
+      if (!form) return;
 
-      handleForm('formLogin', 'loginAlert');
-      handleForm('formRegister', 'registerAlert');
-      handleForm('formForgot', 'forgotAlert');
-      handleForm('formReset', 'resetAlert');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const response = await fetch(form.action, { method: 'POST', body: formData });
+        const data = await response.json();
+        const alertContainer = document.getElementById(alertId);
+
+        if (alertContainer) {
+          alertContainer.innerHTML = `
+            <div class="alert alert-${data.status} text-center py-2 mt-2" role="alert">
+              ${data.message}
+            </div>`;
+        }
+
+        if (data.status === 'success' && data.redirect) {
+          setTimeout(() => window.location.href = data.redirect, 1500);
+        }
+      });
+    };
+
+    handleForm('formLogin', 'loginAlert');
+    handleForm('formRegister', 'registerAlert');
+    handleForm('formForgot', 'forgotAlert');
+    handleForm('formReset', 'resetAlert');
+  });
+  </script>
+
+  <!-- Mostrar modal reset automáticamente si Flask lo pide -->
+  {% if mostrar_modal_reset %}
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const resetModal = new bootstrap.Modal(document.getElementById('modalReset'));
+      resetModal.show();
     });
   </script>
+  {% endif %}
 
 </body>
 </html>
