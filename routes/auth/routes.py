@@ -109,9 +109,19 @@ def forgot_password():
         return jsonify({'status': 'danger', 'message': f'Error al enviar correo: {str(e)}'})
 
 
-# ------------------ RESTABLECER CONTRASEÑA ------------------ #
-@auth.route('/reset_password/<token>', methods=['POST'])
+@auth.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
+    # Si el usuario entra desde el enlace del correo (GET)
+    if request.method == 'GET':
+        try:
+            # Validamos que el token sea válido y no haya expirado
+            email = s.loads(token, salt='password-recovery', max_age=3600)
+            # Mostramos la página principal con el modal activo
+            return render_template('common/index.html', token=token, mostrar_modal_reset=True)
+        except (SignatureExpired, BadSignature):
+            return render_template('common/index.html', token=None, mostrar_modal_reset=False, token_expirado=True)
+
+    # Si el usuario envía el formulario (POST)
     try:
         email = s.loads(token, salt='password-recovery', max_age=3600)
     except (SignatureExpired, BadSignature):

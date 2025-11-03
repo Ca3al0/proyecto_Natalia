@@ -420,6 +420,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
+{% if mostrar_modal_reset %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Esperamos un poco para que Bootstrap cargue bien el modal
+  setTimeout(() => {
+    const modalReset = new bootstrap.Modal(document.getElementById('modalResetPassword'));
+    modalReset.show();
+  }, 500);
+});
+</script>
+{% endif %}
+
+{% if token %}
+<script>
+  // Guardamos el token dentro del formulario
+  document.addEventListener('DOMContentLoaded', function() {
+    const tokenField = document.querySelector('#form-reset-password input[name="token"]');
+    if (tokenField) tokenField.value = "{{ token }}";
+  });
+</script>
+{% endif %}
+
+{% if token_expirado %}
+<script>
+  alert('El enlace para restablecer la contraseña ha expirado o no es válido.');
+</script>
+{% endif %}
+
 
 </body>
 </html>
