@@ -197,36 +197,23 @@ def ver_pedidos_transportista():
     pedidos = Pedido.query.filter_by(ID_Empleado=current_user.ID_Usuario).all()
     return render_template('transportista/pedidos.html', pedidos=pedidos)
 
-@transportista.route('/pedido/<int:pedido_id>/seguimiento', methods=['GET', 'POST'])
+@transportista.route("/actualizar_estado/<int:id_pedido>", methods=["POST"])
 @login_required
-@role_required('transportista')
-def seguimiento_pedido(pedido_id):
-    pedido = Pedido.query.get_or_404(pedido_id)
+def actualizar_estado(id_pedido):
+    pedido = Pedido.query.get_or_404(id_pedido)
+    nuevo_estado = request.form.get("estado")
 
-    # Validar que el pedido está asignado al transportista
-    if pedido.ID_Empleado != current_user.ID_Usuario:
-        flash("No puedes ver este pedido", "danger")
-        return redirect(url_for('transportista.ver_pedidos_transportista'))
+    orden_estados = ["pendiente", "en proceso", "en reparto", "entregado"]
 
-    if request.method == 'POST':
-        nuevo_estado = request.form.get('estado')
-        if nuevo_estado not in ['pendiente', 'en proceso', 'en reparto', 'entregado']:
-            flash("Estado no válido", "danger")
-        else:
-            try:
-                pedido.Estado = nuevo_estado
-                db.session.commit()  # ✅ Esto guarda en la base
-                # Crear notificación
-                notificacion = Notificaciones(
-                    Titulo='Actualización de pedido',
-                    Mensaje=f'El estado de tu pedido #{pedido.ID_Pedido} cambió a "{nuevo_estado}".',
-                    ID_Usuario=pedido.ID_Usuario
-                )
-                db.session.add(notificacion)
-                db.session.commit()
-                flash("Estado actualizado correctamente", "success")
-            except Exception as e:
-                db.session.rollback()
-                flash(f"Error al actualizar: {e}", "danger")
+    actual_idx = orden_estados.index(pedido.Estado)
+    nuevo_idx = orden_estados.index(nuevo_estado)
 
-    return render_template('transportista/seguimiento.html', pedido=pedido)
+    if nuevo_idx < actual_idx:
+        flash("⚠️ No puedes regresar a un estado anterior.", "warning")
+        return redirect(url_for("seguimiento_pedido", id_pedido=id_pedido))
+
+    pedido.Estado = nuevo_estado
+    db.session.commit()
+    flash("✅ Estado actualizado correctamente.", "success")
+
+    return redirect(url_for("transportista/seguimiento.html", id_pedido=id_pedido))

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Seguimiento del Pedido</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    body {
+      background: #f9f9f9;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #004aad;
+      color: white;
+      padding: 1rem 2rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 2rem;
+      width: 90%;
+      max-width: 800px;
+    }
+
+    .panel h2 {
+      color: #004aad;
+      margin-bottom: 1rem;
+    }
+
+    .data-block p {
+      margin: 0.3rem 0;
+      font-size: 0.95rem;
+    }
+
+    .progress-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      margin: 2rem 0;
+    }
+
+    .progress-bar::before {
+      content: "";
+      position: absolute;
+      top: 16px;
+      left: 8%;
+      width: 84%;
+      height: 5px;
+      background: #ddd;
+      z-index: 0;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 1;
+      width: 25%;
+    }
+
+    .step .circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #ccc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      color: white;
+      margin-bottom: 0.5rem;
+      transition: background 0.3s;
+    }
+
+    .step.active .circle {
+      background: #004aad;
+    }
+
+    .step.active p {
+      color: #004aad;
+      font-weight: bold;
+    }
+
+    .step p {
+      font-size: 0.85rem;
+      margin: 0;
+      text-align: center;
+    }
+
+    .status-message {
+      text-align: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>📦 Seguimiento de Pedido</header>
+
+  <div class="container">
+    <div class="panel">
+      <h2>👤 Información del Pedido</h2>
+
+      <div class="data-block">
+        <p><strong>ID Pedido:</strong> #{{ pedido.ID_Pedido }}</p>
+        <p><strong>Artículo:</strong> {{ pedido.NomArticulo }}</p>
+        <p><strong>Transportista:</strong> {{ pedido.transportista.Nombre }}</p>
+        <p><strong>Dirección de entrega:</strong> {{ pedido.usuario.Direccion }}</p>
+      </div>
+
+      <div class="progress-bar">
+        <div class="step {% if pedido.Estado in ['pendiente','en proceso','en reparto','entregado'] %}active{% endif %}">
+          <div class="circle">1</div>
+          <p>Pendiente</p>
+        </div>
+        <div class="step {% if pedido.Estado in ['en proceso','en reparto','entregado'] %}active{% endif %}">
+          <div class="circle">2</div>
+          <p>En Proceso</p>
+        </div>
+        <div class="step {% if pedido.Estado in ['en reparto','entregado'] %}active{% endif %}">
+          <div class="circle">3</div>
+          <p>En Reparto</p>
+        </div>
+        <div class="step {% if pedido.Estado == 'entregado' %}active{% endif %}">
+          <div class="circle">4</div>
+          <p>Entregado</p>
+        </div>
+      </div>
+
+      <div class="status-message">
+        Estado actual: 
+        {% if pedido.Estado == 'pendiente' %}🕓 Pendiente
+        {% elif pedido.Estado == 'en proceso' %}🛠️ En proceso
+        {% elif pedido.Estado == 'en reparto' %}🚚 En reparto
+        {% elif pedido.Estado == 'entregado' %}✅ Entregado
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

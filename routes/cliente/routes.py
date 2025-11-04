@@ -467,3 +467,15 @@ def finalizar_compra():
     return redirect(url_for('catalogo'))
 
 
+@cliente.route('/seguimiento/<int:id_pedido>')
+@login_required
+def seguimiento_cliente(id_pedido):
+    # Buscar el pedido en la base de datos
+    pedido = Pedido.query.get_or_404(id_pedido)
+
+    # Verificar que el pedido pertenece al cliente logueado (por seguridad)
+    if pedido.usuario_id != current_user.id:
+        return "Acceso denegado ❌", 403
+
+    # Renderizar la plantilla con los datos del pedido
+    return render_template('cliente/seguimiento.html', pedido=pedido)
