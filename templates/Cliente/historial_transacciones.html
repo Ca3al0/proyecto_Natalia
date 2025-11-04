@@ -5,13 +5,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4 mb-5"> <!-- Agregado mb-5 para espacio inferior -->
+<div class="container mt-4 mb-5">
     <h1><b>Historial de Pedidos</b></h1>
 
     {% if pedidos %}
-    <!-- Botón para generar PDF -->
-    <button id="btn-pdf" class="btn btn-success btn-sm mb-3">Descargar PDF</button>
-
     <table>
         <thead>
             <tr>
@@ -29,11 +26,6 @@
                 <td>${{ '%.2f' | format(pedido.subtotal) }}</td>
                 <td>
                     <a class="btn btn-ver" href="{{ url_for('cliente.ver_pedido', pedido_id=pedido.ID_Pedido) }}">Ver detalles</a>
-                    <a href="{{ url_for('cliente.ver_recibo_cliente', pedido_id=pedido.ID_Pedido) }}" 
-                    class="btn btn-success btn-sm" target="_blank">
-                    Ver Recibo / PDF
-                    </a>
-
                 </td>
             </tr>
             {% endfor %}
@@ -46,11 +38,10 @@
 
 <style>
 :root {
-  --celeste-claro: #e7fcff;
-  --celeste: #d1faff;
-  --azul-gris: #d1faffe;
-  --verde: #57a773;
-  --verde-oscuro: #157145;
+    --verde: #57a773;
+    --verde-oscuro: #157145;
+    --celeste-claro: #e7fcff;
+    --celeste: #d1faff;
 }
 
 h1 {
@@ -63,7 +54,7 @@ table {
     width: 100%;
     border-collapse: collapse;
     background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -83,6 +74,10 @@ tr:nth-child(even) {
     background-color: var(--celeste);
 }
 
+tr:hover {
+    background-color: var(--celeste-claro);
+}
+
 .btn {
     padding: 6px 12px;
     text-decoration: none;
@@ -91,6 +86,7 @@ tr:nth-child(even) {
     font-size: 14px;
     border: none;
     cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .btn-ver {
@@ -100,15 +96,7 @@ tr:nth-child(even) {
 
 .btn-ver:hover {
     background-color: var(--verde-oscuro);
-}
-
-.btn-eliminar {
-    background-color: #c0392b;
-    color: white;
-}
-
-.btn-eliminar:hover {
-    background-color: #a83224;
+    transform: scale(1.05);
 }
 
 .no-pedidos {
@@ -118,43 +106,4 @@ tr:nth-child(even) {
     color: #7f8c8d;
 }
 </style>
-
-<!-- jsPDF y autoTable -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-
-<script>
-document.getElementById("btn-pdf").addEventListener("click", () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-
-    // Título
-    doc.setFontSize(18);
-    doc.text("Historial de Pedidos", 105, 15, { align: "center" });
-
-    // Cabeceras de la tabla (omitimos la columna de acciones)
-    const headers = ["ID Pedido", "Fecha", "Subtotal"];
-    
-    // Obtener filas de la tabla
-    const data = Array.from(document.querySelectorAll("table tbody tr")).map(tr => {
-        const tds = tr.querySelectorAll("td");
-        return [
-            tds[0].innerText, // ID
-            tds[1].innerText, // Fecha
-            tds[2].innerText  // Subtotal
-        ];
-    });
-
-    // Generar la tabla en PDF
-    doc.autoTable({
-        head: [headers],
-        body: data,
-        startY: 25,
-        styles: { fontSize: 12 }
-    });
-
-    // Descargar PDF
-    doc.save("historial_pedidos.pdf");
-});
-</script>
 {% endblock %}
