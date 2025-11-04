@@ -245,154 +245,105 @@
   <script>AOS.init({ duration: 1000, once: true });</script>
 
   <!-- ===================== FORMULARIOS JS ===================== -->
-  <script>
+<script>
 document.addEventListener('DOMContentLoaded', () => {
 
   // -------- FUNCIÓN GENERAL PARA MOSTRAR ALERTAS --------
   function mostrarAlerta(id, resultado) {
     const cont = document.getElementById(id);
     if (!cont) return;
+
+    // Asegurarse de que siempre haya status y message
+    const status = resultado.status || 'danger';
+    const message = resultado.message || 'Ocurrió un error inesperado.';
+
     cont.innerHTML = `
-      <div class="alert alert-${resultado.status} alert-dismissible fade show mt-2 text-center" role="alert">
-        ${resultado.message}
+      <div class="alert alert-${status} alert-dismissible fade show mt-2 text-center" role="alert">
+        ${message}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
       </div>`;
   }
 
-  // -------- REGISTRO --------
-  const formRegister = document.getElementById('formRegister');
-  if (formRegister) {
-    formRegister.addEventListener('submit', async (e) => {
+  // -------- FUNCIÓN GENERAL PARA ENVIAR FORMULARIOS --------
+  async function handleForm(formId, alertId, onSuccess) {
+    const form = document.getElementById(formId);
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const data = new FormData(formRegister);
+      const data = new FormData(form);
 
       try {
-        const res = await fetch(formRegister.action, { method: 'POST', body: data });
-        const result = await res.json();
-        mostrarAlerta('registerAlert', result);
+        const res = await fetch(form.action, { method: 'POST', body: data });
+        let result;
 
-        if (result.status === 'success') {
-          
-          setTimeout(() => {
-            const modalRegister = bootstrap.Modal.getInstance(document.getElementById('modalRegister'));
-            if (modalRegister) modalRegister.hide();
-
-            const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
-            modalLogin.show();
-
-            formRegister.reset();
-          }, 2000);
+        try {
+          result = await res.json();
+        } catch {
+          result = { status: 'danger', message: 'Error inesperado del servidor.' };
         }
+
+        const status = result.status || 'danger';
+        const message = result.message || 'No se recibió respuesta del servidor.';
+
+        mostrarAlerta(alertId, { status, message });
+
+        if (status === 'success' && typeof onSuccess === 'function') {
+          onSuccess(form, result);
+        }
+
       } catch {
-        mostrarAlerta('registerAlert', {
+        mostrarAlerta(alertId, {
           status: 'danger',
-          message: 'Error al procesar el registro. Intenta nuevamente.'
+          message: 'Error al procesar el formulario. Intenta nuevamente.'
         });
       }
     });
   }
+
+  // -------- REGISTRO --------
+  handleForm('formRegister', 'registerAlert', (form, result) => {
+    setTimeout(() => {
+      const modalRegister = bootstrap.Modal.getInstance(document.getElementById('modalRegister'));
+      if (modalRegister) modalRegister.hide();
+
+      const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
+      modalLogin.show();
+
+      form.reset();
+    }, 2000);
+  });
 
   // -------- LOGIN --------
-  const formLogin = document.getElementById('formLogin');
-  if (formLogin) {
-    formLogin.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = new FormData(formLogin);
-      try {
-        const res = await fetch(formLogin.action, { method: 'POST', body: data });
-        const result = await res.json();
-        mostrarAlerta('loginAlert', result);
-
-        if (result.status === 'success' && result.redirect) {
-          setTimeout(() => window.location.href = result.redirect, 1200);
-        }
-      } catch {
-        mostrarAlerta('loginAlert', {
-          status: 'danger',
-          message: 'Error al iniciar sesión. Intenta nuevamente.'
-        });
-      }
-    });
-  }
+  handleForm('formLogin', 'loginAlert', (form, result) => {
+    if (result.redirect) setTimeout(() => window.location.href = result.redirect, 1200);
+  });
 
   // -------- OLVIDÉ CONTRASEÑA --------
-const formForgot = document.getElementById('formForgot');
+  handleForm('formForgot', 'forgotAlert', (form) => form.reset());
 
-if (formForgot) {
-  formForgot.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = new FormData(formForgot);
+  // -------- RESTABLECER CONTRASEÑA --------
+  handleForm('formReset', 'resetAlert', (form) => {
+    const modalReset = bootstrap.Modal.getInstance(document.getElementById('modalReset'));
+    if (modalReset) modalReset.hide();
 
-    try {
-      const res = await fetch(formForgot.action, { method: 'POST', body: data });
+    const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
+    modalLogin.show();
 
-      // Intentar parsear JSON; si falla, usar mensaje genérico
-      let result;
-      try {
-        result = await res.json();
-      } catch {
-        result = { status: 'danger', message: 'Error inesperado del servidor.' };
-      }
-
-      // Extraer status y message para mostrar alerta
-      const status = result.status || 'danger';
-      const message = result.message || 'No se recibió respuesta del servidor.';
-
-      mostrarAlerta('forgotAlert', { status, message });
-
-      if (status === 'success') formForgot.reset();
-
-    } catch {
-      mostrarAlerta('forgotAlert', {
-        status: 'danger',
-        message: 'Error al enviar el correo. Intenta nuevamente.'
-      });
-    }
+    form.reset();
   });
-}
 
-// -------- RESTABLECER CONTRASEÑA --------
-const formReset = document.getElementById('formReset');
-if (formReset) {
-  formReset.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const data = new FormData(formReset);
-    try {
-      const res = await fetch(formReset.action, { method: 'POST', body: data });
-
-      // Intenta parsear JSON; si no puede, muestra mensaje genérico
-      let result;
-      try {
-        result = await res.json();
-      } catch {
-        result = { status: 'danger', message: 'Error inesperado del servidor.' };
-      }
-
-      // Verifica que existan los campos esperados
-      const status = result.status || 'danger';
-      const message = result.message || 'No se recibió respuesta del servidor.';
-
-      mostrarAlerta('resetAlert', { status, message });
-
-      if (status === 'success') {
-        const modalReset = bootstrap.Modal.getInstance(document.getElementById('modalReset'));
-        if (modalReset) modalReset.hide();
-
-        const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
-        modalLogin.show();
-
-        formReset.reset();
-      }
-    } catch {
-      mostrarAlerta('resetAlert', {
-        status: 'danger',
-        message: 'Error al restablecer la contraseña. Intenta nuevamente.'
-      });
-    }
-  });
-}
-
+});
 </script>
+
+{% if mostrar_modal_reset %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const resetModal = new bootstrap.Modal(document.getElementById('modalReset'));
+    resetModal.show();
+  });
+</script>
+{% endif %}
 
 
   {% if mostrar_modal_reset %}
