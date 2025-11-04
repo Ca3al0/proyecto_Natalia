@@ -1,4 +1,85 @@
-{% extends "common/base.html" %}
+<style>
+:root {
+    --celeste-claro: #e7fcff;
+    --celeste: #d1faff;
+    --azul-gris: #d1faffe;
+    --verde: #57a773;
+    --verde-oscuro: #157145;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--celeste-claro);
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+h2 {
+    text-align: center;
+    color: var(--verde-oscuro);
+    margin-bottom: 20px;
+}
+
+table {
+    width: 80%;
+    margin: 0 auto 30px;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+th {
+    background-color: var(--verde);
+    color: white;
+    font-weight: 600;
+}
+
+tr:nth-child(even) {
+    background-color: var(--celeste);
+}
+
+.total {
+    text-align: right;
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 20%;
+}
+
+.btn-volver {
+    display: block;
+    width: 180px;
+    margin: 20px auto;
+    text-align: center;
+    padding: 10px;
+    background-color: var(--verde);
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-volver:hover {
+    background-color: var(--verde-oscuro);
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+ul li {
+    margin-bottom: 5px;
+}
+</style>
 
 {% block content %}
 <div class="container mt-4">
@@ -8,8 +89,8 @@
     <p><strong>Destino:</strong> {{ pedido.Destino }}</p>
 
     <h4 class="mt-3">Productos</h4>
-    <table class="table table-bordered">
-        <thead class="table-light">
+    <table>
+        <thead>
             <tr>
                 <th>Producto</th>
                 <th>Cantidad</th>
@@ -23,7 +104,7 @@
                 <td>{{ detalle.producto.NombreProducto }}</td>
                 <td>{{ detalle.Cantidad }}</td>
                 <td>${{ '%.2f'|format(detalle.PrecioUnidad) }}</td>
-                <td>${{ '%.2f'|format(detalle.subtotal) }}</td>
+                <td>${{ '%.2f'|format(detalle.Cantidad * detalle.PrecioUnidad) }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -40,6 +121,6 @@
         <p><em>No se han registrado pagos</em></p>
     {% endif %}
 
-    <a href="{{ url_for('cliente.historial') }}" class="btn btn-secondary mt-3">Volver al historial</a>
+    <a href="{{ url_for('cliente.historial') }}" class="btn-volver">Volver al historial</a>
 </div>
 {% endblock %}
