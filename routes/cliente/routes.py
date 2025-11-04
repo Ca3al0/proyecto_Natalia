@@ -234,9 +234,10 @@ def ver_instalaciones():
 
 
 @cliente.route('/producto/<int:id>')
-def detalle_producto(id):
+def detalle_producto_catalogo(id):
     producto = Producto.query.get_or_404(id)
-    return render_template('cliente/detalle_producto.html', producto=producto)
+    return render_template('cliente/detalle_producto_catalogo.html', producto=producto)
+
 
 
 @cliente.route('/productos/<int:id>/resena', methods=['GET'])
@@ -409,7 +410,7 @@ def checkout():
             return jsonify({"success": False, "mensaje": "Dirección no válida."})
 
         try:
-            # Crear pedido
+        
             pedido = Pedido(
                 NombreComprador=current_user.Nombre,
                 Estado='pendiente',
@@ -447,7 +448,7 @@ def checkout():
             db.session.rollback()
             return jsonify({"success": False, "mensaje": f"Ocurrió un error: {str(e)}"})
 
-    # GET: renderiza la plantilla con direcciones
+   
     direcciones = Direccion.query.filter_by(ID_Usuario=current_user.ID_Usuario).all()
     return render_template('Cliente/pagos.html', direcciones=direcciones)
 
@@ -486,7 +487,7 @@ def historial():
     
     pedidos = Pedido.query.filter_by(ID_Usuario=cliente_id).order_by(Pedido.FechaPedido.desc()).all()
     
-    # Calculamos subtotal por pedido
+  
     for pedido in pedidos:
         pedido.subtotal = sum(detalle.Cantidad * detalle.PrecioUnidad for detalle in pedido.detalles_pedido)
     
