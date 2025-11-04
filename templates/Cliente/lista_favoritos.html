@@ -1,36 +1,25 @@
 {% if productos %}
-  <div class="row g-4">
+  <div class="row">
     {% for producto in productos %}
-      <div class="col-12 col-sm-6 col-md-4">
-        <div class="card h-100 shadow-sm rounded-4 overflow-hidden">
+      <div class="col-md-4 mb-3">
+        <div class="card">
           {% if producto.ImagenPrincipal %}
             <img src="{{ url_for('static', filename=producto.ImagenPrincipal) }}"
                  class="card-img-top"
-                 alt="Imagen de {{ producto.NombreProducto }}"
-                 style="object-fit: cover; height: 200px;">
+                 alt="Imagen de {{ producto.NombreProducto }}">
           {% else %}
             <img src="{{ url_for('static', filename='img/catalogo.png') }}"
                  class="card-img-top"
-                 alt="Imagen no disponible"
-                 style="object-fit: cover; height: 200px;">
+                 alt="Imagen no disponible">
           {% endif %}
-          <div class="card-body d-flex flex-column">
+          <div class="card-body">
             <h5 class="card-title">{{ producto.NombreProducto }}</h5>
-            <p class="card-text text-success fw-bold mb-3">$ {{ '%.2f' | format(producto.PrecioUnidad) }}</p>
-
-            <!-- Botones opcionales -->
-            <div class="mt-auto d-flex gap-2">
-              <a href="{{ url_for('cliente.detalle_producto', id=producto.ID_Producto) }}" 
-                 class="btn btn-outline-primary btn-sm flex-grow-1">Ver más</a>
-              <button type="button" class="btn btn-success btn-sm flex-grow-1 btn-add-cart" data-id="{{ producto.ID_Producto|string }}">
-                <i class="bi bi-cart-plus me-1"></i> Agregar
-              </button>
-            </div>
+            <p class="card-text">$ {{ '%.2f' | format(producto.PrecioUnidad) }}</p>
           </div>
         </div>
       </div>
     {% endfor %}
   </div>
 {% else %}
-  <p class="text-muted text-center">No tienes productos favoritos.</p>
+  <p>No tienes productos favoritos.</p>
 {% endif %}

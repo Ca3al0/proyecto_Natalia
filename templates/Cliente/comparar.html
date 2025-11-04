@@ -2,14 +2,148 @@
 
 {% block navbar %}
 {% include "common/partials/navbar_cliente.html" %}
-{% include "common/partials/navbar_secundario2.html" %}
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-  <h2 class="mb-4 text-center text-success">Comparar Productos</h2>
 
-  <!-- Productos disponibles -->
+<style>
+/* Tarjetas de productos */
+.card {
+  border-radius: 15px;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+/* Botones de selección */
+.btn-select-compare.active {
+  background-color: white;
+  color: #28a745;
+  border: 2px solid #28a745;
+  font-weight: bold;
+}
+
+/* Precio y color */
+.precio {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #28a745;
+}
+.color {
+  font-size: 0.95rem;
+  color: #6c757d;
+}
+
+/* Botón fijo de comparar */
+#btn-comparar {
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  transition: transform 0.2s;
+}
+#btn-comparar:hover {
+  transform: scale(1.05);
+  background-color: #218838;
+}
+
+/* Tabla comparativa */
+#tabla-comparativa th, #tabla-comparativa td {
+  vertical-align: middle;
+}
+#tabla-comparativa img {
+  border-radius: 8px;
+}
+#comparativa {
+  animation: fadeIn 0.5s ease-in-out;
+}
+@keyframes fadeIn {
+  from {opacity: 0;}
+  to {opacity:1;}
+}
+</style>
+
+<style>
+/* Tabla comparativa general */
+#comparativa {
+  margin-top: 2rem;
+}
+
+#tabla-comparativa {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* Encabezado */
+#tabla-comparativa thead {
+  background-color: #28a745; /* Verde */
+  color: white;
+}
+
+#tabla-comparativa thead th {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 12px 8px;
+}
+
+/* Celdas */
+#tabla-comparativa td {
+  background-color: #f9f9f9;
+  padding: 12px 8px;
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+/* Primera columna */
+#tabla-comparativa td:first-child {
+  font-weight: 600;
+  color: #333;
+  background-color: #e9f7ef;
+}
+
+/* Imágenes dentro de la tabla */
+#tabla-comparativa td img {
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* Hover sobre filas */
+#tabla-comparativa tbody tr:hover td {
+  background-color: #f1fff4;
+  transition: background-color 0.3s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #tabla-comparativa thead {
+    font-size: 0.9rem;
+  }
+  #tabla-comparativa td {
+    font-size: 0.85rem;
+    padding: 10px 5px;
+  }
+  #tabla-comparativa td img {
+    height: 80px;
+  }
+}
+</style>
+
+
+
+<div class="container mt-5">
+  <h2 class="mb-4 text-center text-success"><b>Comparar Productos</b></h2>
+
+
   <div class="row" id="productos-container">
     {% for producto in productos %}
     <div class="col-md-4 mb-4">
@@ -29,9 +163,9 @@
     {% endfor %}
   </div>
 
-  <!-- Cuadro comparativo tipo tabla -->
+  
   <div id="comparativa" class="mt-5" style="display:none;">
-    <h3 class="text-center mb-4 text-success">Comparacion</h3>
+    <h3 class="text-center mb-4 text-success"><b>Comparacion</b></h3>
     <div class="table-responsive">
       <table class="table table-bordered text-center align-middle" id="tabla-comparativa" style="background:#f9f9f9; border-radius:10px; overflow:hidden;">
         <thead class="bg-success text-white">
@@ -68,14 +202,13 @@
   </div>
 </div>
 
-<!-- Botón flotante -->
+
 <a href="#" id="btn-comparar" 
    class="btn btn-success shadow-lg position-fixed rounded-pill px-4 py-2"
    style="bottom: 30px; right: 30px; z-index: 1050; display:none;">
    Comparar Productos
 </a>
 
-<!-- Modal límite productos -->
 <div class="modal fade" id="modalLimite" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-success">
