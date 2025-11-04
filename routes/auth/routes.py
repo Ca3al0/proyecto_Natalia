@@ -61,7 +61,7 @@ def register():
             'status': 'success',
             'message': 'Cuenta creada correctamente.Ahora puedes iniciar sesión.',
             'redirect': url_for('index'),
-            'delay': 3000  # milisegundos
+            'delay': 3000  
         })
 
     except Exception as e:
