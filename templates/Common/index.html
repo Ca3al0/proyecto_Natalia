@@ -335,36 +335,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // -------- RESTABLECER CONTRASEÑA --------
-  const formReset = document.getElementById('formReset');
-  if (formReset) {
-    formReset.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = new FormData(formReset);
+// -------- RESTABLECER CONTRASEÑA --------
+const formReset = document.getElementById('formReset');
+if (formReset) {
+  formReset.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = new FormData(formReset);
+    try {
+      const res = await fetch(formReset.action, { method: 'POST', body: data });
+
+      // Intenta parsear JSON; si no puede, muestra mensaje genérico
+      let result;
       try {
-        const res = await fetch(formReset.action, { method: 'POST', body: data });
-        const result = await res.json();
-        mostrarAlerta('resetAlert', result);
-
-        if (result.status === 'success') {
-          const modalReset = bootstrap.Modal.getInstance(document.getElementById('modalReset'));
-          if (modalReset) modalReset.hide();
-
-          const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
-          modalLogin.show();
-
-          formReset.reset();
-        }
+        result = await res.json();
       } catch {
-        mostrarAlerta('resetAlert', {
-          status: 'danger',
-          message: 'Error al restablecer la contraseña.'
-        });
+        result = { status: 'danger', message: 'Error inesperado del servidor.' };
       }
-    });
-  }
 
-});
+      // Verifica que existan los campos esperados
+      const status = result.status || 'danger';
+      const message = result.message || 'No se recibió respuesta del servidor.';
+
+      mostrarAlerta('resetAlert', { status, message });
+
+      if (status === 'success') {
+        const modalReset = bootstrap.Modal.getInstance(document.getElementById('modalReset'));
+        if (modalReset) modalReset.hide();
+
+        const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
+        modalLogin.show();
+
+        formReset.reset();
+      }
+    } catch {
+      mostrarAlerta('resetAlert', {
+        status: 'danger',
+        message: 'Error al restablecer la contraseña. Intenta nuevamente.'
+      });
+    }
+  });
+}
+
 </script>
 
 
