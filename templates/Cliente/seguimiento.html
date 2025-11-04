@@ -4,165 +4,188 @@
 
 {% block extra_css %}
 <style>
-    /* 🎨 Estilos para la página de Seguimiento de Pedido */
-    
-    /* Contenedor principal */
-    .container-tracking {
-        max-width: 900px;
-        margin: 50px auto;
-        padding: 25px 30px;
-        font-family: 'Poppins', sans-serif;
-        background-color: #ffffff;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        border: 1px solid #e0e0e0;
+    /* 🎨 VARIABLES DE COLOR Y TIPO */
+    :root {
+        --celeste-claro: #e7fcff;
+        --celeste: #d1faff;
+        --verde: #4CAF50;
+        --verde-oscuro: #1A7942;
+        --gris-claro: #f8f9fa;
+        --sombra-panel: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
 
-    /* Panel de Título */
+    body {
+        font-family: 'Roboto', sans-serif;
+        background-color: var(--gris-claro);
+        margin: 0;
+        padding: 0;
+    }
+
+    /* 🟩 CONTENEDOR */
+    .container-tracking {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 80vh;
+        padding: 3rem 1rem;
+    }
+
+    /* 📦 PANEL PRINCIPAL */
+    .panel {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: var(--sombra-panel);
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 700px;
+    }
+
     .panel h2 {
+        margin-top: 0;
+        color: var(--verde-oscuro);
         font-size: 2rem;
-        color: #333;
-        margin-bottom: 25px;
+        font-weight: 700;
+        border-bottom: 3px solid var(--verde);
+        padding-bottom: 0.5rem;
+        margin-bottom: 1.5rem;
         display: flex;
         align-items: center;
-        border-bottom: 2px solid #f0f0f0; /* Separador sutil */
-        padding-bottom: 15px;
+        gap: 10px;
     }
 
-    .panel h2 i {
-        color: #4caf50; /* Verde brillante */
-        font-size: 2.2rem;
-        margin-right: 10px;
-    }
-
-    /* Bloque de datos del pedido */
+    /* 🧾 BLOQUE DE DATOS */
     .data-block {
-        padding: 10px 0 20px 0;
-        line-height: 1.6;
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background: var(--celeste-claro);
+        border-radius: 8px;
+        border-left: 5px solid var(--verde);
     }
 
     .data-block p {
-        margin: 5px 0;
+        margin: 0.5rem 0;
         font-size: 1rem;
-        color: #555;
+        color: #333;
     }
 
     .data-block strong {
-        color: #222;
-        font-weight: 600;
-        min-width: 150px; /* Alineación visual */
-        display: inline-block;
+        color: var(--verde-oscuro);
     }
 
-    /* Barra de progreso (Timeline) */
+    /* 🚚 BARRA DE PROGRESO */
     .progress-bar {
         position: relative;
-        margin: 40px 0 30px 0;
-        height: 12px;
-        background: #e0e0e0;
-        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin: 4rem 0 3rem;
     }
 
-    /* Línea de progreso rellena */
-    .progress-line-fill {
-        height: 100%;
-        width: 0%; /* Se actualizará con Jinja */
-        background: linear-gradient(90deg, #4caf50, #81c784);
-        border-radius: 10px;
-        transition: width 1s ease-in-out;
-    }
-
-    /* Pasos individuales */
-    .step {
+    /* Línea base */
+    .progress-bar::before {
+        content: "";
         position: absolute;
-        top: -22px;
+        top: 24px;
+        left: 5%;
+        width: 90%;
+        height: 8px;
+        background: var(--celeste);
+        border-radius: 4px;
+        z-index: 0;
+    }
+
+    /* Línea activa */
+    .progress-line-fill {
+        position: absolute;
+        top: 24px;
+        left: 5%;
+        height: 8px;
+        background: var(--verde);
+        border-radius: 4px;
+        z-index: 1;
+        transition: width 0.6s ease-in-out;
+    }
+
+    /* Cada paso */
+    .step {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        z-index: 2;
+        width: 25%;
         text-align: center;
-        width: 50px;
-        transform: translateX(-50%);
-        z-index: 10; /* Asegura que los círculos estén sobre la barra */
+    }
+
+    .step .circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: var(--celeste);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #000;
+        font-size: 1.3rem;
+        margin-bottom: 0.7rem;
+        transition: all 0.4s ease;
+        border: 2px solid transparent;
+    }
+
+    .step.active .circle {
+        background: var(--verde);
+        color: #fff;
+        transform: scale(1.1);
+        border-color: var(--verde-oscuro);
+        box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
     }
 
     .step p {
-        margin-top: 8px;
-        font-size: 0.85rem;
+        font-size: 0.95rem;
+        margin: 0;
         color: #555;
-        font-weight: 500;
-        white-space: nowrap; /* Evita que el texto se rompa */
-    }
-
-    /* Círculos de cada paso */
-    .circle {
-        width: 40px;
-        height: 40px;
-        background-color: #e0e0e0;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-        font-size: 1.3rem;
-        border: 2px solid #ffffff; /* Borde blanco para destacarlo */
-        box-sizing: border-box;
-    }
-
-    .circle i {
-        color: #777; /* Color por defecto de los íconos */
-    }
-
-    /* Paso activo (completado o actual) */
-    .step.active .circle {
-        background: linear-gradient(135deg, #4caf50, #81c784);
-        color: #fff;
-        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.5);
-        transform: scale(1.1); /* Ligeramente más grande */
-    }
-
-    .step.active .circle i {
-        color: white; /* Ícono blanco cuando activo */
-    }
-
-    /* Mensaje de estado destacado */
-    .status-message {
-        margin-top: 25px;
-        padding: 15px 20px;
-        background-color: #e8f5e9; /* Fondo verde claro */
-        border-left: 5px solid #4caf50; /* Borde verde fuerte */
-        color: #333;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
         font-weight: 600;
-        font-size: 1.05rem;
-        transition: background 0.3s;
+        transition: color 0.4s;
+    }
+
+    .step.active p {
+        color: var(--verde-oscuro);
+        font-weight: 700;
+    }
+
+    /* 🟢 MENSAJE DE ESTADO */
+    .status-message {
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-top: 2rem;
+        padding: 1.2rem;
+        color: #fff;
+        background: var(--verde-oscuro);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .status-message i {
-        margin-right: 10px;
+        margin-right: 8px;
         font-size: 1.3rem;
-        color: #4caf50;
     }
 
-    /* Responsive */
-    @media (max-width: 700px) {
-        .container-tracking {
-            margin: 20px;
-            padding: 15px;
-        }
-        .panel h2 {
-            font-size: 1.5rem;
-        }
-        .step p {
-            font-size: 0.7rem;
-        }
-        .circle {
-            width: 30px;
-            height: 30px;
-            font-size: 1rem;
-        }
-        .step {
-            top: -18px; /* Ajuste la posición de los pasos */
-            width: 40px;
-        }
+    /* 📍 Info destino */
+    #destino-info {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #007bff;
+    }
+
+    /* 📱 Responsive */
+    @media (max-width: 550px) {
+        .panel { padding: 1.5rem; }
+        .panel h2 { font-size: 1.6rem; }
+        .step .circle { width: 34px; height: 34px; font-size: 1rem; }
+        .step p { font-size: 0.75rem; }
+        .progress-bar::before, .progress-line-fill { top: 18px; }
+        .status-message { font-size: 1rem; padding: 1rem; }
     }
 </style>
 {% endblock %}
@@ -182,20 +205,20 @@
             <p><strong>Destino:</strong> <span id="destino-info">{{ pedido.Destino }}</span></p>
             <p><strong>Fecha Pedido:</strong> {{ pedido.FechaPedido.strftime('%d/%m/%Y') }}</p>
             {% if pedido.FechaEntrega %}
-            <p><strong>Fecha Estimada de Entrega:</strong> {{ pedido.FechaEntrega.strftime('%d/%m/%Y') }}</p>
+                <p><strong>Fecha Estimada de Entrega:</strong> {{ pedido.FechaEntrega.strftime('%d/%m/%Y') }}</p>
             {% endif %}
         </div>
-        
-        <hr> {% set estados = ['pendiente', 'en proceso', 'en reparto', 'entregado'] %}
+
+        {% set estados = ['pendiente', 'en proceso', 'en reparto', 'entregado'] %}
         {% set iconos = ['bi-clock-fill', 'bi-gear-fill', 'bi-truck', 'bi-check-circle-fill'] %}
         {% set estado_actual_index = estados.index(pedido.Estado) if pedido.Estado in estados else -1 %}
 
         <div class="progress-bar" id="barraProgresoCliente">
-            {% set progreso_porcentaje = (estado_actual_index * 33.33)|round(2) if estado_actual_index >= 0 and estado_actual_index < 3 else (100 if estado_actual_index == 3 else 0) %}
+            {% set progreso_porcentaje = (estado_actual_index * 33.33) if estado_actual_index >= 0 and estado_actual_index < 3 else (100 if estado_actual_index == 3 else 0) %}
             <div class="progress-line-fill" style="width: {{ progreso_porcentaje }}%;"></div>
 
             {% for i in range(4) %}
-                <div class="step {% if estado_actual_index >= i %}active{% endif %}" style="left: {{ (i*100/3)|round(2) }}%;">
+                <div class="step {% if estado_actual_index >= i %}active{% endif %}">
                     <div class="circle">
                         <i class="bi {{ iconos[i] }}"></i>
                     </div>
@@ -205,8 +228,8 @@
         </div>
 
         <div class="status-message" id="mensajeCliente">
-            <i class="bi bi-info-circle-fill"></i> 
-            Estado actual: <strong>{{ pedido.Estado | replace('_',' ') | capitalize }}</strong>
+            <i class="bi bi-info-circle-fill"></i>
+            Estado actual: {{ pedido.Estado | replace('_',' ') | capitalize }}
         </div>
     </div>
 </div>
