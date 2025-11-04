@@ -2,25 +2,259 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="text-primary mb-4">Finalizar Compra (Checkout)</h1>
+    <h1 class="text-primary mb-5"><i class="bi bi-credit-card-2-back me-2"></i> Finalizar Compra (Checkout)</h1>
     
-    <div class="row">
-        <div class="col-md-8">
-            <h2>Detalles de Envío y Pago</h2>
-            <p>Formularios de envío y pago irán aquí...</p>
+    <div id="flash-message-container" class="mb-4">
         </div>
-        <div class="col-md-4">
-            <div class="card shadow-sm">
+
+    <div class="row">
+        
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-geo-alt-fill me-2"></i> Dirección de Envío</h4>
+                </div>
                 <div class="card-body">
-                    <h4 class="card-title">Resumen del Pedido</h4>
-                    <p>Subtotal: $XXX.XX</p>
-                    <p>Envío: $YY.YY</p>
-                    <hr>
-                    <h5 class="text-success">Total a Pagar: $ZZZ.ZZ</h5>
-                    <button class="btn btn-success btn-lg w-100 mt-3" type="submit">Pagar Ahora</button>
+                    <form id="checkout-form">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control" id="nombre" required value="Natalia Gómez">
+                        </div>
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label">Dirección de Envío</label>
+                            <input type="text" class="form-control" id="direccion" required value="Calle 10 # 5-20">
+                        </div>
+                        
+                        <h4 class="mt-4 mb-3"><i class="bi bi-cash-stack me-2"></i> Método de Pago</h4>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="pago" id="credito" value="credito" checked>
+                                <label class="form-check-label" for="credito">Tarjeta de Crédito / Débito</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="pago" id="paypal" value="paypal">
+                                <label class="form-check-label" for="paypal">PayPal</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="pago" id="transferencia" value="transferencia">
+                                <label class="form-check-label" for="transferencia">Transferencia Bancaria (Manual)</label>
+                            </div>
+                        </div>
+
+                        <div id="datos-tarjeta" class="card p-3 bg-light mt-3 border">
+                            <h5>Datos de la Tarjeta</h5>
+                            <div class="mb-3">
+                                <label for="numero-tarjeta" class="form-label">Número de Tarjeta</label>
+                                <input type="text" class="form-control" id="numero-tarjeta" required pattern="\d{16}" title="Debe contener 16 dígitos" placeholder="Ej: 1111222233334444">
+                            </div>
+                            <div class="row">
+                                <div class="col-6 mb-3">
+                                    <label for="expiracion" class="form-label">Fecha Exp. (MM/AA)</label>
+                                    <input type="text" class="form-control" id="expiracion" required pattern="(0[1-9]|1[0-2])\/\d{2}" placeholder="MM/AA">
+                                </div>
+                                <div class="col-6 mb-3">
+                                    <label for="cvv" class="form-label">CVV</label>
+                                    <input type="text" class="form-control" id="cvv" required pattern="\d{3,4}" placeholder="3 o 4 dígitos">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-lg sticky-top" style="top: 20px;">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0"><i class="bi bi-receipt me-2"></i> Resumen de la Orden</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush mb-3" id="resumen-productos">
+                        </ul>
+                    <ul class="list-group list-group-flush border-top pt-2">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            **Subtotal:**
+                            <span class="fw-bold" id="checkout-subtotal">$0.00</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            **Costo de Envío:**
+                            <span class="fw-bold text-danger" id="checkout-envio">$5.00</span> 
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
+                            <h5 class="mb-0 text-success">**Total a Pagar:**</h5>
+                            <h5 class="mb-0 text-success" id="checkout-total">$0.00</h5>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <button id="btn-pagar" class="btn btn-success btn-lg w-100 mt-3 shadow-lg">
+                <i class="bi bi-lock-fill me-2"></i> Confirmar y Pagar
+            </button>
+        </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    let carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+    const costoEnvio = 5.00; 
+
+    // --- UTILERIAS ---
+    const mostrarMensaje = (texto, tipo) => {
+        const container = document.getElementById('flash-message-container');
+        container.innerHTML = ''; // Limpiar mensajes anteriores
+        const alert = document.createElement('div');
+        let iconClass;
+
+        if (tipo === 'success') iconClass = 'bi-check-circle-fill';
+        else if (tipo === 'danger') iconClass = 'bi-x-octagon-fill';
+        else if (tipo === 'warning') iconClass = 'bi-exclamation-triangle-fill';
+        else iconClass = 'bi-info-circle-fill';
+
+        alert.className = `alert alert-${tipo} d-flex align-items-center`;
+        alert.setAttribute('role', 'alert');
+        alert.innerHTML = `<i class="bi ${iconClass} me-2 fs-4"></i><div>${texto}</div>`;
+        
+        container.appendChild(alert);
+        setTimeout(() => alert.remove(), 5000);
+    };
+
+    // --- LÓGICA DE CÁLCULO Y RENDERIZADO (Mantenida) ---
+    const actualizarTotal = (subtotal) => {
+        const totalPagar = subtotal + costoEnvio;
+        document.getElementById('checkout-subtotal').textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById('checkout-envio').textContent = `$${costoEnvio.toFixed(2)}`;
+        document.getElementById('checkout-total').textContent = `$${totalPagar.toFixed(2)}`;
+        return totalPagar;
+    };
+
+    const renderizarResumen = () => {
+        const resumenProductos = document.getElementById('resumen-productos');
+        resumenProductos.innerHTML = '';
+        let subtotal = 0;
+
+        if (carrito.length === 0) {
+            document.querySelector('.container').innerHTML = `
+                <div class="alert alert-warning text-center mt-5" role="alert">
+                    <h4 class="alert-heading">Tu carrito está vacío</h4>
+                    <p>No hay productos para finalizar la compra.</p>
+                    <hr>
+                    <a href="{{ url_for('cliente.catalogo') }}" class="btn btn-warning">Volver al Catálogo</a>
+                </div>
+            `;
+            return 0; 
+        }
+
+        carrito.forEach(item => {
+            const precio = parseFloat(item.precio || 0); 
+            const cantidad = parseInt(item.cantidad || 1); 
+            const subtotalItem = precio * cantidad;
+            subtotal += subtotalItem;
+
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            listItem.innerHTML = `
+                ${item.nombre} x ${cantidad}
+                <span class="text-secondary">$${subtotalItem.toFixed(2)}</span>
+            `;
+            resumenProductos.appendChild(listItem);
+        });
+
+        actualizarTotal(subtotal);
+        return subtotal;
+    };
+
+    const initialSubtotal = renderizarResumen();
+    const totalFinal = initialSubtotal + costoEnvio;
+
+    // --- SIMULACIÓN DE PAGO ---
+    const simularPago = (metodo, total) => {
+        return new Promise((resolve) => {
+            // Simulación de latencia de red/servidor
+            setTimeout(() => {
+                if (metodo === 'credito') {
+                    const numTarjeta = document.getElementById('numero-tarjeta').value;
+
+                    // Validación básica
+                    if (numTarjeta.length !== 16 || !/^\d+$/.test(numTarjeta)) {
+                         resolve({ success: false, message: "Error de Tarjeta: El número debe ser de 16 dígitos." });
+                         return;
+                    }
+
+                    // SIMULACIÓN DE RESPUESTA
+                    // Si el número de tarjeta termina en '0000', simular fallo.
+                    if (numTarjeta.slice(-4) === '0000') {
+                        resolve({ success: false, message: `Transacción **FALLIDA** (Error de servidor 5003). Por favor, intenta con otra tarjeta o método de pago.` });
+                    } else {
+                        resolve({ success: true, message: `¡Pago de $${total.toFixed(2)} **APROBADO**! Tu orden será procesada en breve. ID de transacción: ${Date.now()}` });
+                    }
+
+                } else if (metodo === 'paypal') {
+                    resolve({ success: true, message: `Pago con PayPal **EXITOSO**. Serás redirigido a la confirmación de tu pedido.` });
+                } else if (metodo === 'transferencia') {
+                    resolve({ success: true, message: `Orden generada. Recibirás un correo con las instrucciones para completar la **Transferencia Bancaria**.` });
+                } else {
+                    resolve({ success: false, message: "Método de pago no reconocido." });
+                }
+            }, 2000); // Espera 2 segundos para simular el procesamiento
+        });
+    };
+
+    // --- EVENT LISTENERS ---
+
+    // 1. Mostrar/Ocultar datos de tarjeta
+    const radioPagos = document.querySelectorAll('input[name="pago"]');
+    const datosTarjetaDiv = document.getElementById('datos-tarjeta');
+    radioPagos.forEach(radio => {
+        radio.addEventListener('change', () => {
+            datosTarjetaDiv.style.display = (document.getElementById('credito').checked) ? 'block' : 'none';
+        });
+    });
+
+    // 2. Botón de Pago
+    document.getElementById('btn-pagar').addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        const form = document.getElementById('checkout-form');
+        // Validar campos de envío/nombre
+        if (!form.reportValidity()) {
+            return; 
+        }
+
+        const btnPagar = e.currentTarget;
+        const metodoSeleccionado = document.querySelector('input[name="pago"]:checked').value;
+        
+        // Deshabilitar botón mientras procesa
+        btnPagar.disabled = true;
+        btnPagar.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Procesando...';
+
+        try {
+            const resultado = await simularPago(metodoSeleccionado, totalFinal);
+
+            if (resultado.success) {
+                mostrarMensaje(resultado.message, 'success');
+                // Acción final: Vaciar carrito y redirigir
+                localStorage.setItem('carrito', '[]'); 
+                setTimeout(() => {
+                    // Simular redirección a la página de confirmación
+                    window.location.href = "{{ url_for('catalogo') }}"; 
+                }, 3000); 
+
+            } else {
+                mostrarMensaje(resultado.message, 'danger');
+            }
+        } catch (error) {
+            mostrarMensaje(`Ocurrió un error inesperado: ${error.message}`, 'danger');
+        } finally {
+            // Re-habilitar botón (si el pago falló y no hubo redirección)
+            btnPagar.disabled = false;
+            btnPagar.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Confirmar y Pagar';
+        }
+    });
+
+    // Inicializar el estado de los datos de tarjeta
+    datosTarjetaDiv.style.display = (document.getElementById('credito').checked) ? 'block' : 'none';
+});
+</script>
 {% endblock %}
