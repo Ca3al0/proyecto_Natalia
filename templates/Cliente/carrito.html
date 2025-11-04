@@ -1,0 +1,122 @@
+{% extends "common/base.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">🛒 Tu Carrito</h2>
+  <ul id="lista-carrito" class="list-group mb-3"></ul>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <strong>Total: $<span id="total-carrito">0.00</span></strong>
+    <button id="vaciar-carrito" class="btn btn-danger">Vaciar Carrito</button>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const lista = document.getElementById('lista-carrito');
+  const totalSpan = document.getElementById('total-carrito');
+  let carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
+
+  const actualizarLocalStorage = () => {
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    actualizarContador();
+  };
+
+  const actualizarContador = () => {
+    const contador = document.getElementById('cart-count');
+    if(contador){
+      const total = carrito.reduce((sum, item) => sum + item.cantidad, 0);
+      contador.textContent = total;
+      contador.style.display = total > 0 ? 'inline-block' : 'none';
+    }
+  };
+
+  const renderizarCarrito = () => {
+    lista.innerHTML = '';
+    if(carrito.length === 0){
+      lista.innerHTML = '<li class="list-group-item">El carrito está vacío</li>';
+      totalSpan.textContent = '0.00';
+      return;
+    }
+
+    let total = 0;
+
+    carrito.forEach(item => {
+      total += item.precio * item.cantidad;
+
+      const li = document.createElement('li');
+      li.className = 'list-group-item d-flex align-items-center justify-content-between';
+
+      li.innerHTML = `
+        <div class="d-flex align-items-center">
+          <img src="${item.imagen}" alt="${item.nombre}" style="width:60px; height:60px; object-fit:cover;" class="me-3">
+          <div>
+            <h6>${item.nombre}</h6>
+            <p class="mb-1">$${item.precio.toFixed(2)}</p>
+            <div class="input-group input-group-sm" style="width:120px;">
+              <button class="btn btn-outline-secondary btn-decrease" data-id="${item.id}">-</button>
+              <input type="text" class="form-control text-center" value="${item.cantidad}" data-id="${item.id}">
+              <button class="btn btn-outline-secondary btn-increase" data-id="${item.id}">+</button>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-danger btn-sm btn-eliminar" data-id="${item.id}"><i class="bi bi-trash"></i></button>
+      `;
+
+      lista.appendChild(li);
+    });
+
+    totalSpan.textContent = total.toFixed(2);
+
+    // Eventos para botones dentro del carrito
+    document.querySelectorAll('.btn-eliminar').forEach(btn => {
+      btn.addEventListener('click', () => {
+        carrito = carrito.filter(i => i.id !== btn.dataset.id);
+        actualizarLocalStorage();
+        renderizarCarrito();
+      });
+    });
+
+    document.querySelectorAll('.btn-increase').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = carrito.find(i => i.id === btn.dataset.id);
+        item.cantidad += 1;
+        actualizarLocalStorage();
+        renderizarCarrito();
+      });
+    });
+
+    document.querySelectorAll('.btn-decrease').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = carrito.find(i => i.id === btn.dataset.id);
+        item.cantidad -= 1;
+        if(item.cantidad < 1){
+          carrito = carrito.filter(i => i.id !== item.id);
+        }
+        actualizarLocalStorage();
+        renderizarCarrito();
+      });
+    });
+
+    document.querySelectorAll('input[type="text"]').forEach(input => {
+      input.addEventListener('change', () => {
+        let val = parseInt(input.value);
+        if(isNaN(val) || val < 1) val = 1;
+        const item = carrito.find(i => i.id === input.dataset.id);
+        item.cantidad = val;
+        actualizarLocalStorage();
+        renderizarCarrito();
+      });
+    });
+  };
+
+  document.getElementById('vaciar-carrito').addEventListener('click', () => {
+    carrito = [];
+    actualizarLocalStorage();
+    renderizarCarrito();
+    alert('Carrito vaciado');
+  });
+
+  renderizarCarrito();
+  actualizarContador();
+});
+</script>
+{% endblock %}

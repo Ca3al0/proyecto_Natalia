@@ -75,17 +75,21 @@
 
 
 
-      <!-- Carrito -->
-      <a href="javascript:void(0)" class="nav-icon position-relative" onclick="toggleCart()" title="Ver carrito"
-         aria-label="Ver carrito">
-        <i class="bi bi-cart fs-4 text-success"></i>
-        <span id="cart-count"
-              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-      </a>
+    <!-- Carrito -->
+<a href="{{ url_for('cliente.ver_carrito') }}" 
+   class="nav-icon position-relative" 
+   id="btn-carrito"
+   title="Ver carrito"
+   aria-label="Ver carrito">
+  <i class="bi bi-cart fs-4 text-success"></i>
+  <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+</a>
 
     </div>
   </div>
 </nav>
+
+
 
 <!-- Modal Favoritos -->
 <div class="modal fade" id="favoritosModal" tabindex="-1" aria-hidden="true">

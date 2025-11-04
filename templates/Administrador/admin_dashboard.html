@@ -227,6 +227,47 @@
   {% endif %}
 {% endwith %}
 
+<!-- Botón flotante -->
+<a href="{{ url_for('admin.chat_admin') }}" id="botonSoporte">
+    <i class="fas fa-headset"></i>
+    Soporte Técnico
+</a>
+
+<style>
+#botonSoporte {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: #007bff;
+    color: white;
+    border-radius: 50px;
+    padding: 12px 18px;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    transition: background 0.3s, transform 0.2s;
+    z-index: 9999;
+}
+
+#botonSoporte i {
+    font-size: 1.2rem;
+}
+
+/* Hover y click */
+#botonSoporte:hover {
+    background: #0056b3;
+    transform: scale(1.05);
+}
+
+#botonSoporte:active {
+    transform: scale(0.95);
+}
+</style>
+
 
 <section class="hero">
   <div class="hero-content">
@@ -327,113 +368,9 @@
   </div>
 </section>
 
-<!-- Botón flotante -->
-<button id="chatbotButton" title="Chat con soporte">
-  <i class="bi bi-chat-dots-fill"></i>
-</button>
-
-<!-- Ventana de chat -->
-<div id="chatbotModal" class="chat-modal">
-  <div class="chat-header">
-    <span>Chat con soporte</span>
-    <button id="closeChat">&times;</button>
-  </div>
-  <div class="chat-body" id="chatBody">
-    <!-- Mensajes aparecerán aquí -->
-  </div>
-  <div class="chat-footer">
-    <input type="text" id="chatInput" placeholder="Escribe un mensaje...">
-    <button id="sendChat">Enviar</button>
-  </div>
-</div>
-
-<!-- Estilos CSS -->
-<style>
-#chatbotButton {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #57a773;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  font-size: 24px;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  z-index: 1000;
-}
-
-#chatbotModal {
-  display: none;
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  width: 320px;
-  max-height: 400px;
-  background-color: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-}
-
-.chat-header {
-  background-color: #57a773;
-  color: white;
-  padding: 10px;
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.chat-body {
-  padding: 10px;
-  flex: 1;
-  overflow-y: auto;
-  background-color: #f8f8f8;
-}
-
-.chat-footer {
-  display: flex;
-  border-top: 1px solid #ddd;
-}
-
-#chatInput {
-  flex: 1;
-  padding: 8px;
-  border: none;
-  border-radius: 0 0 0 12px;
-}
-
-#sendChat {
-  padding: 8px 12px;
-  background-color: #57a773;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 0 0 12px 0;
-}
-</style>
 
 
-<script>
-const chatbotButton = document.getElementById('chatbotButton');
-const chatbotModal = document.getElementById('chatbotModal');
-const closeChat = document.getElementById('closeChat');
 
-chatbotButton.addEventListener('click', () => {
-  chatbotModal.style.display = 'flex';
-});
-
-closeChat.addEventListener('click', () => {
-  chatbotModal.style.display = 'none';
-});
-</script>
 
 
 

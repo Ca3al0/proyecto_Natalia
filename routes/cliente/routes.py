@@ -386,3 +386,11 @@ def mensajes_cliente_ajax():
             'cliente_nombre': m.cliente.Nombre
         } for m in mensajes
     ])
+
+# En tu archivo de rutas del cliente (cliente.py)
+@cliente.route('/carrito')
+@login_required
+def ver_carrito():
+    # Puedes obtener los productos del carrito desde localStorage con JS
+    # O si quieres sincronizar con base de datos, consulta aquí
+    return render_template('Cliente/carrito.html')
