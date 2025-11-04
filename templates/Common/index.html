@@ -303,6 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // -------- REGISTRO --------
   handleForm('formRegister', 'registerAlert', (form, result) => {
+    // Espera 2 segundos para mostrar mensaje antes de cerrar modal
     setTimeout(() => {
       const modalRegister = bootstrap.Modal.getInstance(document.getElementById('modalRegister'));
       if (modalRegister) modalRegister.hide();
@@ -320,17 +321,23 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // -------- OLVIDÉ CONTRASEÑA --------
-  handleForm('formForgot', 'forgotAlert', (form) => form.reset());
+  handleForm('formForgot', 'forgotAlert', (form) => {
+    // Espera 2 segundos para mostrar mensaje antes de resetear el formulario
+    setTimeout(() => form.reset(), 2000);
+  });
 
   // -------- RESTABLECER CONTRASEÑA --------
   handleForm('formReset', 'resetAlert', (form) => {
-    const modalReset = bootstrap.Modal.getInstance(document.getElementById('modalReset'));
-    if (modalReset) modalReset.hide();
+    // Espera 2 segundos para que el usuario vea el mensaje
+    setTimeout(() => {
+      const modalReset = bootstrap.Modal.getInstance(document.getElementById('modalReset'));
+      if (modalReset) modalReset.hide();
 
-    const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
-    modalLogin.show();
+      const modalLogin = new bootstrap.Modal(document.getElementById('modalLogin'));
+      modalLogin.show();
 
-    form.reset();
+      form.reset();
+    }, 2000);
   });
 
 });
@@ -346,13 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
 {% endif %}
 
 
-  {% if mostrar_modal_reset %}
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const resetModal = new bootstrap.Modal(document.getElementById('modalReset'));
-      resetModal.show();
-    });
-  </script>
-  {% endif %}
+
+
 </body>
 </html>
