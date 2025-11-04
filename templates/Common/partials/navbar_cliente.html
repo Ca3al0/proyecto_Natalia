@@ -1,76 +1,74 @@
 {% block navbar %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-<nav class="navbar navbar-expand-lg fixed-top bg-light shadow-sm">
-  <div class="container-fluid px-4">
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg shadow-sm py-3 bg-white fixed-top">
+  <div class="container position-relative d-flex justify-content-center align-items-center">
 
-    <a class="navbar-brand fw-bold text-success" href="{{ url_for('index') }}">Casa en el Árbol</a>
+    <!-- Logo -->
+    <a class="navbar-brand fw-bold text-success position-absolute start-0" href="{{ url_for('index') }}">Casa en el Árbol</a>
 
-   
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain"
-      aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+    <!-- Buscador centrado -->
+    <div class="position-relative w-50">
+      <input type="text" class="form-control form-control-lg rounded-pill ps-5 search-input"
+             placeholder="¿Qué estás buscando hoy?">
+      <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 fs-5 search-icon"></i>
+    </div>
 
-    <div class="collapse navbar-collapse" id="navbarMain">
-      <div class="search-container mx-auto d-none d-md-block">
-        <input class="form-control rounded-pill border-success-subtle" type="search"
-          placeholder="¿Qué estás buscando hoy?" aria-label="Buscar">
+    <!-- Iconos usuario, favoritos y carrito -->
+    <div class="position-absolute end-0 d-flex align-items-center gap-3">
+
+      <!-- Favoritos -->
+      <button type="button" class="nav-icon position-relative" id="btn-favoritos" title="Ver favoritos"
+              style="background:none; border:none; cursor:pointer;" aria-label="Ver favoritos">
+        <i class="bi bi-heart fs-4 text-success"></i>
+        <span id="contador-favoritos"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+              style="display:none">0</span>
+      </button>
+
+     <!-- Usuario -->
+<div class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle fs-4" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+    <i class="bi bi-person" style="color: #57a773;"></i>
+  </a>
+  {% if current_user.is_authenticated %}
+  <ul class="dropdown-menu dropdown-menu-end shadow p-3" style="width: 250px; background-color: white;">
+    <li class="d-flex align-items-center mb-3">
+      <!-- Bolita con iniciales -->
+      <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center me-2"
+           style="width: 45px; height: 45px; font-size: 16px; background-color: #57a773;">
+        {{ current_user.Nombre[0]|upper }}{{ current_user.Apellido[0]|upper }}
       </div>
+      <strong class="text-uppercase">{{ current_user.Nombre }} {{ current_user.Apellido }}</strong>
+    </li>
+    <li><a class="dropdown-item" href="{{ url_for('cliente.actualizacion_datos') }}">Perfil</a></li>
+    <li><a class="dropdown-item" href="{{ url_for('cliente.ver_notificaciones_cliente') }}">Notificaciones</a></li>
+    <li class="mt-3">
+      <a href="{{ url_for('auth.logout') }}" class="btn btn-success w-100">Cerrar sesión</a>
+    </li>
+  </ul>
+  {% else %}
+  <ul class="dropdown-menu dropdown-menu-end shadow" style="background-color: white;">
+    <li><a class="dropdown-item" href="{{ url_for('auth.login') }}">Iniciar sesión</a></li>
+    <li><a class="dropdown-item" href="{{ url_for('auth.register') }}">Registrarse</a></li>
+  </ul>
+  {% endif %}
+</div>
 
-      <div class="d-flex align-items-center gap-3 ms-auto">
+      <!-- Carrito -->
+      <a href="javascript:void(0)" class="nav-icon position-relative" onclick="toggleCart()" title="Ver carrito"
+         aria-label="Ver carrito">
+        <i class="bi bi-cart fs-4 text-success"></i>
+        <span id="cart-count"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
+      </a>
 
-       
-        <button type="button" class="nav-icon position-relative" id="btn-favoritos" title="Ver favoritos"
-          style="background:none; border:none; cursor:pointer;" aria-label="Ver favoritos">
-          <i class="bi bi-heart fs-4 text-success"></i>
-          <span id="contador-favoritos"
-            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-            style="display:none">0</span>
-        </button>
-
-       
-        <div class="dropdown">
-          <a class="nav-icon dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false"
-            aria-label="Menú usuario">
-            <i class="bi bi-person fs-4 text-success"></i>
-          </a>
-          {% if current_user.is_authenticated %}
-          <ul class="dropdown-menu dropdown-menu-end p-3" style="width: 250px;">
-            <li class="d-flex align-items-center mb-3">
-              <div class="rounded-circle bg-light border text-dark fw-bold d-flex align-items-center justify-content-center me-2"
-                style="width: 45px; height: 45px; font-size: 16px;">
-                {{ current_user.Nombre[0]|upper }}{{ current_user.Apellido[0]|upper }}
-              </div>
-              <strong class="text-uppercase">{{ current_user.Nombre }} {{ current_user.Apellido }}</strong>
-            </li>
-            <li><a class="dropdown-item" href="{{ url_for('cliente.actualizacion_datos') }}"> Perfil</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('cliente.ver_notificaciones_cliente') }}"> Notificaciones</a></li>
-            <li class="mt-3">
-              <a href="{{ url_for('auth.logout') }}" class="btn btn-success w-100">Cerrar sesión</a>
-            </li>
-          </ul>
-          {% else %}
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="{{ url_for('auth.login') }}">Iniciar sesión</a></li>
-            <li><a class="dropdown-item" href="{{ url_for('auth.register') }}">Registrarse</a></li>
-          </ul>
-          {% endif %}
-        </div>
-
-     
-        <a href="javascript:void(0)" class="nav-icon position-relative" onclick="toggleCart()" title="Ver carrito"
-          aria-label="Ver carrito">
-          <i class="bi bi-cart fs-4 text-success"></i>
-          <span id="cart-count"
-            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">0</span>
-        </a>
-
-      </div>
     </div>
   </div>
 </nav>
 
+<!-- Modal Favoritos -->
 <div class="modal fade" id="favoritosModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-scrollable">
     <div class="modal-content">
@@ -87,14 +85,35 @@
     </div>
   </div>
 </div>
+
+<style>
+  /* Buscador estilo moderno */
+  .search-input {
+    border: 2px solid #9bd1a5 !important;
+    background-color: white;
+    text-align: center;
+    color: #157145;
+    transition: all 0.3s ease;
+  }
+  .search-input:focus,
+  .search-input:hover {
+    outline: none;
+    border-color: #57a773 !important;
+    box-shadow: 0 0 8px rgba(87, 167, 115, 0.5);
+  }
+  .search-icon {
+    color: #57a773;
+    pointer-events: none;
+  }
+</style>
+
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
- 
+  // Favoritos
   let favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]').map(String);
 
   const actualizarContadorFavoritos = () => {
@@ -126,7 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
     return agregado;
   };
 
- 
   document.querySelectorAll('.btn-favorite').forEach(btn => {
     const id = btn.dataset.id;
     actualizarIconoFavorito(btn, favoritos.includes(id));
@@ -138,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   actualizarContadorFavoritos();
 
-
+  // Abrir modal favoritos
   document.getElementById('btn-favoritos')?.addEventListener('click', () => {
     const container = document.getElementById('favoritosContent');
     if (favoritos.length === 0) {
