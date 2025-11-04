@@ -9,16 +9,20 @@
     <p><strong>Artículo:</strong> {{ pedido.NomArticulo }}</p>
   </div>
 
-<form action="{{ url_for('transportista.actualizar_estado', id_pedido=pedido.ID_Pedido) }}" method="POST">
-    <select name="estado">
-        <option value="pendiente" {% if pedido.Estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
-        <option value="en proceso" {% if pedido.Estado == 'en proceso' %}selected{% endif %}>En proceso</option>
-        <option value="en reparto" {% if pedido.Estado == 'en reparto' %}selected{% endif %}>En reparto</option>
-        <option value="entregado" {% if pedido.Estado == 'entregado' %}selected{% endif %}>Entregado</option>
-    </select>
-    <button type="submit">Actualizar</button>
-</form>
-
+  <form 
+      action="{{ url_for('transportista.actualizar_estado', id_pedido=pedido.ID_Pedido) }}" 
+      method="POST"
+      onsubmit="return validarAvance()">
+      
+      <select name="estado" id="estado">
+          <option value="pendiente" {% if pedido.Estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+          <option value="en proceso" {% if pedido.Estado == 'en proceso' %}selected{% endif %}>En proceso</option>
+          <option value="en reparto" {% if pedido.Estado == 'en reparto' %}selected{% endif %}>En reparto</option>
+          <option value="entregado" {% if pedido.Estado == 'entregado' %}selected{% endif %}>Entregado</option>
+      </select>
+      
+      <button type="submit">Actualizar</button>
+  </form>
 
   <div class="info">
     Cambia el estado actual solo para avanzar en el proceso. No se puede volver atrás.
@@ -34,7 +38,6 @@
 
   function validarAvance() {
     const nuevoEstado = document.getElementById("estado").value;
-
     const indiceActual = ordenEstados.indexOf(estadoActual);
     const indiceNuevo = ordenEstados.indexOf(nuevoEstado);
 
