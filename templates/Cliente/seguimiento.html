@@ -3,6 +3,9 @@
 {% block title %}Seguimiento de Pedido{% endblock %}
 
 {% block extra_css %}
+<!-- Cargar Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 <style>
 /* Contenedor principal */
 .container-tracking {
@@ -89,12 +92,20 @@
     font-size: 1.3rem;
 }
 
+.circle i {
+    color: #777; /* color por defecto de los íconos */
+}
+
 /* Paso activo */
 .step.active .circle {
     background: linear-gradient(135deg, #4caf50, #81c784);
     color: #fff;
     box-shadow: 0 4px 15px rgba(76, 175, 80, 0.5);
     transform: scale(1.2);
+}
+
+.step.active .circle i {
+    color: white; /* ícono blanco cuando activo */
 }
 
 /* Mensaje de estado */
