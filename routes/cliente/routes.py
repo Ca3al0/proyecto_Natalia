@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, render_template_string
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
 from basedatos.models import db, Usuario, Notificaciones, Direccion, Calendario,Pedido, Producto, Resena, Detalle_Pedido, Pagos
@@ -19,7 +19,9 @@ reviews = []
 @login_required
 @role_required("cliente")
 def dashboard():
-    return render_template("cliente/dashboard.html")
+    # Verifica si hay que mostrar la bienvenida (después del login)
+    mostrar_bienvenida = session.pop('mostrar_bienvenida', False)
+    return render_template("cliente/dashboard.html", mostrar_bienvenida=mostrar_bienvenida)
 
 # ---------- NOTIFICACIONES ----------
 @cliente.route("/notificaciones", methods=["GET", "POST"])

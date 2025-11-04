@@ -262,54 +262,6 @@
     </div>
   </footer>
 
-  <!-- ===================== MODAL BIENVENIDA ===================== -->
-<div class="modal fade" id="modalBienvenida" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-fullscreen">
-    <div class="modal-content bg-success text-white d-flex justify-content-center align-items-center flex-column position-relative overflow-hidden">
-      
-      <!-- Animación de fondo -->
-      <div class="bienvenida-bg position-absolute top-0 start-0 w-100 h-100"></div>
-
-      <!-- Contenido -->
-      <div class="text-center p-4" style="z-index: 2;">
-        <h1 class="display-3 fw-bold mb-3">¡Bienvenido/a, {{ usuario_nombre }}!</h1>
-        <p class="fs-4 mb-4">Estamos felices de verte en tu dashboard de Casa en el Árbol.</p>
-        <button type="button" class="btn btn-light btn-lg fw-bold" data-bs-dismiss="modal">Continuar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<style>
-  /* Fondo animado */
-  .bienvenida-bg {
-    background: radial-gradient(circle at 50% 50%, rgba(87,167,115,0.6), rgba(87,167,115,0.3), transparent 70%);
-    animation: pulse 2s infinite alternate;
-  }
-
-  @keyframes pulse {
-    0% { transform: scale(1); opacity: 0.7; }
-    100% { transform: scale(1.2); opacity: 1; }
-  }
-</style>
-
-<script>
-  // Mostrar modal al login exitoso
-  handleForm('formLogin', 'loginAlert', (form, result) => {
-    if (result.status === 'success') {
-      // Mostrar modal de bienvenida
-      const bienvenidaModal = new bootstrap.Modal(document.getElementById('modalBienvenida'));
-      bienvenidaModal.show();
-
-      // Redirigir o mostrar dashboard después de cerrar
-      document.getElementById('modalBienvenida').addEventListener('hidden.bs.modal', () => {
-        if (result.redirect) window.location.href = result.redirect;
-      });
-
-      form.reset();
-    }
-  });
-</script>
 
 
 

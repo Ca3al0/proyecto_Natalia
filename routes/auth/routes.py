@@ -96,9 +96,18 @@ def login():
         }
         destino = rutas_por_rol.get(usuario.Rol, 'index')
 
-        return jsonify({'status': 'success', 'message': 'Inicio de sesión exitoso.', 'redirect': url_for(destino)})
+        # ⚡ Solo para clientes, mostramos la bienvenida
+        if usuario.Rol == 'cliente':
+            session['mostrar_bienvenida'] = True
+
+        return jsonify({
+            'status': 'success',
+            'message': 'Inicio de sesión exitoso.',
+            'redirect': url_for(destino)
+        })
 
     return jsonify({'status': 'danger', 'message': 'Correo o contraseña incorrectos.'})
+
 
 
 # ------------------ LOGOUT ------------------ #
