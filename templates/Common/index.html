@@ -447,7 +447,7 @@ document.getElementById("formRegister").addEventListener("submit", async (e) => 
   e.preventDefault();
 
   const formData = new FormData(e.target);
-  const response = await fetch("/register", {
+  const response = await fetch("{{ url_for('auth.register') }}", {
     method: "POST",
     body: formData,
   });
@@ -470,7 +470,7 @@ document.getElementById("formRegister").addEventListener("submit", async (e) => 
 
       const loginModal = new bootstrap.Modal(document.getElementById("modalLogin"));
       loginModal.show(); // abre el modal de login
-    }, 4000); // espera 1.5 segundos para mostrar el login
+    }, 5000); // espera 1.5 segundos para mostrar el login
   }
 });
 </script>

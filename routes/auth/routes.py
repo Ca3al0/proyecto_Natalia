@@ -14,7 +14,7 @@ s = URLSafeTimedSerializer("mi_clave_super_secreta_y_unica")
 @auth.route('/register', methods=['POST'])
 def register():
     nombre_completo = request.form.get('name', '').strip()
-    correo = request.form.get('email', '').strip().lower()  # 👈 corrección aquí
+    correo = request.form.get('email', '').strip()
     telefono = request.form.get('phone', '').strip()
     password = request.form.get('password', '').strip()
 
@@ -29,7 +29,7 @@ def register():
         return jsonify({'status': 'danger', 'message': error})
 
     if Usuario.query.filter_by(Correo=correo).first():
-        return jsonify({'status': 'danger', 'message': 'Correo ya registrado.'})
+        return jsonify({'status': 'danger', 'message': 'Este correo ya está registrado. Usa otro o inicia sesión.'})
 
     nombre, apellido = (nombre_completo.split(" ", 1) + [""])[:2]
 
@@ -51,11 +51,28 @@ def register():
             mensaje="Tu cuenta se ha creado correctamente."
         )
 
-        return jsonify({'status': 'success', 'message': 'Cuenta creada correctamente. Ahora puedes iniciar sesión.'})
+        # Mensaje y apertura del modal de login
+        return jsonify({
+            'status': 'success',
+            'message': 'Cuenta creada correctamente. Redirigiendo al login...',
+            'redirect': url_for('index')
+        })
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({'status': 'danger', 'message': f'Error al registrar: {str(e)}'})
+
+        # Detección de duplicado
+        if 'Duplicate entry' in str(e):
+            return jsonify({
+                'status': 'danger',
+                'message': 'El correo ya está registrado. Intenta con otro.'
+            })
+
+        # Cualquier otro error
+        return jsonify({
+            'status': 'danger',
+            'message': 'Error al registrar. Intenta nuevamente.'
+        })
 
 
 # ------------------ LOGIN ------------------ #
