@@ -274,23 +274,23 @@ def get_usuario_actual():
 def ver_pedidos():
     now = datetime.now()
 
-    # Obtener pedidos por estado
+ 
     pedidos_pendientes = Pedido.query.filter_by(Estado='pendiente').all()
     pedidos_en_proceso = Pedido.query.filter_by(Estado='en proceso').all()
     pedidos_entregados = Pedido.query.filter_by(Estado='entregado').all()
 
-    # Actualizar estado de pedidos en proceso si HoraLlegada ya pasó
+   
     for pedido in pedidos_en_proceso:
         if pedido.HoraLlegada and pedido.HoraLlegada <= now:
             pedido.Estado = 'entregado'
             db.session.add(pedido)
     db.session.commit()
 
-    # Volver a obtener pedidos en proceso y entregados después de actualizar
+  
     pedidos_en_proceso = Pedido.query.filter_by(Estado='en proceso').all()
     pedidos_entregados = Pedido.query.filter_by(Estado='entregado').all()
 
-    # Obtener usuarios con rol transportista
+
     usuarios_transportistas = Usuario.query.filter_by(Rol='transportista').all()
 
     return render_template(
