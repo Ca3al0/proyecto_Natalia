@@ -1,0 +1,43 @@
+{% extends "common/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Historial de transacciones</h2>
+    {% if historial %}
+        <table class="table table-striped mt-3">
+            <thead>
+                <tr>
+                    <th>Pedido</th>
+                    <th>Estado</th>
+                    <th>Fecha del pedido</th>
+                    <th>Subtotal</th>
+                    <th>Pagos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pedido in historial %}
+                <tr>
+                    <td>{{ pedido.ID_Pedido }}</td>
+                    <td>{{ pedido.Estado }}</td>
+                    <td>{{ pedido.FechaPedido.strftime('%d/%m/%Y') }}</td>
+                    <td>${{ '%.2f' | format(pedido.Subtotal) }}</td>
+                    <td>
+                        {% if pedido.Pagos %}
+                            <ul>
+                            {% for pago in pedido.Pagos %}
+                                <li>${{ '%.2f' | format(pago.Monto) }} - {{ pago.MetodoPago }} ({{ pago.FechaPago.strftime('%d/%m/%Y') }})</li>
+                            {% endfor %}
+                            </ul>
+                        {% else %}
+                            Sin pagos registrados
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No hay transacciones registradas.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -418,9 +418,8 @@ def checkout():
                 ID_Usuario=current_user.ID_Usuario
             )
             db.session.add(pedido)
-            db.session.flush()  # Para obtener ID_Pedido
+            db.session.flush() 
 
-            # Agregar detalles y restar stock
             for item in carrito:
                 producto_id = item.get('id_producto') or item.get('ID_Producto') or item.get('id')
                 producto = Producto.query.get(producto_id)
@@ -469,15 +468,42 @@ def finalizar_compra():
 @cliente.route('/seguimiento/<int:id_pedido>')
 @login_required
 def seguimiento_cliente(id_pedido):
-    # Obtener el pedido por ID
+    
     pedido = Pedido.query.get_or_404(id_pedido)
 
-    # Verificar que el pedido pertenece al cliente logueado
-    if pedido.usuario.id != current_user.id:  # <-- usar 'id', no 'ID'
+
+    if pedido.usuario.id != current_user.id: 
         return "Acceso denegado ❌", 403
 
     return render_template('cliente/seguimiento.html', pedido=pedido)
 
 
+@cliente.route('/historial')
+@login_required
+def historial():
+    cliente_id = current_user.ID_Usuario
+    
+    # Obtenemos los pedidos del cliente
+    pedidos = Pedido.query.filter_by(ID_Usuario=cliente_id).order_by(Pedido.FechaPedido.desc()).all()
+    
+    historial = []
 
+    for pedido in pedidos:
+        subtotal = sum([detalle.subtotal for detalle in pedido.detalles_pedido])
+        pagos = [
+            {
+                "MetodoPago": pago.MetodoPago,
+                "Monto": pago.Monto,
+                "FechaPago": pago.FechaPago
+            } for pago in pedido.pagos
+        ]
+        
+        historial.append({
+            "ID_Pedido": pedido.ID_Pedido,
+            "Estado": pedido.Estado,
+            "FechaPedido": pedido.FechaPedido,
+            "Subtotal": subtotal,
+            "Pagos": pagos
+        })
 
+    return render_template('cliente/historial_transacciones.html', historial=historial)
