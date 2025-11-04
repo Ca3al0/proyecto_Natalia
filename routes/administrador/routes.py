@@ -274,41 +274,32 @@ def get_usuario_actual():
 def ver_pedidos():
     now = datetime.now()
 
+    # Obtener pedidos por estado
     pedidos_pendientes = Pedido.query.filter_by(Estado='pendiente').all()
     pedidos_en_proceso = Pedido.query.filter_by(Estado='en proceso').all()
+    pedidos_entregados = Pedido.query.filter_by(Estado='entregado').all()
 
+    # Actualizar estado de pedidos en proceso si HoraLlegada ya pasó
     for pedido in pedidos_en_proceso:
         if pedido.HoraLlegada and pedido.HoraLlegada <= now:
             pedido.Estado = 'entregado'
             db.session.add(pedido)
     db.session.commit()
 
- 
+    # Volver a obtener pedidos en proceso y entregados después de actualizar
     pedidos_en_proceso = Pedido.query.filter_by(Estado='en proceso').all()
     pedidos_entregados = Pedido.query.filter_by(Estado='entregado').all()
 
-    for pedido in pedidos_en_proceso:
-        if pedido.ID_Empleado:
-            transportista = Usuario.query.get(pedido.ID_Empleado)
-            pedido.TransportistaNombre = transportista.Nombre if transportista else 'No asignado'
-        else:
-            pedido.TransportistaNombre = 'No asignado'
-
-  
-    for pedido in pedidos_entregados:
-        if pedido.ID_Empleado:
-            transportista = Usuario.query.get(pedido.ID_Empleado)
-            pedido.TransportistaNombre = transportista.Nombre if transportista else 'No asignado'
-        else:
-            pedido.TransportistaNombre = 'No asignado'
-
+    # Obtener usuarios con rol transportista
     usuarios_transportistas = Usuario.query.filter_by(Rol='transportista').all()
 
-    return render_template('administrador/ver_pedidos.html',
-                           pedidos_pendientes=pedidos_pendientes,
-                           pedidos_en_proceso=pedidos_en_proceso,
-                           pedidos_entregados=pedidos_entregados,
-                           usuarios_transportistas=usuarios_transportistas)
+    return render_template(
+        'administrador/ver_pedidos.html',
+        pedidos_pendientes=pedidos_pendientes,
+        pedidos_en_proceso=pedidos_en_proceso,
+        pedidos_entregados=pedidos_entregados,
+        usuarios_transportistas=usuarios_transportistas
+    )
 
 
 # ---------- AGREGAR PRODUCTO ----------
