@@ -29,10 +29,11 @@
                 <td>${{ '%.2f' | format(pedido.subtotal) }}</td>
                 <td>
                     <a class="btn btn-ver" href="{{ url_for('cliente.ver_pedido', pedido_id=pedido.ID_Pedido) }}">Ver detalles</a>
-                    <a href="{{ url_for('ver_recibo_cliente', pedido_id=pedido.ID_Pedido) }}" 
-                       class="btn btn-success btn-sm" target="_blank">
-                        Ver Recibo / PDF
+                    <a href="{{ url_for('cliente.ver_recibo_cliente', pedido_id=pedido.ID_Pedido) }}" 
+                    class="btn btn-success btn-sm" target="_blank">
+                    Ver Recibo / PDF
                     </a>
+
                 </td>
             </tr>
             {% endfor %}

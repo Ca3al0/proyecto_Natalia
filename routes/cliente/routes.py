@@ -513,3 +513,7 @@ def eliminar_pedido(pedido_id):
     flash('Pedido eliminado correctamente.', 'success')
     return redirect(url_for('cliente.historial'))
 
+@cliente.route('/recibo/<int:pedido_id>')
+def ver_recibo_cliente(pedido_id):
+    # Aquí iría la lógica para generar o mostrar el PDF
+    return f"Recibo del pedido {pedido_id}"
