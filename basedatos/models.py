@@ -142,9 +142,9 @@ class Pedido(db.Model):
     detalles_pedido = db.relationship('Detalle_Pedido', backref='pedido', lazy=True)
     firmas = db.relationship('Firmas', backref='pedido', lazy=True)
     comentarios = db.relationship('Comentarios', backref='pedido', lazy=True)
+    historial = db.relationship('HistorialActividad', backref='usuario', lazy=True)
     
 
-    # Relación con empleado (transportista)
     empleado = db.relationship('Usuario', foreign_keys=[ID_Empleado])
 
     @property
@@ -314,3 +314,11 @@ class RegistroFotografico(db.Model):
     usuario = db.relationship('Usuario', backref=db.backref('registros_fotograficos', lazy=True))
     pedido = db.relationship('Pedido', backref=db.backref('registros_fotograficos', lazy=True))
 
+class HistorialActividad(db.Model):
+    __tablename__ = 'historial_actividad'
+    
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.ID_Usuario', ondelete='CASCADE'), nullable=False)
+    accion = db.Column(db.String(255), nullable=False)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    

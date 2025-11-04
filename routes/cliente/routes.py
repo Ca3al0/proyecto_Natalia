@@ -2,7 +2,7 @@ from flask_login import current_user
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Calendario,Pedido, Producto, Resena, Detalle_Pedido, Pagos,Mensaje, RegistroFotografico
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Calendario,Pedido, Producto, Resena, Detalle_Pedido, Pagos,Mensaje, HistorialActividad
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
 from datetime import date,datetime
@@ -513,3 +513,13 @@ def eliminar_pedido(pedido_id):
     flash('Pedido eliminado correctamente.', 'success')
     return redirect(url_for('cliente.historial'))
 
+
+
+
+@cliente.route('/historial_actividad')
+@login_required
+def historial_actividad():
+ 
+    actividades = HistorialActividad.query.filter_by(usuario_id=current_user.ID_Usuario)\
+                                          .order_by(HistorialActividad.fecha.desc()).all()
+    return render_template('cliente/historial_actividad.html', actividades=actividades)
