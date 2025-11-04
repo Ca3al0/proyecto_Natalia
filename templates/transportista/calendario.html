@@ -1,7 +1,7 @@
 {% extends "common/base.html" %}
 
 {% block navbar %}
-    {% include "common/partials/navbar_transpoinsta.html" %}
+  {% include "common/partials/navbar_transpoinsta.html" %}
 {% endblock %}
 
 {% block content %}
@@ -11,245 +11,139 @@
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
 
 <style>
-/* Estilos básicos para el modal personalizado (si no se usa Bootstrap Modal) */
-.modal-custom { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background: rgba(0,0,0,0.5); }
-.modal-content-custom { background: #fff; margin: 5% auto; padding: 25px; border-radius: 8px; width: 95%; max-width: 650px; position: relative; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-.modal-header-custom { font-size: 1.5rem; font-weight: bold; margin-bottom: 15px; color: var(--bs-primary, #0d6efd); }
-.modal-footer-custom { margin-top: 20px; text-align: right; border-top: 1px solid #eee; padding-top: 15px; }
-
-/* Estilos de preview de imágenes */
-#registroPreview img { 
-    max-width: 100px; 
-    height: 100px; /* Asegura altura consistente */
-    object-fit: cover; /* Recorta si es necesario para llenar el espacio */
-    margin: 5px; 
-    border-radius: 6px; 
-    border: 1px solid #ddd;
-}
+.modal { display: none; position: fixed; z-index: 1000; left:0; top:0; width:100%; height:100%; overflow:auto; background:rgba(0,0,0,0.5); }
+.modal-content { background:#fff; margin:5% auto; padding:20px; border-radius:8px; width:90%; max-width:600px; position:relative; }
+.modal-header { font-size:18px; font-weight:bold; margin-bottom:10px; }
+.modal-footer { margin-top:15px; text-align:right; }
+.modal-footer button { padding:5px 10px; margin-left:5px; }
+#registroPreview img { max-width:100px; margin:5px; border-radius:6px; }
 </style>
 
-<div class="container mt-4">
-    <div class="card shadow">
-        <div class="card-body">
-            <div id="calendar"></div>
-        </div>
-    </div>
-</div>
+<div id="calendar"></div>
 
-
-<div id="registroFotograficoModal" class="modal-custom">
-    <div class="modal-content-custom">
-        <div class="modal-header-custom">Registro Fotográfico</div>
+<!-- Modal Registro Fotográfico -->
+<div id="registroFotograficoModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">Registro Fotográfico</div>
         <div class="modal-body">
-            
-            <div id="modalContentContainer">
+            <form id="registroFotograficoForm" enctype="multipart/form-data">
+                <input type="hidden" name="pedido_id" id="pedido_id" value="">
                 
-                <div id="registroPreview" style="display:none; margin-bottom:20px; border: 1px dashed #ccc; padding: 15px; border-radius: 6px;">
-                    <h4 class="text-secondary mb-3"><i class="bi bi-camera-fill me-2"></i> Registro Guardado Previamente</h4>
-                    
-                    <div id="previewAntes" class="mb-3">
-                        <h6 class="text-info">Antes del Servicio:</h6>
-                        <p id="descripcionAntes" class="small text-muted"></p>
-                        <div id="imagenesAntes" class="d-flex flex-wrap"></div>
-                    </div>
-                    
-                    <div id="previewDespues">
-                        <h6 class="text-info">Después del Servicio:</h6>
-                        <p id="descripcionDespues" class="small text-muted"></p>
-                        <div id="imagenesDespues" class="d-flex flex-wrap"></div>
-                    </div>
+                <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
+                    <label><strong>Fotos Antes:</strong></label><br>
+                    <input type="file" name="fotos_antes" multiple accept="image/*"><br><br>
+                    <label><strong>Descripción Antes:</strong></label><br>
+                    <textarea name="desc_antes" rows="3" style="width:100%;border-radius:6px;border:1px solid #ccc;padding:5px;"></textarea>
                 </div>
 
-                <form id="registroFotograficoForm" enctype="multipart/form-data">
-                    <input type="hidden" name="pedido_id" id="pedido_id" value="">
-                    
-                    <h5 class="mb-3 text-primary"><i class="bi bi-file-earmark-plus me-2"></i> Cargar Nuevo Registro</h5>
+                <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
+                    <label><strong>Fotos Después:</strong></label><br>
+                    <input type="file" name="fotos_despues" multiple accept="image/*"><br><br>
+                    <label><strong>Descripción Después:</strong></label><br>
+                    <textarea name="desc_despues" rows="3" style="width:100%;border-radius:6px;border:1px solid #ccc;padding:5px;"></textarea>
+                </div>
 
-                    <div class="border p-3 rounded mb-3">
-                        <label class="form-label"><strong>Fotos Antes:</strong></label>
-                        <input type="file" name="fotos_antes" multiple accept="image/*" class="form-control mb-2">
-                        <label class="form-label"><strong>Descripción Antes:</strong></label>
-                        <textarea name="desc_antes" rows="2" class="form-control" placeholder="Ej: Mercancía intacta al iniciar la carga."></textarea>
-                    </div>
+                <div class="modal-footer">
+                    <button type="button" onclick="cerrarRegistro()">Cancelar</button>
+                    <button type="submit">Guardar Registro</button>
+                </div>
+            </form>
 
-                    <div class="border p-3 rounded">
-                        <label class="form-label"><strong>Fotos Después:</strong></label>
-                        <input type="file" name="fotos_despues" multiple accept="image/*" class="form-control mb-2">
-                        <label class="form-label"><strong>Descripción Después:</strong></label>
-                        <textarea name="desc_despues" rows="2" class="form-control" placeholder="Ej: Entrega finalizada, estado del lugar/mercancía."></textarea>
-                    </div>
-
-                    <div class="modal-footer-custom">
-                        <button type="button" class="btn btn-secondary" onclick="cerrarRegistro()">Cancelar</button>
-                        <button type="submit" class="btn btn-primary" id="btnGuardarRegistro">Guardar/Actualizar Registro</button>
-                    </div>
-                </form>
-
-            </div> </div>
+            <div id="registroPreview" style="display:none; margin-top:20px;">
+                <h4>Registro Guardado</h4>
+                <div id="previewAntes">
+                    <h5>Antes</h5>
+                    <div id="imagenesAntes"></div>
+                    <p id="descripcionAntes"></p>
+                </div>
+                <div id="previewDespues">
+                    <h5>Después</h5>
+                    <div id="imagenesDespues"></div>
+                    <p id="descripcionDespues"></p>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="cerrarRegistro()">Cerrar</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+
 <script>
-// Función para mostrar mensajes flash (simulación, idealmente esto vendría de Flask)
-function showFlashMessage(message, type) {
-    // Implementación simple, asumiendo una librería JS para toasts o un elemento fijo en la base.
-    // Usaremos un console.log por ahora.
-    console.log(`[${type.toUpperCase()}] ${message}`);
-    // Podrías usar:
-    // M.toast({html: message, classes: type === 'success' ? 'green' : 'red'}); // Si usas Materialize
-    // O crear un simple div flotante con estilos.
-    
-    // Si realmente usas `flash.css`, asegúrate de que haya un contenedor en `base.html`.
-    // Por ahora, solo reemplazamos el `alert` nativo.
-}
-
-
-/**
- * Abre el modal y carga los registros fotográficos existentes.
- * @param {string} pedidoId - El ID del pedido.
- */
 function abrirRegistro(pedidoId){
     document.getElementById('pedido_id').value = pedidoId;
-    document.getElementById('registroFotograficoForm').reset();
-    
-    // Inicializar visualización
-    document.getElementById('registroFotograficoModal').style.display = 'block';
+    document.getElementById('registroFotograficoForm').style.display = 'block';
     document.getElementById('registroPreview').style.display = 'none';
-    document.getElementById('btnGuardarRegistro').disabled = true;
-    document.getElementById('btnGuardarRegistro').innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Cargando...';
+    document.getElementById('registroFotograficoModal').style.display = 'block';
 
-
-    // 1. Limpiar áreas de preview
-    document.getElementById('imagenesAntes').innerHTML = '';
-    document.getElementById('imagenesDespues').innerHTML = '';
-    document.getElementById('descripcionAntes').innerText = 'Sin descripción.';
-    document.getElementById('descripcionDespues').innerText = 'Sin descripción.';
-
-    // 2. Traer datos del backend
-    fetch(`{{ url_for("transportista.obtener_registro_fotografico", pedido_id="0") }}`.replace("0", pedidoId))
-    .then(res => {
-        if (!res.ok) throw new Error("Error al cargar los registros");
-        return res.json();
-    })
+    fetch(`/registro_fotografico/${pedidoId}`)
+    .then(res => res.json())
     .then(data => {
-        
-        let tieneDatos = false;
-        
-        // Asumiendo que `data` es un array de objetos de registro
+        document.getElementById('imagenesAntes').innerHTML = '';
+        document.getElementById('imagenesDespues').innerHTML = '';
+        document.getElementById('descripcionAntes').innerText = '';
+        document.getElementById('descripcionDespues').innerText = '';
+
         data.forEach(r => {
-            if (r.tipo === 'antes') {
-                const img = document.createElement('img');
-                img.src = r.imagen_url.startsWith('/') ? r.imagen_url : `/${r.imagen_url}`; // Asegura URL correcta
+            const img = document.createElement('img');
+            img.src = `/${r.imagen_url}`;
+            if(r.tipo==='antes'){
                 document.getElementById('imagenesAntes').appendChild(img);
-                document.getElementById('descripcionAntes').innerText = r.descripcion || 'Sin descripción.';
-                tieneDatos = true;
-            } else if (r.tipo === 'despues') {
-                const img = document.createElement('img');
-                img.src = r.imagen_url.startsWith('/') ? r.imagen_url : `/${r.imagen_url}`;
+                document.getElementById('descripcionAntes').innerText = r.descripcion;
+            } else {
                 document.getElementById('imagenesDespues').appendChild(img);
-                document.getElementById('descripcionDespues').innerText = r.descripcion || 'Sin descripción.';
-                tieneDatos = true;
+                document.getElementById('descripcionDespues').innerText = r.descripcion;
             }
         });
 
-        if (tieneDatos) {
-            document.getElementById('registroPreview').style.display = 'block';
-        } else {
-            document.getElementById('registroPreview').style.display = 'none';
-        }
-        
-        document.getElementById('btnGuardarRegistro').disabled = false;
-        document.getElementById('btnGuardarRegistro').innerHTML = 'Guardar/Actualizar Registro';
-
-    })
-    .catch(error => {
-        showFlashMessage(`Error al cargar: ${error.message}`, 'error');
-        document.getElementById('btnGuardarRegistro').disabled = false;
-        document.getElementById('btnGuardarRegistro').innerHTML = 'Guardar/Actualizar Registro';
+        if(data.length>0) document.getElementById('registroPreview').style.display='block';
     });
 }
 
-/**
- * Cierra el modal de registro fotográfico.
- */
 function cerrarRegistro(){
     document.getElementById('registroFotograficoForm').reset();
-    document.getElementById('registroPreview').style.display = 'none';
-    document.getElementById('registroFotograficoModal').style.display = 'none';
+    document.getElementById('registroPreview').style.display='none';
+    document.getElementById('registroFotograficoModal').style.display='none';
 }
 
-// Cierre del modal al hacer clic fuera
 window.onclick = function(event){
     const modal = document.getElementById('registroFotograficoModal');
-    if(event.target === modal) cerrarRegistro();
+    if(event.target==modal) cerrarRegistro();
 }
 
-// Manejo del formulario con AJAX
 document.getElementById('registroFotograficoForm').addEventListener('submit', async function(e){
     e.preventDefault();
-    
-    const btnGuardar = document.getElementById('btnGuardarRegistro');
-    btnGuardar.disabled = true;
-    btnGuardar.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Guardando...';
-
     const formData = new FormData(this);
-    
-    try {
-        const response = await fetch('{{ url_for("transportista.guardar_registro") }}', { 
-            method: 'POST', 
-            body: formData 
-        });
-        
-        const result = await response.json();
-        const pedidoId = document.getElementById('pedido_id').value;
-
-        if (response.ok && result.status === 'success') {
-            showFlashMessage('Registro guardado correctamente.', 'success');
-            // Recargar la previsualización
-            abrirRegistro(pedidoId); 
-        } else {
-            // Manejar errores de validación o del servidor
-            showFlashMessage(`Error: ${result.message || 'Error desconocido al guardar.'}`, 'error');
-        }
-
-    } catch (error) {
-        showFlashMessage(`Ocurrió un error de red: ${error.message}`, 'error');
-    } finally {
-        btnGuardar.disabled = false;
-        btnGuardar.innerHTML = 'Guardar/Actualizar Registro';
-        // No cerramos el modal, mostramos el preview recargado
+    const response = await fetch('{{ url_for("transportista.guardar_registro") }}', { method:'POST', body: formData });
+    const result = await response.json();
+    if(result.status==='success'){
+        alert('Registro guardado correctamente');
+        abrirRegistro(document.getElementById('pedido_id').value);
+    } else {
+        alert('Error: '+result.message);
     }
 });
 
-// Inicialización de FullCalendar
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        locale: 'es', // Usar español
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        // **CORRECCIÓN:** Utiliza `url_for` para la URL de eventos
-        events: '{{ url_for("transportista.obtener_mis_eventos") }}', 
-        
+        events: '/mis_eventos',
         eventDidMount: function(info) {
-            // Se usa el estilo de Bootstrap para el botón
             let btn = document.createElement('button');
-            btn.className = 'btn btn-sm btn-info btn-registro-foto mt-1 w-100';
             btn.innerText = 'Registro Fotográfico';
+            btn.style.marginLeft = '5px';
             btn.onclick = function(){ abrirRegistro(info.event.id); };
-            
-            // Añade el botón debajo del evento
-            info.el.querySelector('.fc-event-main-frame').appendChild(btn);
+            info.el.appendChild(btn);
         }
     });
     calendar.render();
 });
 </script>
+
+<script src="{{ url_for('static', filename='js/calendario.js') }}"></script>
 
 {% endblock %}
