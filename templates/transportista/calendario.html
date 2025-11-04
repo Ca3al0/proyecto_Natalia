@@ -83,45 +83,46 @@ const modalTitle = document.getElementById("modalTitle");
 const modalBody = document.getElementById("modalBody");
 const registroModal = document.getElementById("registroFotograficoModal");
 
-// Abrir modal evento
 function openModal(title, body){
     modalTitle.textContent = title;
     modalBody.innerHTML = body;
     modal.style.display = "block";
 }
-function closeModal(){ modal.style.display = "none"; }
 
-// Abrir modal registro fotográfico
+function closeModal(){
+    modal.style.display = "none";
+}
+
 function abrirRegistro(pedidoId){
-    document.getElementById('pedido_id').value = pedidoId;
+    registroModal.style.display = 'block';
     document.getElementById('registroFotograficoForm').reset();
     document.getElementById('registroPreview').style.display = 'none';
     document.getElementById('registroFotograficoForm').style.display = 'block';
-    registroModal.style.display = 'block';
+    document.getElementById('pedido_id').value = pedidoId;
 }
 
-// Cerrar modal registro
 function cerrarRegistro(){
     registroModal.style.display = 'none';
 }
 
-// Cerrar modals al hacer clic fuera
 window.onclick = function(event){
     if(event.target == modal) closeModal();
     if(event.target == registroModal) cerrarRegistro();
 }
 
-// Inicializar calendario
+// FullCalendar
 document.addEventListener('DOMContentLoaded', function(){
     const calendarEl = document.getElementById('calendar');
     const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView:'dayGridMonth',
         locale:'es',
         headerToolbar:{left:'prev,next today', center:'title', right:'dayGridMonth,timeGridWeek,timeGridDay'},
-        events:{ url:'/transportista/api/calendario',
-                 failure: function(){ openModal('Error','No se pudieron cargar los eventos'); }},
-        eventClick: function(info){
-            const tipo = (info.event.extendedProps.tipo || 'Evento').toLowerCase();
+        events:{
+            url:'/transportista/api/calendario',
+            failure:function(){ openModal('Error','No se pudieron cargar los eventos'); }
+        },
+        eventClick:function(info){
+            const tipo = (info.event.extendedProps.tipo || 'Evento').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
             const usuario = info.event.extendedProps.usuario || 'Desconocido';
             const location = info.event.extendedProps.location || 'Ubicación no especificada';
             const title = info.event.title || 'Sin título';
@@ -132,39 +133,45 @@ document.addEventListener('DOMContentLoaded', function(){
                         <p><strong>Cliente:</strong> ${usuario}</p>
                         <p><strong>Ubicación:</strong> ${location}</p>`;
 
-            if(tipo === 'instalacion'){
+            // Botón para abrir Registro Fotográfico en pedidos o instalaciones
+            if(tipo === 'instalacion' || tipo === 'pedido'){
                 body += `<div style="margin-top:15px; text-align:center;">
-                            <button onclick="abrirRegistro('${idEvento}')">Registro Fotográfico</button>
+                            <button class="modal-footer-btn" onclick="abrirRegistro('${idEvento}')">Registro Fotográfico</button>
                          </div>`;
             }
 
             openModal(title, body);
+        },
+        eventDidMount:function(info){
+            info.el.style.cursor = 'pointer';
         }
     });
     calendar.render();
 });
 
-// Guardar registro fotográfico
+// Guardar registro vía AJAX
 document.getElementById('registroFotograficoForm').addEventListener('submit', async function(e){
     e.preventDefault();
     const formData = new FormData(this);
 
     try {
         const response = await fetch('{{ url_for("transportista.guardar_registro") }}', {
-            method: 'POST',
+            method:'POST',
             body: formData
         });
         const result = await response.json();
+
         if(result.status === 'success'){
             alert('Registro guardado correctamente');
-            abrirRegistro(document.getElementById('pedido_id').value);
+            abrirRegistro(document.getElementById('pedido_id').value); // recarga preview
         } else {
-            alert('Error al guardar: ' + (result.message || 'Error desconocido'));
+            alert('Error al guardar: '+(result.message||'Error desconocido'));
         }
     } catch(err){
-        alert('Error de red: ' + err.message);
+        alert('Error de red: '+err.message);
     }
 });
+
 </script>
 
 {% endblock %}
