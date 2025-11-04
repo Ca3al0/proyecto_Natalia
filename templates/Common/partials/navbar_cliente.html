@@ -27,17 +27,17 @@
               style="display:none">0</span>
       </button>
 
-     <!-- Usuario -->
+<!-- Usuario -->
 <div class="nav-item dropdown">
   <a class="nav-link dropdown-toggle fs-4" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
     <i class="bi bi-person" style="color: #57a773;"></i>
   </a>
   {% if current_user.is_authenticated %}
-  <ul class="dropdown-menu dropdown-menu-end shadow p-3" style="width: 250px; background-color: white;">
+  <ul class="dropdown-menu dropdown-menu-end shadow p-3" style="width: 250px; background-color: white; border-radius: 10px;">
     <li class="d-flex align-items-center mb-3">
       <!-- Bolita con iniciales -->
       <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center me-2"
-           style="width: 45px; height: 45px; font-size: 16px; background-color: #57a773;">
+           style="width: 45px; height: 45px; font-size: 16px; background-color: #9bd1a5;">
         {{ current_user.Nombre[0]|upper }}{{ current_user.Apellido[0]|upper }}
       </div>
       <strong class="text-uppercase">{{ current_user.Nombre }} {{ current_user.Apellido }}</strong>
@@ -49,12 +49,13 @@
     </li>
   </ul>
   {% else %}
-  <ul class="dropdown-menu dropdown-menu-end shadow" style="background-color: white;">
+  <ul class="dropdown-menu dropdown-menu-end shadow" style="background-color: white; border-radius: 10px;">
     <li><a class="dropdown-item" href="{{ url_for('auth.login') }}">Iniciar sesión</a></li>
     <li><a class="dropdown-item" href="{{ url_for('auth.register') }}">Registrarse</a></li>
   </ul>
   {% endif %}
 </div>
+
 
       <!-- Carrito -->
       <a href="javascript:void(0)" class="nav-icon position-relative" onclick="toggleCart()" title="Ver carrito"
