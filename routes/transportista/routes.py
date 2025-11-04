@@ -138,3 +138,53 @@ def registrar_fotografia_transportista():
     except Exception as e:
         db.session.rollback()
         return jsonify({'status': 'danger', 'message': f'Error: {str(e)}'})
+    
+@transportista.route('/guardar_registro', methods=['POST'])
+def guardar_registro():
+    try:
+        pedido_id = request.form.get('pedido_id')
+        desc_antes = request.form.get('desc_antes')
+        desc_despues = request.form.get('desc_despues')
+        fotos_antes = request.files.getlist('fotos_antes')
+        fotos_despues = request.files.getlist('fotos_despues')
+
+        upload_folder = os.path.join(current_app.root_path, 'static/uploads')
+        os.makedirs(upload_folder, exist_ok=True)
+
+        for f in fotos_antes:
+            filename = secure_filename(f.filename)
+            f.save(os.path.join(upload_folder, filename))
+            registro = RegistroFotografico(
+                pedido_id=pedido_id,
+                tipo='antes',
+                descripcion=desc_antes,
+                imagen_url=f'uploads/{filename}'
+            )
+            db.session.add(registro)
+
+        for f in fotos_despues:
+            filename = secure_filename(f.filename)
+            f.save(os.path.join(upload_folder, filename))
+            registro = RegistroFotografico(
+                pedido_id=pedido_id,
+                tipo='despues',
+                descripcion=desc_despues,
+                imagen_url=f'uploads/{filename}'
+            )
+            db.session.add(registro)
+
+        db.session.commit()
+        return jsonify({'status':'success'})
+    except Exception as e:
+        return jsonify({'status':'error','message':str(e)})
+
+
+@transportista.route('/registro_fotografico/<int:pedido_id>')
+def get_registro_fotografico(pedido_id):
+    registros = RegistroFotografico.query.filter_by(pedido_id=pedido_id).all()
+    data = [{
+        'tipo': r.tipo,
+        'descripcion': r.descripcion,
+        'imagen_url': r.imagen_url
+    } for r in registros]
+    return jsonify(data)
