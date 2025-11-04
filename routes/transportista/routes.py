@@ -191,31 +191,43 @@ def get_registro_fotografico(pedido_id):
 
 @transportista.route('/pedidos')
 @login_required
-@role_required('transportista')
-def pedidos_transportista():
-    
-    pedidos = Pedido.query.filter(Pedido.Estado.in_(['pendiente', 'en proceso'])).all()
+@role_required('transportista')  # Solo transportistas
+def ver_pedidos_transportista():
+    # Trae solo los pedidos asignados al transportista actual
+    pedidos = Pedido.query.filter_by(ID_Empleado=current_user.ID_Usuario).all()
     return render_template('transportista/pedidos.html', pedidos=pedidos)
+
 
 @transportista.route('/pedido/<int:pedido_id>/estado', methods=['POST'])
 @login_required
+@role_required('transportista')
 def actualizar_estado_pedido(pedido_id):
     pedido = Pedido.query.get_or_404(pedido_id)
+
+    # Validar que el pedido está asignado al transportista
+    if pedido.ID_Empleado != current_user.ID_Usuario:
+        return jsonify({'status': 'error', 'message': 'No puedes modificar este pedido'}), 403
+
+    # Obtener el estado enviado desde JS
     nuevo_estado = request.json.get('estado')
 
     if nuevo_estado not in ['pendiente', 'en proceso', 'en reparto', 'entregado']:
         return jsonify({'status': 'error', 'message': 'Estado no válido'}), 400
 
-    pedido.Estado = nuevo_estado
-    db.session.commit()
+    try:
+        pedido.Estado = nuevo_estado
+        db.session.commit()  # ✅ Esto guarda en la base de datos
 
-    # Crear notificación
-    notificacion = Notificaciones(
-        Titulo='Actualización de pedido',
-        Mensaje=f'El estado de tu pedido #{pedido.ID_Pedido} cambió a "{nuevo_estado}".',
-        ID_Usuario=pedido.ID_Usuario
-    )
-    db.session.add(notificacion)
-    db.session.commit()
+        # Crear notificación para el cliente
+        notificacion = Notificaciones(
+            Titulo='Actualización de pedido',
+            Mensaje=f'El estado de tu pedido #{pedido.ID_Pedido} cambió a "{nuevo_estado}".',
+            ID_Usuario=pedido.ID_Usuario
+        )
+        db.session.add(notificacion)
+        db.session.commit()
 
-    return jsonify({'status': 'success', 'message': 'Estado actualizado'})
+        return jsonify({'status': 'success', 'message': 'Estado actualizado'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': f'Error al actualizar: {str(e)}'}), 500
