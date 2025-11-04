@@ -1,163 +1,234 @@
 {% extends "common/base.html" %}
 
+{% block navbar %}
+  {% include "common/partials/navbar_admin.html" %}
+{% endblock %}
+
+
 {% block content %}
-<h2 style="text-align:center; margin-bottom:30px; color:#157145; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Chat con Clientes</h2>
+<h2 style="text-align:center; margin-bottom:40px; color:#007bff; font-family:'Poppins', sans-serif; font-weight: 700; letter-spacing: 1px;">Chat en Tiempo Real</h2>
 
 <div id="chatWrapper">
-    <!-- Panel de clientes -->
     <div id="clientesPanel">
-        <h4>Clientes</h4>
+        <h4 style="color:#333; font-weight: 600;"> Clientes </h4>
         <ul id="listaClientes">
             {% for user in clientes %}
-                <li data-id="{{ user.ID_Usuario }}">{{ user.Nombre }}</li>
+                <li data-id="{{ user.ID_Usuario }}">
+                    <span class="user-initial">{{ user.Nombre|first }}</span>
+                    {{ user.Nombre }}
+                </li>
             {% endfor %}
         </ul>
     </div>
 
-    <!-- Panel de chat -->
     <div id="chatPanel">
-        <div id="chatBody"></div>
+        <div id="chatHeader">
+            <h5 id="clienteActualNombre">Selecciona un cliente...</h5>
+        </div>
+        <div id="chatBody">
+            <div id="initialMessage" style="text-align: center; color: #888; padding: 50px;">
+                <p>¡Hola! Haz clic en un cliente de la izquierda para ver el historial y comenzar la conversación.</p>
+                <i class="far fa-comments" style="font-size: 30px; margin-top: 15px; color: #ccc;"></i>
+            </div>
+        </div>
         <div id="chatInputContainer">
-            <input type="text" id="chatInput" placeholder="Escribe un mensaje...">
-            <button id="sendChat">Enviar</button>
+            <input type="text" id="chatInput" placeholder="Escribe tu respuesta aquí..." disabled>
+            <button id="sendChat" disabled>
+                <i class="fas fa-paper-plane"></i>
+            </button>
         </div>
     </div>
 </div>
 
 <style>
-/* Contenedor principal */
+  
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+
 #chatWrapper {
     display: flex;
-    max-width: 1000px;
+    max-width: 1100px; 
     margin: 0 auto;
-    border-radius: 12px;
+    border-radius: 18px; 
     overflow: hidden;
-    height: 550px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height: 650px; 
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+    font-family: 'Poppins', sans-serif;
+    background: #ffffff;
 }
 
-/* Panel de clientes */
+
 #clientesPanel {
-    width: 280px;
-    border-right: 1px solid #ccc;
-    background: #f0f8ff;
-    padding: 15px;
+    width: 320px;
+    border-right: 1px solid #eee;
+    background: #f4f7f6; 
+    padding: 25px 0;
     overflow-y: auto;
 }
 #clientesPanel h4 {
-    margin-bottom: 15px;
-    color: #157145;
+    margin-bottom: 20px;
+    padding: 0 20px;
+    color: #007bff;
+    border-left: 4px solid #007bff;
+    line-height: 1.2;
 }
 #clientesPanel ul {
     list-style: none;
     padding: 0;
 }
 #clientesPanel li {
-    padding: 12px;
-    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    margin-bottom: 2px;
     cursor: pointer;
-    border-radius: 8px;
-    transition: 0.3s;
-    background: #e6f7ff;
-    color: #157145;
+    transition: background 0.3s, transform 0.1s;
+    border-left: 5px solid transparent;
+    font-weight: 500;
 }
-#clientesPanel li:hover,
-#clientesPanel li.active {
-    background: #57a773;
+.user-initial {
+    background: #007bff;
     color: white;
-    transform: scale(1.03);
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+#clientesPanel li:hover {
+    background: #e9ecef;
+}
+#clientesPanel li.active {
+    background: #d4e3ff;
+    color: #007bff;
+    border-left: 5px solid #007bff;
+    font-weight: 600;
+    box-shadow: inset 0 0 5px rgba(0, 123, 255, 0.1);
 }
 
-/* Panel de chat */
+
 #chatPanel {
     flex: 1;
     display: flex;
     flex-direction: column;
     background: #ffffff;
 }
+#chatHeader {
+    padding: 15px 20px;
+    border-bottom: 1px solid #eee;
+    background: #ffffff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+#chatHeader h5 {
+    margin: 0;
+    color: #333;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
 #chatBody {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
-    background: #f9f9f9;
+    background: #fcfcfc;
 }
-.cliente-msg {
-    text-align: right;
-    margin-bottom: 10px;
-    background: #d1faff;
-    padding: 10px 15px;
-    border-radius: 20px 20px 0 20px;
-    max-width: 75%;
+
+
+.message-container {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.cliente-msg-container { justify-content: flex-start; } 
+
+.admin-msg-container { justify-content: flex-end; } 
+
+.message-bubble {
+    padding: 12px 18px;
+    max-width: 70%;
     word-wrap: break-word;
-    margin-left: auto;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    transition: 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    line-height: 1.5;
+    font-size: 0.95rem;
+    transition: transform 0.2s;
 }
-.cliente-msg:hover {
-    background: #a0e0ff;
+.message-bubble:hover {
+    transform: translateY(-1px);
 }
-.admin-msg {
-    text-align: left;
-    margin-bottom: 10px;
-    background: #57a773;
-    color: white;
-    padding: 10px 15px;
+
+
+.cliente-msg-container .message-bubble {
+    background: #e0f7fa; 
+    color: #333;
     border-radius: 20px 20px 20px 0;
-    max-width: 75%;
-    word-wrap: break-word;
-    margin-right: auto;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    transition: 0.3s;
-}
-.admin-msg:hover {
-    background: #45925c;
 }
 
-/* Scroll personalizado */
-#chatBody::-webkit-scrollbar {
-    width: 8px;
-}
-#chatBody::-webkit-scrollbar-thumb {
-    background-color: #57a773;
-    border-radius: 4px;
-}
-#chatBody::-webkit-scrollbar-track {
-    background: #e6f7ff;
+.admin-msg-container .message-bubble {
+    background: #007bff; 
+    color: white;
+    border-radius: 20px 20px 0 20px;
 }
 
-/* Input y botón */
+
+#clientesPanel::-webkit-scrollbar, #chatBody::-webkit-scrollbar {
+    width: 6px;
+}
+#clientesPanel::-webkit-scrollbar-thumb, #chatBody::-webkit-scrollbar-thumb {
+    background-color: #a0a0a0;
+    border-radius: 3px;
+}
+#clientesPanel::-webkit-scrollbar-track, #chatBody::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
 #chatInputContainer {
     display: flex;
-    padding: 12px;
-    border-top: 1px solid #ccc;
-    background: #f0f8ff;
+    padding: 15px;
+    border-top: 1px solid #eee;
+    background: #ffffff;
 }
 #chatInput {
     flex: 1;
-    padding: 10px;
-    margin-right: 8px;
-    border-radius: 10px;
+    padding: 12px 20px;
+    margin-right: 10px;
+    border-radius: 25px;
     border: 1px solid #ccc;
-    font-size: 15px;
+    font-size: 1rem;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
-#chatInput:focus {
+#chatInput:focus:not([disabled]) {
     outline: none;
-    border-color: #57a773;
-    box-shadow: 0 0 5px rgba(87,167,115,0.5);
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 #sendChat {
-    padding: 10px 18px;
+    width: 50px; 
+    height: 50px;
     border: none;
-    background: #57a773;
+    background: #007bff;
     color: white;
-    border-radius: 10px;
+    border-radius: 50%; 
     cursor: pointer;
-    font-weight: bold;
-    transition: 0.3s;
+    font-size: 1.2rem;
+    transition: background 0.3s, transform 0.1s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-#sendChat:hover {
-    background: #45925c;
+#sendChat:hover:not([disabled]) {
+    background: #0056b3;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}
+#sendChat:active:not([disabled]) {
+    transform: scale(0.95);
+}
+#sendChat[disabled], #chatInput[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 </style>
 
@@ -166,53 +237,121 @@ let clienteSeleccionado = null;
 const chatBody = document.getElementById('chatBody');
 const chatInput = document.getElementById('chatInput');
 const sendBtn = document.getElementById('sendChat');
+const initialMessage = document.getElementById('initialMessage');
+const clienteActualNombre = document.getElementById('clienteActualNombre');
 
-// Seleccionar cliente
-document.querySelectorAll('#listaClientes li').forEach(li => {
+function toggleInput(enabled) {
+    chatInput.disabled = !enabled;
+    sendBtn.disabled = !enabled;
+    if (enabled) {
+        chatInput.focus();
+        chatInput.placeholder = "Escribe tu respuesta aquí...";
+    } else {
+        chatInput.placeholder = "Selecciona un cliente para chatear...";
+    }
+}
+toggleInput(false); 
+
+
+function renderMessage(msg, clienteNombre) {
+    const container = document.createElement('div');
+   
+    container.className = msg.enviado_admin ? 'message-container admin-msg-container' : 'message-container cliente-msg-container';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+
+    
+    const sender = msg.enviado_admin ? 'Tú (Admin)' : clienteNombre;
+    bubble.textContent = msg.contenido; 
+
+    container.appendChild(bubble);
+    chatBody.appendChild(container);
+}
+
+   document.querySelectorAll('#listaClientes li').forEach(li => {
     li.addEventListener('click', () => {
         document.querySelectorAll('#listaClientes li').forEach(el => el.classList.remove('active'));
         li.classList.add('active');
         clienteSeleccionado = li.dataset.id;
-        cargarMensajes(clienteSeleccionado);
+        
+        const nombreCompleto = li.textContent.trim();
+        const nombre = nombreCompleto.substring(nombreCompleto.indexOf(' ')).trim(); 
+        
+        clienteActualNombre.textContent = nombre;
+        initialMessage.style.display = 'none';
+        
+        toggleInput(true);
+        cargarMensajes(clienteSeleccionado, nombre);
     });
 });
 
-// Enviar mensaje
-sendBtn.addEventListener('click', async () => {
-    if(!clienteSeleccionado) return alert('Selecciona un cliente primero.');
+async function enviarMensaje() {
+    if(!clienteSeleccionado || sendBtn.disabled) return;
+
     const contenido = chatInput.value.trim();
     if(!contenido) return;
 
-    const response = await fetch('{{ url_for("admin.enviar_mensaje_admin") }}', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({contenido, cliente_id: clienteSeleccionado})
-    });
-    const data = await response.json();
-    if(data.status === 'ok'){
-        chatInput.value = '';
-        cargarMensajes(clienteSeleccionado);
+    try {
+       
+        const response = await fetch('{{ url_for("admin.enviar_mensaje_admin") }}', { 
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({contenido, cliente_id: clienteSeleccionado})
+        });
+        const data = await response.json();
+        
+        if(data.status === 'ok'){
+            
+            renderMessage({ contenido: contenido, enviado_admin: true }, 'Admin');
+            chatInput.value = '';
+            chatBody.scrollTop = chatBody.scrollHeight;
+        } else {
+            console.error('Error al enviar el mensaje:', data.error);
+        }
+    } catch(error) {
+        console.error('Error de red:', error);
+    }
+}
+
+// Event Listeners para enviar
+sendBtn.addEventListener('click', enviarMensaje);
+chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        enviarMensaje();
     }
 });
 
-// Cargar mensajes
-async function cargarMensajes(clienteId){
-    const response = await fetch(`/admin/chat/mensajes/${clienteId}`);
-    const mensajes = await response.json();
-    chatBody.innerHTML = '';
-    mensajes.forEach(msg => {
-        const div = document.createElement('div');
-        div.className = msg.enviado_admin ? 'admin-msg' : 'cliente-msg';
-        div.innerHTML = `<strong>${msg.enviado_admin ? 'Admin' : msg.cliente_nombre}:</strong> ${msg.contenido}`;
-        chatBody.appendChild(div);
-    });
-    chatBody.scrollTop = chatBody.scrollHeight;
+
+async function cargarMensajes(clienteId, clienteNombre){
+    try {
+        
+        const response = await fetch(`/admin/chat/mensajes/${clienteId}`); 
+        const mensajes = await response.json();
+        
+        chatBody.innerHTML = '';
+        mensajes.forEach(msg => renderMessage(msg, clienteNombre));
+        chatBody.scrollTop = chatBody.scrollHeight;
+        
+        if (mensajes.length === 0) {
+            chatBody.innerHTML = `<p style="text-align: center; color: #aaa; padding-top: 50px;">Aún no hay mensajes con ${clienteNombre}.</p>`;
+        }
+    } catch(error) {
+        console.error('Error al cargar mensajes:', error);
+        chatBody.innerHTML = '<p style="text-align: center; color: red; padding-top: 50px;">⚠️ Error de conexión. No se pudieron cargar los mensajes.</p>';
+    }
 }
 
-// Actualizar cada 3s
+
 setInterval(() => {
     if(clienteSeleccionado){
-        cargarMensajes(clienteSeleccionado);
+        
+        const activeLi = document.querySelector(`#listaClientes li.active`);
+        if (activeLi) {
+            const nombreCompleto = activeLi.textContent.trim();
+            const nombre = nombreCompleto.substring(nombreCompleto.indexOf(' ')).trim();
+            cargarMensajes(clienteSeleccionado, nombre);
+        }
     }
 }, 3000);
 </script>

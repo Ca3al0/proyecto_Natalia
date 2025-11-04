@@ -1,128 +1,121 @@
 {% extends "common/base.html" %}
 
 {% block content %}
-<!-- Botón flotante -->
-<button id="chatToggle" title="Abrir chat" style="
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: #57a773;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 24px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    z-index: 1000;
-">💬</button>
+<h2 style="text-align:center; margin-bottom:40px; color:#007bff; font-family:'Poppins', sans-serif; font-weight: 700; letter-spacing: 1px;">💬 Chat de Soporte en Tiempo Real</h2>
 
-<!-- Panel de chat oculto -->
-<div id="chatPanel" style="
-    display: none;
-    position: fixed;
-    bottom: 100px;
-    right: 30px;
-    width: 350px;
-    max-height: 500px;
-    border-radius: 10px;
-    overflow: hidden;
-    background: white;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-">
-    <div id="chatHeader" style="background: #57a773; color: white; padding: 10px; text-align:center; font-weight:bold; cursor: grab;">
-        Chat con Admin
-        <span id="closeChat" style="float:right; cursor:pointer;">✖</span>
-    </div>
-    <div id="chatBody" style="flex:1; padding:10px; overflow-y:auto; background:#f9f9f9;"></div>
-    <div id="chatInputContainer" style="display:flex; border-top:1px solid #ccc; padding:10px;">
-        <input type="text" id="chatInput" placeholder="Escribe un mensaje..." style="flex:1; padding:8px; border-radius:5px; border:1px solid #ccc;">
-        <button id="sendChat" style="padding:8px 12px; margin-left:5px; border:none; background:#57a773; color:white; border-radius:5px; cursor:pointer;">Enviar</button>
+<div id="chatWrapper">
+    <div id="chatPanel">
+        <div id="chatHeader">
+            <h5>Soporte Técnico</h5>
+        </div>
+        <div id="chatBody">
+            <div id="initialMessage" style="text-align: center; color: #888; padding: 50px;">
+                <p>¡Hola! Aquí podrás chatear directamente con nuestro equipo de soporte.</p>
+                <i class="far fa-comments" style="font-size: 30px; margin-top: 15px; color: #ccc;"></i>
+            </div>
+        </div>
+        <div id="chatInputContainer">
+            <input type="text" id="chatInput" placeholder="Escribe tu mensaje..." disabled>
+            <button id="sendChat" disabled>
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
     </div>
 </div>
 
 <style>
-.cliente-msg {
-    text-align: right;
-    margin-bottom: 8px;
-    background: #d1faff;
-    padding: 8px 12px;
-    border-radius: 12px;
-    max-width: 80%;
-    word-wrap: break-word;
-    margin-left: auto;
-}
-.admin-msg {
-    text-align: left;
-    margin-bottom: 8px;
-    background: #57a773;
-    color: white;
-    padding: 8px 12px;
-    border-radius: 12px;
-    max-width: 80%;
-    word-wrap: break-word;
-    margin-right: auto;
-}
-#chatBody::-webkit-scrollbar {
-    width: 6px;
-}
-#chatBody::-webkit-scrollbar-thumb {
-    background-color: #57a773;
-    border-radius: 3px;
-}
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+#chatWrapper { max-width:700px; margin:0 auto; border-radius:18px; overflow:hidden; height:600px; box-shadow:0 15px 50px rgba(0,0,0,0.15); font-family:'Poppins',sans-serif; display:flex; background:#fff; }
+#chatPanel { flex:1; display:flex; flex-direction:column; }
+#chatHeader { padding:15px 20px; border-bottom:1px solid #eee; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.05); }
+#chatHeader h5 { margin:0; font-weight:600; color:#333; }
+#chatBody { flex:1; padding:20px; background:#fcfcfc; overflow-y:auto; }
+.message-container { display:flex; margin-bottom:10px; }
+.cliente-msg-container { justify-content:flex-end; }
+.admin-msg-container { justify-content:flex-start; }
+.message-bubble { padding:10px 15px; max-width:70%; word-wrap:break-word; font-size:0.95rem; line-height:1.4; border-radius:20px; transition:opacity 0.3s ease; }
+.cliente-msg-container .message-bubble { background:#007bff; color:white; border-bottom-right-radius:20px; border-top-left-radius:20px; border-top-right-radius:20px; }
+.admin-msg-container .message-bubble { background:#e0f7fa; color:#333; border-bottom-left-radius:20px; border-top-left-radius:20px; border-top-right-radius:20px; }
+#chatBody::-webkit-scrollbar { width:6px; }
+#chatBody::-webkit-scrollbar-thumb { background-color:#a0a0a0; border-radius:3px; }
+#chatBody::-webkit-scrollbar-track { background:transparent; }
+#chatInputContainer { display:flex; padding:15px; border-top:1px solid #eee; background:#fff; }
+#chatInput { flex:1; padding:12px 18px; margin-right:10px; border-radius:25px; border:2px solid #007bff; font-size:1rem; transition:border-color 0.3s, box-shadow 0.3s; }
+#chatInput:focus:not([disabled]) { outline:none; border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.25); }
+#sendChat { width:45px; height:45px; border:none; background:#007bff; color:white; border-radius:50%; cursor:pointer; font-size:1.1rem; display:flex; justify-content:center; align-items:center; transition:background 0.3s, transform 0.1s; }
+#sendChat:hover:not([disabled]) { background:#0056b3; transform:scale(1.05); }
+#sendChat:active:not([disabled]) { transform:scale(0.95); }
+#sendChat[disabled], #chatInput[disabled] { opacity:0.6; cursor:not-allowed; }
 </style>
 
 <script>
-const chatToggle = document.getElementById('chatToggle');
-const chatPanel = document.getElementById('chatPanel');
-const chatBody = document.getElementById('chatBody');
-const chatInput = document.getElementById('chatInput');
-const sendBtn = document.getElementById('sendChat');
-const closeChat = document.getElementById('closeChat');
+let chatBody = document.getElementById('chatBody');
+let chatInput = document.getElementById('chatInput');
+let sendBtn = document.getElementById('sendChat');
+let initialMessage = document.getElementById('initialMessage');
 
-// Abrir/cerrar chat
-chatToggle.addEventListener('click', () => chatPanel.style.display = 'flex');
-closeChat.addEventListener('click', () => chatPanel.style.display = 'none');
+function toggleInput(enabled) {
+    chatInput.disabled = !enabled;
+    sendBtn.disabled = !enabled;
+    chatInput.placeholder = enabled ? "Escribe tu mensaje..." : "Cargando chat...";
+    if(enabled) chatInput.focus();
+}
+toggleInput(true);
 
-// Función para cargar mensajes
-async function cargarMensajes() {
-    const response = await fetch(`/cliente/chat/mensajes`);
-    const mensajes = await response.json();
-    chatBody.innerHTML = '';
-    mensajes.forEach(msg => {
-        const div = document.createElement('div');
-        div.className = msg.enviado_admin ? 'admin-msg' : 'cliente-msg';
-        div.innerHTML = `<strong>${msg.enviado_admin ? 'Admin' : 'Tú'}:</strong> ${msg.contenido}`;
-        chatBody.appendChild(div);
-    });
+function renderMessage(msg) {
+    const container = document.createElement('div');
+    container.className = msg.enviado_admin ? 'message-container admin-msg-container' : 'message-container cliente-msg-container';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+    bubble.textContent = msg.contenido;
+
+    bubble.style.opacity = 0;
+    container.appendChild(bubble);
+    chatBody.appendChild(container);
+    setTimeout(() => { bubble.style.opacity = 1; }, 50);
+
     chatBody.scrollTop = chatBody.scrollHeight;
 }
 
-// Enviar mensaje
-sendBtn.addEventListener('click', async () => {
+async function enviarMensaje() {
     const contenido = chatInput.value.trim();
     if(!contenido) return;
-    
-    const response = await fetch('{{ url_for("cliente.enviar_mensaje_cliente") }}', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({contenido})
-    });
-    const data = await response.json();
-    if(data.status === 'ok'){
-        chatInput.value = '';
-        cargarMensajes();
+
+    try {
+        const response = await fetch('{{ url_for("cliente.enviar_mensaje_cliente") }}', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body: JSON.stringify({contenido})
+        });
+        const data = await response.json();
+        if(data.status === 'ok') {
+            renderMessage({contenido: contenido, enviado_admin:false});
+            chatInput.value = '';
+        }
+    } catch(err) { console.error('Error enviando mensaje:', err); }
+}
+
+sendBtn.addEventListener('click', enviarMensaje);
+chatInput.addEventListener('keypress', (e) => { if(e.key==='Enter') enviarMensaje(); });
+
+async function cargarMensajes() {
+    try {
+        const res = await fetch('{{ url_for("cliente.mensajes_cliente_ajax") }}');
+        const mensajes = await res.json();
+        chatBody.innerHTML = '';
+        if(mensajes.length === 0) {
+            chatBody.innerHTML = `<p style="text-align:center;color:#aaa;padding-top:50px;">Aún no hay mensajes.</p>`;
+        } else {
+            mensajes.forEach(msg => renderMessage(msg));
+        }
+    } catch(err) {
+        chatBody.innerHTML = `<p style="text-align:center;color:red;padding-top:50px;">⚠️ Error cargando mensajes.</p>`;
     }
-});
+}
 
-// Auto actualizar cada 3s
+cargarMensajes();
 setInterval(cargarMensajes, 3000);
-
-// Cargar mensajes al abrir
-chatToggle.addEventListener('click', cargarMensajes);
 </script>
 {% endblock %}
