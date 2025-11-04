@@ -116,7 +116,7 @@
   <div class="list-group">
     {% if pedidos %}
       {% for pedido in pedidos %}
-        <div class="list-group-item d-flex justify-content-between align-items-center">
+        <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
           <div>
             <strong>Pedido #{{ pedido.ID_Pedido }}</strong><br>
             {% if pedido.FechaPedido %}
@@ -128,17 +128,49 @@
             <small>Destino: {{ pedido.Destino or 'No especificado' }}</small><br>
             <span class="badge bg-success mt-1">{{ pedido.Estado|capitalize }}</span>
           </div>
-          <button class="btn btn-outline-success btn-sm"
-                  data-bs-toggle="modal"
-                  data-bs-target="#modalPedido"
-                  data-id="{{ pedido.ID_Pedido }}">
-            Ver detalles
-          </button>
+
+          <div class="d-flex gap-2 mt-2 mt-md-0">
+            <button class="btn btn-outline-success btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalPedido"
+                    data-id="{{ pedido.ID_Pedido }}">
+              Ver detalles
+            </button>
+
+            <button class="btn btn-outline-primary btn-sm"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalRegistroFotografico"
+                    data-id="{{ pedido.ID_Pedido }}">
+              Ver registro fotográfico
+            </button>
+            <a href="#" 
+          class="btn btn-outline-warning btn-sm">
+          Rastrear pedido
+        </a>
+     
+          </div>
         </div>
       {% endfor %}
     {% else %}
       <p class="text-muted">No tienes pedidos registrados.</p>
     {% endif %}
+  </div>
+</div>
+
+
+<div class="modal fade" id="modalRegistroFotografico" tabindex="-1" aria-labelledby="modalRegistroFotograficoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content p-4 rounded-4">
+      <div class="modal-header border-0">
+        <h5 class="modal-title fw-bold" id="modalRegistroFotograficoLabel">REGISTRO FOTOGRÁFICO DEL PEDIDO</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div id="contenido-registro-fotografico">
+          <p class="text-muted"></p>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -204,7 +236,7 @@
   </div>
 </div>
 
-<!-- Modal Confirmar Borrar -->
+
 <div class="modal fade" id="modalConfirmarBorrar" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content p-4 rounded-4 text-center">
@@ -218,7 +250,7 @@
   </div>
 </div>
 
-<!-- Modal Detalle Pedido -->
+
 <div class="modal fade" id="modalPedido" tabindex="-1" aria-labelledby="modalPedidoLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content p-4 rounded-4">

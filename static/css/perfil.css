@@ -1,6 +1,6 @@
 .container-fluid {
     padding-top: 100px; 
-    padding-bottom: 100px; 
+    padding-bottom: 150px; /* más espacio abajo */
     font-family: 'Segoe UI', sans-serif;
     color: #333;
     background: #f0fdf4; 
@@ -13,7 +13,6 @@
     position: sticky;
     top: 100px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    transition: all 0.3s;
 }
 
 .sidebar h4 {
@@ -33,30 +32,19 @@
     color: #157145;
     font-weight: 600;
     text-decoration: none;
-    transition: all 0.3s;
 }
 
 .sidebar a.active,
 .sidebar a:hover {
     background: #57a773;
     color: white;
-    transform: translateX(5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
-
 
 .card {
     border-radius: 25px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-    transition: all 0.4s;
     background: white;
 }
-
-.card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-}
-
 
 .profile-header h5 {
     font-weight: 800;
@@ -72,7 +60,6 @@ form .form-label {
 form .form-control {
     border-radius: 50px;
     border: 2px solid #9bd1e5;
-    transition: all 0.3s;
     padding: 12px 20px;
 }
 
@@ -81,7 +68,6 @@ form .form-control:focus {
     box-shadow: 0 0 12px rgba(87,167,115,0.5);
 }
 
-
 .btn-green {
     background-color: #57a773;
     color: white;
@@ -89,38 +75,20 @@ form .form-control:focus {
     font-weight: 700;
     padding: 10px 25px;
     font-size: 1rem;
-    transition: all 0.3s;
     box-shadow: 0 5px 15px rgba(87,167,115,0.4);
 }
-
-.btn-green:hover {
-    background-color: #157145;
-    transform: translateY(-3px) scale(1.05);
-}
-
 
 .list-group-item {
     border-radius: 20px;
     margin-bottom: 15px;
     padding: 20px 25px;
-    transition: all 0.3s;
     background: #ffffff;
     border: 1px solid #e0f0ea;
 }
 
-.list-group-item:hover {
-    background: #d1faff;
-    transform: translateY(-3px);
-}
-
 .btn-borrar-direccion {
-    transition: all 0.2s;
+    transition: color 0.2s;
 }
-
-.btn-borrar-direccion:hover {
-    color: #c82333;
-}
-
 
 .modal-content {
     border-radius: 25px;
@@ -153,7 +121,6 @@ form .form-control:focus {
     font-weight: 700;
 }
 
-
 .flash-small {
     border-radius: 20px;
     font-size: 0.95rem;
@@ -162,12 +129,10 @@ form .form-control:focus {
     font-weight: 600;
 }
 
-
 .flash-small i {
     font-size: 1.3rem;
     margin-right: 8px;
 }
-
 
 @media (max-width: 992px) {
     .sidebar {
