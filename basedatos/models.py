@@ -121,7 +121,7 @@ class ImagenProducto(db.Model):
 
 
 
-# ------------------ Pedido ------------------
+
 # ------------------ Pedido ------------------
 class Pedido(db.Model):
     __tablename__ = 'Pedido'

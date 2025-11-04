@@ -664,21 +664,13 @@ def asignar_transportista(id_pedido):
 def reporte_entregas():
     pedidos_entregados = Pedido.query.filter_by(Estado='entregado').all()
 
-    
-    transportistas = {usuario.ID_Usuario: usuario for usuario in Usuario.query.filter_by(Rol='transportista').all()}
+    # Ya no es necesario modificar TransportistaNombre aquí
 
-    for pedido in pedidos_entregados:
-        if pedido.ID_Empleado:
-            transportista = transportistas.get(pedido.ID_Empleado)
-            if transportista:
-                pedido.TransportistaNombre = f"{transportista.ID_Usuario} - {transportista.Nombre}"
-            else:
-                pedido.TransportistaNombre = 'No asignado'
-        else:
-            pedido.TransportistaNombre = 'No asignado'
+    return render_template(
+        'administrador/reportes_entregas.html',
+        pedidos_entregados=pedidos_entregados
+    )
 
-    return render_template('administrador/reportes_entregas.html',
-                           pedidos_entregados=pedidos_entregados)
 
 @admin.route('/chat', methods=['GET'])
 @login_required
