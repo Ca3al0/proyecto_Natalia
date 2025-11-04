@@ -171,7 +171,6 @@
         <tr>
           <th>Pedido #</th>
           <th>Cliente</th>
-          <th>Fecha Entrega</th>
           <th>Productos</th>
           <th>Transportista</th>
         </tr>
@@ -181,7 +180,6 @@
           <tr>
             <td data-label="Pedido #">{{ pedido.ID_Pedido }}</td>
             <td data-label="Cliente">{{ pedido.NombreComprador }}</td>
-            <td data-label="Fecha Entrega">{{ pedido.FechaEntrega.strftime('%Y-%m-%d %H:%M') if pedido.FechaEntrega else 'N/A' }}</td>
             <td data-label="Productos">
               <ul class="mb-0">
                 {% for detalle in pedido.detalles_pedido %}
