@@ -4,13 +4,12 @@
   {% include "common/partials/navbar_admin.html" %}
 {% endblock %}
 
-
 {% block content %}
-<h2 style="text-align:center; margin-bottom:40px; color:#007bff; font-family:'Poppins', sans-serif; font-weight: 700; letter-spacing: 1px;">Chat en Tiempo Real</h2>
+<h2 style="text-align:center; margin-bottom:40px; color:#07525c; font-family:'Poppins', sans-serif; font-weight: 700; letter-spacing: 1px;">Chat en Tiempo Real</h2>
 
 <div id="chatWrapper">
     <div id="clientesPanel">
-        <h4 style="color:#333; font-weight: 600;"> Clientes </h4>
+        <h4 style="color:#057145; font-weight: 600;"> Clientes </h4>
         <ul id="listaClientes">
             {% for user in clientes %}
                 <li data-id="{{ user.ID_Usuario }}">
@@ -41,9 +40,7 @@
 </div>
 
 <style>
-  
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 #chatWrapper {
     display: flex;
@@ -57,24 +54,19 @@
     background: #ffffff;
 }
 
-
 #clientesPanel {
     width: 320px;
     border-right: 1px solid #eee;
-    background: #f4f7f6; 
+    background: #f0f7f0; /* fondo verde muy suave */
     padding: 25px 0;
     overflow-y: auto;
 }
 #clientesPanel h4 {
     margin-bottom: 20px;
     padding: 0 20px;
-    color: #007bff;
-    border-left: 4px solid #007bff;
+    color: #157145; /* verde acento */
+    border-left: 4px solid #57a773; /* verde principal */
     line-height: 1.2;
-}
-#clientesPanel ul {
-    list-style: none;
-    padding: 0;
 }
 #clientesPanel li {
     display: flex;
@@ -87,7 +79,7 @@
     font-weight: 500;
 }
 .user-initial {
-    background: #007bff;
+    background: #57a773; /* verde principal */
     color: white;
     border-radius: 50%;
     width: 35px;
@@ -100,16 +92,15 @@
     flex-shrink: 0;
 }
 #clientesPanel li:hover {
-    background: #e9ecef;
+    background: #d9f0d9; /* verde claro */
 }
 #clientesPanel li.active {
-    background: #d4e3ff;
-    color: #007bff;
-    border-left: 5px solid #007bff;
+    background: #9bd1a5; /* verde claro destacado */
+    color: #07525c; /* verde oscuro */
+    border-left: 5px solid #57a773;
     font-weight: 600;
-    box-shadow: inset 0 0 5px rgba(0, 123, 255, 0.1);
+    box-shadow: inset 0 0 5px rgba(87, 167, 115, 0.1);
 }
-
 
 #chatPanel {
     flex: 1;
@@ -125,7 +116,7 @@
 }
 #chatHeader h5 {
     margin: 0;
-    color: #333;
+    color: #07525c; /* verde oscuro */
     font-size: 1.1rem;
     font-weight: 600;
 }
@@ -133,103 +124,29 @@
     flex: 1;
     padding: 20px;
     overflow-y: auto;
-    background: #fcfcfc;
+    background: #f6fcf6; /* fondo verde muy suave */
 }
 
-
-.message-container {
-    display: flex;
-    margin-bottom: 15px;
-}
-
+.message-container { display: flex; margin-bottom: 15px; }
 .cliente-msg-container { justify-content: flex-start; } 
-
 .admin-msg-container { justify-content: flex-end; } 
+.message-bubble { padding: 12px 18px; max-width: 70%; word-wrap: break-word; box-shadow: 0 2px 8px rgba(0,0,0,0.1); line-height:1.5; font-size:0.95rem; transition: transform 0.2s;}
+.message-bubble:hover { transform: translateY(-1px); }
 
-.message-bubble {
-    padding: 12px 18px;
-    max-width: 70%;
-    word-wrap: break-word;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    line-height: 1.5;
-    font-size: 0.95rem;
-    transition: transform 0.2s;
-}
-.message-bubble:hover {
-    transform: translateY(-1px);
-}
+.cliente-msg-container .message-bubble { background: #d9f0d9; color: #07525c; border-radius: 20px 20px 20px 0; }
+.admin-msg-container .message-bubble { background: #57a773; color: white; border-radius: 20px 20px 0 20px; }
 
+#clientesPanel::-webkit-scrollbar, #chatBody::-webkit-scrollbar { width: 6px; }
+#clientesPanel::-webkit-scrollbar-thumb, #chatBody::-webkit-scrollbar-thumb { background-color: #a0a0a0; border-radius: 3px; }
+#clientesPanel::-webkit-scrollbar-track, #chatBody::-webkit-scrollbar-track { background: transparent; }
 
-.cliente-msg-container .message-bubble {
-    background: #e0f7fa; 
-    color: #333;
-    border-radius: 20px 20px 20px 0;
-}
-
-.admin-msg-container .message-bubble {
-    background: #007bff; 
-    color: white;
-    border-radius: 20px 20px 0 20px;
-}
-
-
-#clientesPanel::-webkit-scrollbar, #chatBody::-webkit-scrollbar {
-    width: 6px;
-}
-#clientesPanel::-webkit-scrollbar-thumb, #chatBody::-webkit-scrollbar-thumb {
-    background-color: #a0a0a0;
-    border-radius: 3px;
-}
-#clientesPanel::-webkit-scrollbar-track, #chatBody::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-
-#chatInputContainer {
-    display: flex;
-    padding: 15px;
-    border-top: 1px solid #eee;
-    background: #ffffff;
-}
-#chatInput {
-    flex: 1;
-    padding: 12px 20px;
-    margin-right: 10px;
-    border-radius: 25px;
-    border: 1px solid #ccc;
-    font-size: 1rem;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-#chatInput:focus:not([disabled]) {
-    outline: none;
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-}
-#sendChat {
-    width: 50px; 
-    height: 50px;
-    border: none;
-    background: #007bff;
-    color: white;
-    border-radius: 50%; 
-    cursor: pointer;
-    font-size: 1.2rem;
-    transition: background 0.3s, transform 0.1s;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-#sendChat:hover:not([disabled]) {
-    background: #0056b3;
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
-}
-#sendChat:active:not([disabled]) {
-    transform: scale(0.95);
-}
-#sendChat[disabled], #chatInput[disabled] {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
+#chatInputContainer { display: flex; padding: 15px; border-top: 1px solid #eee; background: #ffffff; }
+#chatInput { flex: 1; padding: 12px 20px; margin-right: 10px; border-radius: 25px; border: 1px solid #ccc; font-size: 1rem; transition: border-color 0.3s, box-shadow 0.3s; }
+#chatInput:focus:not([disabled]) { outline: none; border-color: #57a773; box-shadow: 0 0 0 3px rgba(87, 167, 115, 0.25); }
+#sendChat { width: 50px; height: 50px; border: none; background: #57a773; color: white; border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: background 0.3s, transform 0.1s; display:flex; justify-content:center; align-items:center; }
+#sendChat:hover:not([disabled]) { background: #157145; box-shadow: 0 4px 10px rgba(87,167,115,0.3); }
+#sendChat:active:not([disabled]) { transform: scale(0.95); }
+#sendChat[disabled], #chatInput[disabled] { opacity: 0.6; cursor: not-allowed; }
 </style>
 
 <script>

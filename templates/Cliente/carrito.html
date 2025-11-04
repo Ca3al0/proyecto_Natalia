@@ -1,59 +1,122 @@
 {% extends "common/base.html" %}
 
+{% block navbar %}
+  {% include "common/partials/navbar_cliente.html" %}
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
-    <h2 class="mb-4 text-primary">🛒 Tu Carrito de Compras</h2>
+    <h2 class="mb-4 fw-bold" style="color: #07525c;">Tu Carrito de Compras</h2>
     
-    <div id="lista-carrito" class="row g-4 mb-4">
-    </div>
+    <div id="lista-carrito" class="row g-4 mb-4"></div>
     
     <div class="d-flex justify-content-between align-items-center mb-5">
         <button id="vaciar-carrito" class="btn btn-danger btn-lg shadow">
             <i class="bi bi-trash me-2"></i> Vaciar Carrito
         </button>
-        <h3 class="m-0">Total: <span class="text-success fw-bold" id="carrito-total">$0.00</span></h3>
+        <h3 class="m-0">Total: <span class="fw-bold" id="carrito-total" style="color:#57a773;">$0.00</span></h3>
     </div>
     
     <div class="text-end">
-        <a href="{{ url_for('cliente.checkout') }}" id="btn-checkout" class="btn btn-success btn-lg shadow">
+        <a href="{{ url_for('cliente.checkout') }}" id="btn-checkout" class="btn btn-success btn-lg shadow" style="background-color:#57a773; border-color:#57a773;">
             <i class="bi bi-credit-card me-2"></i> Proceder al Pago
         </a>
     </div>
 </div>
 
+<style>
+:root {
+    --primary-green: #07525c;
+    --secondary-green: #57a773;
+    --light-green: #9bd1a5;
+    --accent-green: #157145;
+    --bg-cream: #f8f9fa;
+    --text-dark: #1b3e2b;
+    --shadow-light: rgba(0,0,0,0.05);
+    --shadow-medium: rgba(0,0,0,0.12);
+    --badge-light: #e7fcff;
+    --badge-dark: #57a773;
+}
+
+body {
+    background-color: var(--bg-cream);
+    color: var(--text-dark);
+}
+
+.card-modern {
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px var(--shadow-light);
+}
+
+.card-modern:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px var(--shadow-medium);
+}
+
+.card-modern img {
+    transition: transform 0.3s;
+}
+.card-modern:hover img {
+    transform: scale(1.05);
+}
+
+.card-title {
+    color: var(--primary-green);
+}
+
+.btn-eliminar {
+    border-color: #dc3545;
+    color: #dc3545;
+    transition: background-color 0.3s, color 0.3s;
+}
+.btn-eliminar:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.input-cantidad {
+    border-radius: 8px;
+    border: 1px solid var(--secondary-green);
+    transition: box-shadow 0.2s;
+}
+.input-cantidad:focus {
+    box-shadow: 0 0 8px rgba(5,82,92,0.3);
+    border-color: var(--accent-green);
+}
+
+#carrito-total {
+    font-size: 1.5rem;
+}
+
+.alert-info {
+    font-size: 1.1rem;
+    background-color: var(--badge-light);
+    color: var(--primary-green);
+    border-color: var(--secondary-green);
+}
+</style>
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Usamos 'let' para 'carrito' porque será reasignado al vaciarlo.
     let carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
     
-    // Referencias DOM
     const listaCarritoDOM = document.getElementById('lista-carrito');
     const carritoTotalDOM = document.getElementById('carrito-total');
     const vaciarCarritoBtn = document.getElementById('vaciar-carrito');
-    const checkoutContainer = document.querySelector('.text-end'); // Contenedor del botón de pago
-    const checkoutBtn = document.getElementById('btn-checkout');
+    const checkoutContainer = document.querySelector('.text-end');
 
-    // --- Funciones del Carrito ---
-
-    /**
-     * Calcula y actualiza el total a pagar en el DOM.
-     */
     const actualizarTotal = () => {
-        const total = carrito.reduce((sum, item) => {
-            const precio = parseFloat(item.precio || 0);
-            const cantidad = parseInt(item.cantidad || 1);
-            return sum + (precio * cantidad);
-        }, 0);
+        const total = carrito.reduce((sum, item) => sum + (parseFloat(item.precio || 0) * parseInt(item.cantidad || 1)), 0);
         carritoTotalDOM.textContent = `$${total.toFixed(2)}`;
     };
 
-    /**
-     * Renderiza todos los productos del carrito y adjunta event listeners.
-     */
     const renderizarCarrito = () => {
         listaCarritoDOM.innerHTML = '';
 
-        if (carrito.length === 0) {
+        if(carrito.length === 0){
             listaCarritoDOM.innerHTML = `
                 <div class="col-12">
                     <div class="alert alert-info text-center" role="alert">
@@ -65,32 +128,29 @@ document.addEventListener('DOMContentLoaded', () => {
             checkoutContainer.style.display = 'none';
             vaciarCarritoBtn.disabled = true;
             return;
-        } 
-        
-        // Habilitar si hay items
+        }
+
         checkoutContainer.style.display = 'block';
         vaciarCarritoBtn.disabled = false;
-
 
         carrito.forEach((item, index) => {
             const precio = parseFloat(item.precio || 0);
             const cantidad = parseInt(item.cantidad || 1);
 
             const col = document.createElement('div');
-            // Usamos template literal para la sintaxis del HTML
             col.className = 'col-12 col-md-6 col-lg-4';
             col.innerHTML = `
-                <div class="card h-100 shadow-sm border-0">
+                <div class="card card-modern h-100">
                     <img src="${item.imagen || '{{ url_for('static', filename='img/catalogo.png') }}'}" 
                         class="card-img-top p-3" 
                         alt="${item.nombre}" 
                         style="height: 200px; object-fit: contain;"
                     >
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title text-primary">${item.nombre}</h5>
-                        <p class="card-text mb-1">Precio Unitario: <span class="fw-bold">$${precio.toFixed(2)}</span></p>
+                        <h5 class="card-title fw-bold">${item.nombre}</h5>
+                        <p class="card-text mb-1">Precio Unitario: <span class="fw-bold" style="color: var(--secondary-green);">$${precio.toFixed(2)}</span></p>
                         <p class="card-text mb-3">Subtotal: 
-                            <span class="fw-bold text-success">$<span data-subtotal-index="${index}">${(precio * cantidad).toFixed(2)}</span></span>
+                            <span class="fw-bold" style="color: var(--accent-green);">$<span data-subtotal-index="${index}">${(precio * cantidad).toFixed(2)}</span></span>
                         </p>
 
                         <div class="d-flex align-items-center gap-3 mb-3 mt-auto">
@@ -109,71 +169,50 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `;
-
             listaCarritoDOM.appendChild(col);
 
-            // Se adjunta el evento al input
             const inputCantidad = col.querySelector('.input-cantidad');
             inputCantidad.addEventListener('change', (e) => handleCantidadChange(e, precio));
 
-            // Se adjunta el evento al botón de eliminar
             col.querySelector('.btn-eliminar').addEventListener('click', (e) => handleEliminarClick(e, index));
         });
 
-        // Siempre actualizar el total después de renderizar
         actualizarTotal();
     };
-    
-    /**
-     * Maneja el cambio de cantidad de un ítem.
-     */
+
     const handleCantidadChange = (event, precioUnitario) => {
         const input = event.target;
         const index = parseInt(input.getAttribute('data-index'));
         let nuevaCantidad = parseInt(input.value);
 
-        // Aseguramos que la cantidad es válida
-        if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
+        if(isNaN(nuevaCantidad) || nuevaCantidad < 1){
             nuevaCantidad = 1;
-            input.value = 1; // Corregir visualmente el input
+            input.value = 1;
         }
-            
-        // 1. Actualiza el modelo (array carrito)
-        carrito[index].cantidad = nuevaCantidad; 
-        
-        // 2. Persiste en el almacenamiento local
+
+        carrito[index].cantidad = nuevaCantidad;
         localStorage.setItem('carrito', JSON.stringify(carrito));
-        
-        // 3. Actualiza el subtotal del ítem en el DOM
+
         const nuevoSubtotal = (precioUnitario * nuevaCantidad).toFixed(2);
         document.querySelector(`[data-subtotal-index="${index}"]`).textContent = nuevoSubtotal;
 
-        // 4. Actualiza el total general
         actualizarTotal();
     };
-    
-    /**
-     * Maneja el click en el botón Eliminar.
-     */
+
     const handleEliminarClick = (event, indexToRemove) => {
-        // Usamos el index pasado para una eliminación precisa
         carrito.splice(indexToRemove, 1);
         localStorage.setItem('carrito', JSON.stringify(carrito));
-        // Recargar la vista completa para reindexar y refrescar eventos
-        renderizarCarrito(); 
+        renderizarCarrito();
     };
 
-
-    // --- Evento Vaciar Carrito ---
     vaciarCarritoBtn.addEventListener('click', () => {
-        if (carrito.length > 0 && confirm('¿Está seguro que desea vaciar su carrito? Esta acción no se puede deshacer.')) {
+        if(carrito.length > 0 && confirm('¿Está seguro que desea vaciar su carrito? Esta acción no se puede deshacer.')) {
             carrito = [];
             localStorage.setItem('carrito', JSON.stringify(carrito));
             renderizarCarrito();
         }
     });
 
-    // --- Inicialización ---
     renderizarCarrito();
 });
 </script>

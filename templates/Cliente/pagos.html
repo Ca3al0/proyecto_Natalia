@@ -1,12 +1,118 @@
 {% extends "common/base.html" %}
 
+{% block navbar %}
+  {% include "common/partials/navbar_cliente.html" %}
+{% endblock %}
+
 {% block content %}
+
+<style>
+:root {
+  --primary-green: #07525c;      
+  --secondary-green: #57a773;    
+  --light-green: #9bd1a5;       
+  --accent-green: #157145;       
+  --bg-cream: #f8f9fa;          
+  --text-dark: #1b3e2b;         
+  --shadow-light: rgba(0, 0, 0, 0.05);
+  --shadow-medium: rgba(0, 0, 0, 0.12);
+  --badge-light: #e7fcff;        
+  --badge-dark: #57a773;         
+}
+
+/* General */
+body {
+    background-color: var(--bg-cream);
+    color: var(--text-dark);
+}
+
+/* Card Headers */
+.card-header {
+    font-weight: 600;
+    border-bottom: none;
+}
+.card-header.bg-primary {
+    background-color: var(--primary-green) !important;
+}
+.card-header.bg-success {
+    background-color: var(--secondary-green) !important;
+}
+
+/* Cards */
+.card {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px var(--shadow-light);
+}
+
+/* Botones */
+.btn-success {
+    background-color: var(--secondary-green);
+    border-color: var(--secondary-green);
+}
+.btn-success:hover {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+}
+.btn-danger {
+    background-color: #dc3545;
+}
+.btn-danger:hover {
+    background-color: #b02a37;
+}
+
+/* Inputs */
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid var(--secondary-green);
+    box-shadow: none;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent-green);
+    box-shadow: 0 0 8px rgba(5, 82, 92, 0.3);
+}
+
+/* List Group Resumen */
+.list-group-item {
+    border: none;
+    padding: 0.75rem 1rem;
+}
+.list-group-item.bg-light {
+    background-color: var(--light-green) !important;
+}
+
+/* Modal */
+.modal-content {
+    border-radius: 12px;
+    overflow: hidden;
+}
+.modal-header {
+    font-weight: 600;
+}
+.modal-header.bg-success {
+    background-color: var(--secondary-green) !important;
+}
+#total-modal {
+    color: var(--accent-green);
+}
+
+/* Botón Pagar */
+#btn-pagar {
+    background-color: var(--secondary-green);
+    border-color: var(--secondary-green);
+}
+#btn-pagar:hover {
+    background-color: var(--accent-green);
+    border-color: var(--accent-green);
+}
+</style>
+
 <div class="container mt-5">
-    <h1 class="text-primary mb-5"><i class="bi bi-credit-card-2-back me-2"></i> Finalizar Compra (Checkout)</h1>
+    <h1 class="text-primary mb-5" style="color: var(--primary-green)"><i class="bi bi-credit-card-2-back me-2"></i><b>Finalizar Compra</b>  </h1>
     
     <div id="flash-message-container" class="mb-4"></div>
 
     <div class="row">
+        <!-- Columna de Formulario -->
         <div class="col-md-8">
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
@@ -16,7 +122,7 @@
                     <form id="checkout-form" method="POST" action="{{ url_for('cliente.finalizar_compra') }}">
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre Completo</label>
-                            <input type="text" class="form-control" id="nombre" name="nombre" required value="{{ current_user.nombre }}">
+                            <input type="text" class="form-control" id="nombre" name="nombre" required value="{{ current_user.Nombre }}">
                         </div>
                         
                         <div class="mb-3">
@@ -72,24 +178,17 @@
             </div>
         </div>
 
+        <!-- Columna Resumen -->
         <div class="col-md-4">
             <div class="card shadow-lg sticky-top" style="top: 20px;">
                 <div class="card-header bg-success text-white">
-                    <h4 class="mb-0"><i class="bi bi-receipt me-2"></i> Resumen de la Orden</h4>
+                    <h4 class="mb-0"><i class="bi bi-receipt me-2"></i> Resumen del pedido </h4>
                 </div>
                 <div class="card-body">
                     <ul class="list-group list-group-flush mb-3" id="resumen-productos"></ul>
                     <ul class="list-group list-group-flush border-top pt-2">
                         <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Subtotal:
-                            <span class="fw-bold" id="checkout-subtotal">$0.00</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Costo de Envío:
-                            <span class="fw-bold text-danger" id="checkout-envio">$5.00</span> 
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center bg-light">
-                            <h5 class="mb-0 text-success">Total a Pagar:</h5>
+                            Total a Pagar:
                             <h5 class="mb-0 text-success" id="checkout-total">$0.00</h5>
                         </li>
                     </ul>
@@ -123,20 +222,15 @@
   </div>
 </div>
 
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
-    const costoEnvio = 5.00;
     let totalFinal = 0;
 
     const resumen = document.getElementById('resumen-productos');
-    const subtotalEl = document.getElementById('checkout-subtotal');
-    const envioEl = document.getElementById('checkout-envio');
     const totalEl = document.getElementById('checkout-total');
     const carritoInput = document.getElementById('carrito-json');
 
-    // Renderizar resumen del carrito
     let subtotal = 0;
     carrito.forEach(item => {
         const cantidad = item.cantidad || 1;
@@ -149,13 +243,10 @@ document.addEventListener('DOMContentLoaded', () => {
         resumen.appendChild(li);
     });
 
-    totalFinal = subtotal + costoEnvio;
-    subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
-    envioEl.textContent = `$${costoEnvio.toFixed(2)}`;
+    totalFinal = subtotal;
     totalEl.textContent = `$${totalFinal.toFixed(2)}`;
     carritoInput.value = JSON.stringify(carrito);
 
-    // Toggle inputs según método de pago
     const datosTarjetaDiv = document.getElementById('datos-tarjeta');
     const datosDigitalesDiv = document.getElementById('datos-digitales');
     const toggleInputs = () => {
@@ -166,16 +257,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('input[name="pago"]').forEach(r => r.addEventListener('change', toggleInputs));
     toggleInputs();
 
-    // Botón pagar
     const btnPagar = document.getElementById('btn-pagar');
     btnPagar.addEventListener('click', async (e) => {
         e.preventDefault();
-
         if (carrito.length === 0) {
             alert("El carrito está vacío.");
             return;
         }
-
         const direccion = document.getElementById('select-direccion').value;
         const metodo = document.querySelector('input[name="pago"]:checked').value;
 
@@ -191,14 +279,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (data.success) {
-                // Mostrar modal
                 const modal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
                 document.getElementById('total-modal').textContent = `Total: $${totalFinal.toFixed(2)}`;
                 modal.show();
-
-                // Vaciar carrito
                 localStorage.setItem('carrito', '[]');
-
             } else {
                 alert(data.mensaje);
             }
@@ -210,7 +294,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-
 </script>
+
 {% endblock %}

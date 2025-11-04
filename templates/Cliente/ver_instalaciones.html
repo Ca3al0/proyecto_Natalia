@@ -2,7 +2,6 @@
 
 {% block navbar %}
   {% include "common/partials/navbar_cliente.html" %}
-  {% include "common/partials/navbar_secundario2.html" %}
 {% endblock %}
 
 {% block content %}
@@ -10,10 +9,10 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
 <style>
   :root {
-    --primary-green: #5f8f3f;
-    --secondary-green: #4e7b33;
-    --light-green: #6c9a50;
-    --accent-green: #7cb342;
+    --primary-green: #07525c; /* verde oscuro */
+    --secondary-green: #57a773; /* verde principal */
+    --light-green: #9bd1a5; /* verde claro */
+    --accent-green: #157145; /* verde acento */
     --bg-cream: #f8f6f0;
     --text-dark: #2c3e50;
     --shadow-light: rgba(0, 0, 0, 0.08);
@@ -64,7 +63,7 @@
   }
 
   ul.installaciones li strong {
-    color: var(--primary-green);
+    color: var(--secondary-green); /* verde principal para destacar */
   }
 
   ul.installaciones li:last-child {
@@ -79,7 +78,7 @@
   }
 
   .btn-success {
-    background: linear-gradient(135deg, #4CAF50, #81C784);
+    background: linear-gradient(135deg, var(--secondary-green), var(--light-green));
     color: #fff;
     padding: 10px 20px;
     border-radius: 50px;
@@ -91,15 +90,21 @@
   }
 
   .btn-success:hover {
-    background: linear-gradient(135deg, #81C784, #4CAF50);
+    background: linear-gradient(135deg, var(--light-green), var(--secondary-green));
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+    box-shadow: 0 8px 20px rgba(87, 167, 115, 0.4);
   }
 
   .btn-wrapper {
     text-align: center;
     margin-top: 30px;
   }
+
+  /* Flash messages */
+  .alert-success { background-color: var(--secondary-green); color: #fff; border: none; }
+  .alert-danger { background-color: #dc3545; color: #fff; border: none; }
+  .alert-warning { background-color: #ffc107; color: #212529; border: none; }
+  .alert-info { background-color: var(--light-green); color: var(--primary-green); border: none; }
 </style>
 
 {% with messages = get_flashed_messages(with_categories=true) %}
@@ -121,28 +126,26 @@
   {% endif %}
 {% endwith %}
 
-
 <div class="card">
   <h2>Instalaciones Agendadas</h2>
 
   {% if instalaciones %}
     <ul class="installaciones">
-  {% for inst in instalaciones %}
-    <li>
-      <div><strong>Fecha:</strong> {{ inst.Fecha }}</div>
-      <div><strong>Hora:</strong> {{ inst.Hora }}</div>
-      <div><strong>Ubicación:</strong> {{ inst.Ubicacion }}</div>
-      <div><strong>Agendado por:</strong> {{ inst.NombreUsuario }}</div>
-    </li>
-  {% endfor %}
-</ul>
-
+      {% for inst in instalaciones %}
+        <li>
+          <div><strong>Fecha:</strong> {{ inst.Fecha }}</div>
+          <div><strong>Hora:</strong> {{ inst.Hora }}</div>
+          <div><strong>Ubicación:</strong> {{ inst.Ubicacion }}</div>
+          <div><strong>Agendado por:</strong> {{ inst.NombreUsuario }}</div>
+        </li>
+      {% endfor %}
+    </ul>
   {% else %}
     <p class="no-data">No tienes instalaciones agendadas aún.</p>
   {% endif %}
 
   <div class="btn-wrapper">
-  <a href="{{ url_for('cliente.agendar_instalacion') }}" class="btn-success">Volver a agendar</a>
+    <a href="{{ url_for('cliente.agendar_instalacion') }}" class="btn-success">Volver a agendar</a>
   </div>
 </div>
 {% endblock %}
@@ -153,32 +156,3 @@
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 <script src="{{ url_for('static', filename='js/notificaciones.js') }}"></script>
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

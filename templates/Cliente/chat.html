@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block content %}
-<h2 style="text-align:center; margin-bottom:40px; color:#007bff; font-family:'Poppins', sans-serif; font-weight: 700; letter-spacing: 1px;"> Soporte tecnico</h2>
+<h2 style="text-align:center; margin-bottom:40px; color:#07525c; font-family:'Poppins', sans-serif; font-weight: 700; letter-spacing: 1px;"> Soporte Técnico</h2>
 
 <div id="chatWrapper">
     <div id="chatPanel">
         <div id="chatHeader">
-            <h5>Comunicate con un administrador</h5>
+            <h5>Comunícate con un administrador</h5>
         </div>
         <div id="chatBody">
             <div id="initialMessage" style="text-align: center; color: #888; padding: 50px;">
@@ -30,25 +30,87 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-#chatWrapper { max-width:700px; margin:0 auto; border-radius:18px; overflow:hidden; height:600px; box-shadow:0 15px 50px rgba(0,0,0,0.15); font-family:'Poppins',sans-serif; display:flex; background:#fff; }
+#chatWrapper { 
+    max-width:700px; 
+    margin:0 auto; 
+    border-radius:18px; 
+    overflow:hidden; 
+    height:600px; 
+    box-shadow:0 15px 50px rgba(0,0,0,0.15); 
+    font-family:'Poppins',sans-serif; 
+    display:flex; 
+    background:#fff; 
+}
 #chatPanel { flex:1; display:flex; flex-direction:column; }
 #chatHeader { padding:15px 20px; border-bottom:1px solid #eee; background:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.05); }
-#chatHeader h5 { margin:0; font-weight:600; color:#333; }
-#chatBody { flex:1; padding:20px; background:#fcfcfc; overflow-y:auto; }
+#chatHeader h5 { margin:0; font-weight:600; color:#07525c; }
+#chatBody { flex:1; padding:20px; background:#f3fdf6; overflow-y:auto; }
+
 .message-container { display:flex; margin-bottom:10px; }
 .cliente-msg-container { justify-content:flex-end; }
 .admin-msg-container { justify-content:flex-start; }
-.message-bubble { padding:10px 15px; max-width:70%; word-wrap:break-word; font-size:0.95rem; line-height:1.4; border-radius:20px; transition:opacity 0.3s ease; }
-.cliente-msg-container .message-bubble { background:#007bff; color:white; border-bottom-right-radius:20px; border-top-left-radius:20px; border-top-right-radius:20px; }
-.admin-msg-container .message-bubble { background:#e0f7fa; color:#333; border-bottom-left-radius:20px; border-top-left-radius:20px; border-top-right-radius:20px; }
+
+.message-bubble { 
+    padding:10px 15px; 
+    max-width:70%; 
+    word-wrap:break-word; 
+    font-size:0.95rem; 
+    line-height:1.4; 
+    border-radius:20px; 
+    transition:opacity 0.3s ease; 
+}
+.cliente-msg-container .message-bubble { 
+    background:#57a773; 
+    color:white; 
+    border-bottom-right-radius:20px; 
+    border-top-left-radius:20px; 
+    border-top-right-radius:20px; 
+}
+.admin-msg-container .message-bubble { 
+    background:#9bd1a5; 
+    color:#07525c; 
+    border-bottom-left-radius:20px; 
+    border-top-left-radius:20px; 
+    border-top-right-radius:20px; 
+}
+
 #chatBody::-webkit-scrollbar { width:6px; }
-#chatBody::-webkit-scrollbar-thumb { background-color:#a0a0a0; border-radius:3px; }
+#chatBody::-webkit-scrollbar-thumb { background-color:#9bd1a5; border-radius:3px; }
 #chatBody::-webkit-scrollbar-track { background:transparent; }
+
 #chatInputContainer { display:flex; padding:15px; border-top:1px solid #eee; background:#fff; }
-#chatInput { flex:1; padding:12px 18px; margin-right:10px; border-radius:25px; border:2px solid #007bff; font-size:1rem; transition:border-color 0.3s, box-shadow 0.3s; }
-#chatInput:focus:not([disabled]) { outline:none; border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,0.25); }
-#sendChat { width:45px; height:45px; border:none; background:#007bff; color:white; border-radius:50%; cursor:pointer; font-size:1.1rem; display:flex; justify-content:center; align-items:center; transition:background 0.3s, transform 0.1s; }
-#sendChat:hover:not([disabled]) { background:#0056b3; transform:scale(1.05); }
+#chatInput { 
+    flex:1; 
+    padding:12px 18px; 
+    margin-right:10px; 
+    border-radius:25px; 
+    border:2px solid #57a773; 
+    font-size:1rem; 
+    transition:border-color 0.3s, box-shadow 0.3s; 
+}
+#chatInput:focus:not([disabled]) { 
+    outline:none; 
+    border-color:#07525c; 
+    box-shadow:0 0 0 3px rgba(7,82,92,0.25); 
+}
+#sendChat { 
+    width:45px; 
+    height:45px; 
+    border:none; 
+    background:#07525c; 
+    color:white; 
+    border-radius:50%; 
+    cursor:pointer; 
+    font-size:1.1rem; 
+    display:flex; 
+    justify-content:center; 
+    align-items:center; 
+    transition:background 0.3s, transform 0.1s; 
+}
+#sendChat:hover:not([disabled]) { 
+    background:#157145; 
+    transform:scale(1.05); 
+}
 #sendChat:active:not([disabled]) { transform:scale(0.95); }
 #sendChat[disabled], #chatInput[disabled] { opacity:0.6; cursor:not-allowed; }
 </style>

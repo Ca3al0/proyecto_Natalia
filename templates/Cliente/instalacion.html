@@ -2,14 +2,12 @@
 
 {% block navbar %}
   {% include "common/partials/navbar_cliente.html" %}
-  {% include "common/partials/navbar_secundario2.html" %}
 {% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/notificaciones.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
 <style>
-  
   .form-wrapper {
     display: flex;
     justify-content: center;
@@ -22,7 +20,7 @@
     padding: 2rem;
     max-width: 500px;
     width: 100%;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -31,7 +29,7 @@
 
   .auth-card h5 {
     font-weight: 700;
-    color: #212529;
+    color: #07525c; /* verde oscuro */
     margin-bottom: 1rem;
     text-align: center;
   }
@@ -39,14 +37,14 @@
   .auth-input {
     border-radius: 50px;
     padding: 12px 15px;
-    border: 1px solid #ced4da;
-    transition: border-color 0.3s;
+    border: 1px solid #57a773; /* verde secundario */
+    transition: border-color 0.3s, box-shadow 0.3s;
     width: 100%;
   }
 
   .auth-input:focus {
-    border-color: #28a745;
-    box-shadow: 0 0 5px rgba(40,167,69,0.5);
+    border-color: #07525c; /* verde oscuro */
+    box-shadow: 0 0 5px rgba(7,82,92,0.25); /* sombra verde */
     outline: none;
   }
 
@@ -68,7 +66,7 @@
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.4);
     backdrop-filter: blur(6px);
     display: flex;
     justify-content: center;
@@ -76,8 +74,8 @@
     z-index: 1050;
   }
 
-    .btn-success {
-    background: linear-gradient(135deg, #4CAF50, #81C784);
+  .btn-success {
+    background: linear-gradient(135deg, #57a773, #9bd1a5); /* verde secundario a verde claro */
     color: #fff;
     padding: 10px 20px;
     border-radius: 50px;
@@ -89,16 +87,22 @@
   }
 
   .btn-success:hover {
-    background: linear-gradient(135deg, #81C784, #4CAF50);
+    background: linear-gradient(135deg, #9bd1a5, #57a773);
     transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.4);
+    box-shadow: 0 8px 20px rgba(87,167,115,0.4);
   }
 
   .btn-wrapper {
     text-align: center;
     margin-top: 30px;
   }
-  
+
+  /* Flash messages */
+  .alert-success { background-color: #57a773; color: #fff; border: none; }
+  .alert-danger { background-color: #dc3545; color: #fff; border: none; }
+  .alert-warning { background-color: #ffc107; color: #212529; border: none; }
+  .alert-info { background-color: #9bd1a5; color: #07525c; border: none; }
+
 </style>
 
 {# Mostrar mensajes flash #}
@@ -150,26 +154,23 @@
     </select>
 
     <button type="submit" class="btn-success" style="width: 100%; margin-top: 1rem;">
-    Agendar instalación
+      Agendar instalación
     </button>
 
   </form>
 </div>
 
-<!-- Modal de Éxito -->
+
 <div id="modalExito" class="auth-overlay" style="display:none;">
   <div class="auth-card">
     <h5>¡Instalación guardada!</h5>
     <div class="btn-wrapper">
       <button id="verInstalacionesBtn" class="btn-success">
-        Ver instalaciones
+        Continuar
       </button>
     </div>
   </div>
 </div>
-
-
-
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url_for('static', filename='js/actualizacion.js') }}"></script>
@@ -204,8 +205,7 @@
     });
 
     verInstalacionesBtn.addEventListener('click', () => {
-      // Usa url_for para generar la ruta correcta
-      window.location.href = "{{ url_for('cliente.ver_instalaciones') }}";
+      window.location.href = "{{ url_for('catalogo') }}";
     });
 
     window.addEventListener('click', (event) => {
@@ -216,18 +216,3 @@
   });
 </script>
 {% endblock %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
