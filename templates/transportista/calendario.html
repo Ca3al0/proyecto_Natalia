@@ -9,25 +9,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/calendario.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }} flash-small d-flex align-items-center mt-3" role="alert">
-        {% if category == 'success' %}
-          <i class="bi bi-check-circle-fill me-2"></i>
-        {% elif category == 'danger' %}
-          <i class="bi bi-x-circle-fill me-2"></i>
-        {% elif category == 'warning' %}
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-        {% elif category == 'info' %}
-          <i class="bi bi-info-circle-fill me-2"></i>
-        {% endif %}
-        {{ message }}
-      </div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-
 <div id="calendar"></div>
 
 <!-- Modal Evento -->
@@ -41,13 +22,15 @@
     </div>
 </div>
 
-
+<!-- Modal Registro Fotográfico -->
 <div id="registroFotograficoModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">Registro Fotográfico</div>
         <div class="modal-body">
-            <form id="registroFotograficoForm">
-             
+            <form id="registroFotograficoForm" enctype="multipart/form-data">
+                <!-- ESTE INPUT ES IMPORTANTE -->
+                <input type="hidden" name="pedido_id" id="pedido_id" value="">
+
                 <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
                     <label><strong>Fotos Antes:</strong></label><br>
                     <input type="file" name="fotos_antes" multiple accept="image/*" capture="environment"><br><br>
@@ -55,7 +38,6 @@
                     <textarea name="desc_antes" rows="3" style="width:100%;border-radius:6px;border:1px solid #ccc;padding:5px;"></textarea>
                 </div>
 
-                
                 <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
                     <label><strong>Fotos Después:</strong></label><br>
                     <input type="file" name="fotos_despues" multiple accept="image/*" capture="environment"><br><br>
@@ -69,7 +51,7 @@
                 </div>
             </form>
 
-            
+            <!-- Preview del registro -->
             <div id="registroPreview" style="display:none; margin-top:20px;">
                 <h4>Registro Guardado</h4>
                 <div id="previewAntes">
@@ -90,26 +72,79 @@
     </div>
 </div>
 
+<!-- FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
 
 <script>
+const modal = document.getElementById("eventModal");
+const modalTitle = document.getElementById("modalTitle");
+const modalBody = document.getElementById("modalBody");
+const registroModal = document.getElementById("registroFotograficoModal");
+
+// Abrir modal evento
+function openModal(title, body){
+    modalTitle.textContent = title;
+    modalBody.innerHTML = body;
+    modal.style.display = "block";
+}
+function closeModal(){ modal.style.display = "none"; }
+
+// Abrir modal registro fotográfico
 function abrirRegistro(pedidoId){
     document.getElementById('pedido_id').value = pedidoId;
     document.getElementById('registroFotograficoForm').reset();
     document.getElementById('registroPreview').style.display = 'none';
-    document.getElementById('registroFotograficoModal').style.display = 'block';
+    document.getElementById('registroFotograficoForm').style.display = 'block';
+    registroModal.style.display = 'block';
 }
 
+// Cerrar modal registro
 function cerrarRegistro(){
-    document.getElementById('registroFotograficoModal').style.display = 'none';
+    registroModal.style.display = 'none';
 }
 
-// Cerrar modal al hacer clic fuera
+// Cerrar modals al hacer clic fuera
 window.onclick = function(event){
-    const modal = document.getElementById('registroFotograficoModal');
-    if(event.target == modal) cerrarRegistro();
+    if(event.target == modal) closeModal();
+    if(event.target == registroModal) cerrarRegistro();
 }
 
-// Guardar registro via AJAX
+// Inicializar calendario
+document.addEventListener('DOMContentLoaded', function(){
+    const calendarEl = document.getElementById('calendar');
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView:'dayGridMonth',
+        locale:'es',
+        headerToolbar:{left:'prev,next today', center:'title', right:'dayGridMonth,timeGridWeek,timeGridDay'},
+        events:{ url:'/transportista/api/calendario',
+                 failure: function(){ openModal('Error','No se pudieron cargar los eventos'); }},
+        eventClick: function(info){
+            const tipo = (info.event.extendedProps.tipo || 'Evento').toLowerCase();
+            const usuario = info.event.extendedProps.usuario || 'Desconocido';
+            const location = info.event.extendedProps.location || 'Ubicación no especificada';
+            const title = info.event.title || 'Sin título';
+            const idEvento = info.event.id || '';
+
+            let body = `<p><strong>Tipo:</strong> ${tipo}</p>
+                        <p><strong>Evento:</strong> ${title}</p>
+                        <p><strong>Cliente:</strong> ${usuario}</p>
+                        <p><strong>Ubicación:</strong> ${location}</p>`;
+
+            if(tipo === 'instalacion'){
+                body += `<div style="margin-top:15px; text-align:center;">
+                            <button onclick="abrirRegistro('${idEvento}')">Registro Fotográfico</button>
+                         </div>`;
+            }
+
+            openModal(title, body);
+        }
+    });
+    calendar.render();
+});
+
+// Guardar registro fotográfico
 document.getElementById('registroFotograficoForm').addEventListener('submit', async function(e){
     e.preventDefault();
     const formData = new FormData(this);
@@ -120,10 +155,9 @@ document.getElementById('registroFotograficoForm').addEventListener('submit', as
             body: formData
         });
         const result = await response.json();
-
         if(result.status === 'success'){
             alert('Registro guardado correctamente');
-            abrirRegistro(document.getElementById('pedido_id').value); // recarga preview si quieres
+            abrirRegistro(document.getElementById('pedido_id').value);
         } else {
             alert('Error al guardar: ' + (result.message || 'Error desconocido'));
         }
@@ -132,13 +166,5 @@ document.getElementById('registroFotograficoForm').addEventListener('submit', as
     }
 });
 </script>
-
-
-<!-- FullCalendar -->
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
-<script src="{{ url_for('static', filename='js/calendario.js') }}"></script>
-
 
 {% endblock %}
