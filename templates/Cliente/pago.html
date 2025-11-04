@@ -18,13 +18,15 @@
                     <form id="checkout-form">
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre Completo</label>
-                            <input type="text" class="form-control" id="nombre" required value="Natalia Gómez">
-                        </div>
-                        <div class="mb-3">
-                            <label for="direccion" class="form-label">Dirección de Envío</label>
-                            <input type="text" class="form-control" id="direccion" required value="Calle 10 # 5-20">
+                            <input type="text" class="form-control" id="nombre" required value="">
                         </div>
                         
+                        <div class="mb-3">
+                            <label for="select-direccion" class="form-label">Seleccionar Dirección de Envío</label>
+                            <select class="form-select" id="select-direccion" required>
+                                <option value="">Selecciona una dirección de tu cuenta...</option>
+                                </select>
+                        </div>
                         <h4 class="mt-4 mb-3"><i class="bi bi-cash-stack me-2"></i> Método de Pago</h4>
                         <div class="mb-3">
                             <div class="form-check">
@@ -40,12 +42,8 @@
                                 <label class="form-check-label" for="daviplata">Daviplata</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="pago" id="paypal" value="paypal">
-                                <label class="form-check-label" for="paypal">PayPal</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="pago" id="transferencia" value="transferencia">
-                                <label class="form-check-label" for="transferencia">Transferencia Bancaria (Manual)</label>
+                                <input class="form-check-input" type="radio" name="pago" id="efectivo" value="efectivo">
+                                <label class="form-check-label" for="efectivo">Efectivo contra Entrega</label>
                             </div>
                         </div>
 
@@ -117,11 +115,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     let carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
     const costoEnvio = 5.00; 
+    let totalFinal = 0; 
+    
+    // --- SIMULACIÓN DE DATOS DE DIRECCIÓN (SIMULACIÓN DE TU TABLA 'direccion') ---
+    const direccionesGuardadas = [
+        { id: 1, alias: 'Casa Principal', direccion: 'Calle 10 # 5-20, Apto 301, Bogotá' },
+        { id: 2, alias: 'Oficina (Trabajo)', direccion: 'Av. Cra 7 # 75-10, Piso 12, Medellín' },
+        { id: 3, alias: 'Casa de Mamá', direccion: 'Carrera 40 # 5A-15, Cali' },
+    ];
 
     // --- UTILERIAS ---
-    const mostrarMensaje = (texto, tipo) => {
+    const mostrarMensaje = (texto, tipo, duration = 5000) => {
         const container = document.getElementById('flash-message-container');
-        container.innerHTML = ''; // Limpiar mensajes anteriores
+        container.innerHTML = ''; 
         const alert = document.createElement('div');
         let iconClass;
 
@@ -135,10 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
         alert.innerHTML = `<i class="bi ${iconClass} me-2 fs-4"></i><div>${texto}</div>`;
         
         container.appendChild(alert);
-        setTimeout(() => alert.remove(), 5000);
+        setTimeout(() => alert.remove(), duration);
     };
 
-    // --- LÓGICA DE CÁLCULO Y RENDERIZADO (Mantenida) ---
+    // --- LÓGICA DE CÁLCULO Y RENDERIZADO ---
     const actualizarTotal = (subtotal) => {
         const totalPagar = subtotal + costoEnvio;
         document.getElementById('checkout-subtotal').textContent = `$${subtotal.toFixed(2)}`;
@@ -179,59 +185,62 @@ document.addEventListener('DOMContentLoaded', () => {
             resumenProductos.appendChild(listItem);
         });
 
-        actualizarTotal(subtotal);
+        totalFinal = actualizarTotal(subtotal);
         return subtotal;
     };
+    
+    // --- LÓGICA DE DIRECCIÓN ---
+    const cargarDirecciones = () => {
+        const select = document.getElementById('select-direccion');
+        direccionesGuardadas.forEach(dir => {
+            const option = document.createElement('option');
+            // La mejor práctica es usar el ID, pero aquí usamos la dirección completa como valor para la simulación
+            option.value = dir.direccion;
+            option.textContent = `${dir.alias} (${dir.direccion})`;
+            select.appendChild(option);
+        });
+    };
 
-    const initialSubtotal = renderizarResumen();
-    const totalFinal = initialSubtotal + costoEnvio;
-
-    // --- SIMULACIÓN DE PAGO (LÓGICA ACTUALIZADA) ---
+    // --- SIMULACIÓN DE PAGO ---
     const simularPago = (metodo, total) => {
         return new Promise((resolve) => {
-            // Simulación de latencia de red/servidor
+            const delay = 1000; 
+            
             setTimeout(() => {
                 if (metodo === 'credito') {
                     const numTarjeta = document.getElementById('numero-tarjeta').value;
-
-                    // Validación básica
                     if (numTarjeta.length !== 16 || !/^\d+$/.test(numTarjeta)) {
-                         resolve({ success: false, message: "Error de Tarjeta: El número debe ser de 16 dígitos." });
+                         resolve({ success: false, message: "Error: El número de tarjeta debe ser de 16 dígitos.", redirect: false });
                          return;
                     }
-
-                    // SIMULACIÓN DE RESPUESTA: Si termina en '0000', simular fallo.
+                    // Simular fallo
                     if (numTarjeta.slice(-4) === '0000') {
-                        resolve({ success: false, message: `Transacción **FALLIDA** (Error de servidor 5003). Intenta con otra tarjeta.` });
+                        resolve({ success: false, message: `Transacción **FALLIDA** (Tarjeta rechazada). Intenta con otra tarjeta.`, redirect: false });
                     } else {
-                        resolve({ success: true, message: `¡Pago de $${total.toFixed(2)} **APROBADO**! ID de transacción: ${Date.now()}` });
+                        resolve({ success: true, message: `✅ ¡Pago de $${total.toFixed(2)} **APROBADO**! Tu pedido ha sido confirmado.`, redirect: true, delay: 1500 });
                     }
 
                 } else if (metodo === 'nequi' || metodo === 'daviplata') {
                     const celular = document.getElementById('numero-celular').value;
-
-                    // Validación básica
                     if (celular.length !== 10 || !/^\d+$/.test(celular)) {
-                         resolve({ success: false, message: `Error en ${metodo}: El número de celular debe ser de 10 dígitos.` });
+                         resolve({ success: false, message: `Error en ${metodo}: El número de celular debe ser de 10 dígitos.`, redirect: false });
                          return;
                     }
-
-                    // SIMULACIÓN DE RESPUESTA:
-                    // Si el número termina en '1234', simular saldo insuficiente/fallo.
+                    // Simular fallo
                     if (celular.slice(-4) === '1234') {
-                        resolve({ success: false, message: `Transacción con **${metodo.toUpperCase()}** FALLIDA. Saldo insuficiente o cuenta no disponible. Celular: ${celular}` });
+                        resolve({ success: false, message: `Transacción con **${metodo.toUpperCase()}** FALLIDA. Saldo insuficiente.`, redirect: false });
                     } else {
-                        resolve({ success: true, message: `Se ha enviado la solicitud de pago de $${total.toFixed(2)} a tu **${metodo.toUpperCase()}** con número ${celular}. Por favor, **acepta la transacción en tu celular** para finalizar.` });
+                        // Pago instantáneo
+                        resolve({ success: true, message: `✅ Pago de $${total.toFixed(2)} con **${metodo.toUpperCase()}** **APROBADO** de inmediato.`, redirect: true, delay: 1500 });
                     }
 
-                } else if (metodo === 'paypal') {
-                    resolve({ success: true, message: `Pago con PayPal **EXITOSO**. Serás redirigido a la confirmación de tu pedido.` });
-                } else if (metodo === 'transferencia') {
-                    resolve({ success: true, message: `Orden generada. Recibirás un correo con las instrucciones para completar la **Transferencia Bancaria**.` });
+                } else if (metodo === 'efectivo') {
+                    // Pago en efectivo solo confirma la orden
+                    resolve({ success: true, message: `🛍️ Orden Confirmada. Prepara $${total.toFixed(2)} para el pago en **Efectivo** al recibir.`, redirect: true, delay: 2500 });
                 } else {
-                    resolve({ success: false, message: "Método de pago no reconocido." });
+                    resolve({ success: false, message: "Método de pago no reconocido.", redirect: false });
                 }
-            }, 2000); // Espera 2 segundos para simular el procesamiento
+            }, delay); 
         });
     };
 
@@ -242,19 +251,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const datosTarjetaDiv = document.getElementById('datos-tarjeta');
     const datosDigitalesDiv = document.getElementById('datos-digitales');
     const numeroCelularInput = document.getElementById('numero-celular');
+    const tarjetaInputs = datosTarjetaDiv.querySelectorAll('input');
 
     const togglePaymentInputs = () => {
         const metodoSeleccionado = document.querySelector('input[name="pago"]:checked').value;
         
-        // 1. Visibilidad de las secciones
         const isCredito = metodoSeleccionado === 'credito';
         const isDigital = metodoSeleccionado === 'nequi' || metodoSeleccionado === 'daviplata';
 
         datosTarjetaDiv.style.display = isCredito ? 'block' : 'none';
         datosDigitalesDiv.style.display = isDigital ? 'block' : 'none';
 
-        // 2. Requerir campos dinámicamente
-        datosTarjetaDiv.querySelectorAll('input').forEach(input => input.required = isCredito);
+        // Requerir campos dinámicamente
+        tarjetaInputs.forEach(input => input.required = isCredito);
         numeroCelularInput.required = isDigital;
     };
 
@@ -267,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
 
         const form = document.getElementById('checkout-form');
-        // Validar campos de envío/nombre y los campos de pago requeridos
+        // Validar campos de envío/nombre (ahora vacío, por lo que el usuario debe llenarlo) y la dirección seleccionada.
         if (!form.reportValidity()) {
             return; 
         }
@@ -275,7 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const btnPagar = e.currentTarget;
         const metodoSeleccionado = document.querySelector('input[name="pago"]:checked').value;
         
-        // Deshabilitar botón mientras procesa
         btnPagar.disabled = true;
         btnPagar.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Procesando...';
 
@@ -283,27 +291,34 @@ document.addEventListener('DOMContentLoaded', () => {
             const resultado = await simularPago(metodoSeleccionado, totalFinal);
 
             if (resultado.success) {
-                mostrarMensaje(resultado.message, 'success');
-                // Acción final: Vaciar carrito y redirigir
-                localStorage.setItem('carrito', '[]'); 
-                setTimeout(() => {
-                    // Simular redirección a la página de confirmación (uso 'cliente.catalogo' para volver al inicio o un lugar seguro)
-                    window.location.href = "{{ url_for('catalogo') }}"; 
-                }, 4000); 
+                mostrarMensaje(resultado.message, 'success', resultado.redirect ? resultado.delay + 1000 : 5000); 
+
+                if (resultado.redirect) {
+                    // Pago o confirmación inmediata, vaciar carrito y redirigir
+                    localStorage.setItem('carrito', '[]'); 
+                    setTimeout(() => {
+                        window.location.href = "{{ url_for('catalogo') }}"; 
+                    }, resultado.delay || 1500); 
+                } else {
+                    btnPagar.disabled = false;
+                    btnPagar.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Confirmar y Pagar';
+                }
 
             } else {
                 mostrarMensaje(resultado.message, 'danger');
+                btnPagar.disabled = false;
+                btnPagar.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Confirmar y Pagar';
             }
         } catch (error) {
             mostrarMensaje(`Ocurrió un error inesperado: ${error.message}`, 'danger');
-        } finally {
-            // Re-habilitar botón (si el pago falló y no hubo redirección)
             btnPagar.disabled = false;
             btnPagar.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Confirmar y Pagar';
         }
     });
 
-    // Inicializar el estado de los campos de pago al cargar
+    // --- INICIALIZACIÓN ---
+    renderizarResumen(); 
+    cargarDirecciones();
     togglePaymentInputs();
 });
 </script>
