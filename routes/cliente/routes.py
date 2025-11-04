@@ -466,16 +466,18 @@ def finalizar_compra():
     flash(f'✅ Pago con {metodo_pago} realizado correctamente', 'success')
     return redirect(url_for('catalogo'))
 
-
 @cliente.route('/seguimiento/<int:id_pedido>')
 @login_required
 def seguimiento_cliente(id_pedido):
-    # Buscar el pedido en la base de datos
+    # Obtener el pedido por ID
     pedido = Pedido.query.get_or_404(id_pedido)
 
-    # Verificar que el pedido pertenece al cliente logueado (por seguridad)
-    if pedido.usuario_id != current_user.id:
+    # Verificar que el pedido pertenece al cliente logueado
+    if pedido.usuario.id != current_user.id:  # <-- usar 'id', no 'ID'
         return "Acceso denegado ❌", 403
 
-    # Renderizar la plantilla con los datos del pedido
     return render_template('cliente/seguimiento.html', pedido=pedido)
+
+
+
+

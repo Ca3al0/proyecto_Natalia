@@ -143,10 +143,11 @@
                     data-id="{{ pedido.ID_Pedido }}">
               Ver registro fotográfico
             </button>
-            <a href="#" 
-          class="btn btn-outline-warning btn-sm">
-          Rastrear pedido
-        </a>
+      <a href="{{ url_for('cliente.seguimiento_cliente', id_pedido=pedido.ID_Pedido) }}" 
+       class="btn btn-outline-warning btn-sm">
+       Rastrear pedido
+    </a>
+
      
           </div>
         </div>
