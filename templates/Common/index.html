@@ -316,24 +316,40 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // -------- OLVIDÉ CONTRASEÑA --------
-  const formForgot = document.getElementById('formForgot');
-  if (formForgot) {
-    formForgot.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const data = new FormData(formForgot);
+const formForgot = document.getElementById('formForgot');
+
+if (formForgot) {
+  formForgot.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const data = new FormData(formForgot);
+
+    try {
+      const res = await fetch(formForgot.action, { method: 'POST', body: data });
+
+      // Intentar parsear JSON; si falla, usar mensaje genérico
+      let result;
       try {
-        const res = await fetch(formForgot.action, { method: 'POST', body: data });
-        const result = await res.json();
-        mostrarAlerta('forgotAlert', result);
-        if (result.status === 'success') formForgot.reset();
+        result = await res.json();
       } catch {
-        mostrarAlerta('forgotAlert', {
-          status: 'danger',
-          message: 'Error al enviar el correo. Intenta nuevamente.'
-        });
+        result = { status: 'danger', message: 'Error inesperado del servidor.' };
       }
-    });
-  }
+
+      // Extraer status y message para mostrar alerta
+      const status = result.status || 'danger';
+      const message = result.message || 'No se recibió respuesta del servidor.';
+
+      mostrarAlerta('forgotAlert', { status, message });
+
+      if (status === 'success') formForgot.reset();
+
+    } catch {
+      mostrarAlerta('forgotAlert', {
+        status: 'danger',
+        message: 'Error al enviar el correo. Intenta nuevamente.'
+      });
+    }
+  });
+}
 
 // -------- RESTABLECER CONTRASEÑA --------
 const formReset = document.getElementById('formReset');
