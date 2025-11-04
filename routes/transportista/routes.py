@@ -10,7 +10,7 @@ from flask_login import login_required
 from datetime import datetime
 from flask import current_app
 from flask_login import current_user
-from basedatos.models import db, Usuario,Pedido, RegistroFotografico,Calendario
+from basedatos.models import db, Usuario,Pedido, RegistroFotografico,Calendario, Notificaciones
 from basedatos.decoradores import role_required
 from werkzeug.utils import secure_filename
 from sqlalchemy import func
@@ -188,3 +188,34 @@ def get_registro_fotografico(pedido_id):
         'imagen_url': r.imagen_url
     } for r in registros]
     return jsonify(data)
+
+@transportista.route('/pedidos')
+@login_required
+@role_required('transportista')
+def pedidos_transportista():
+    
+    pedidos = Pedido.query.filter(Pedido.Estado.in_(['pendiente', 'en proceso'])).all()
+    return render_template('transportista/pedidos.html', pedidos=pedidos)
+
+@transportista.route('/pedido/<int:pedido_id>/estado', methods=['POST'])
+@login_required
+def actualizar_estado_pedido(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    nuevo_estado = request.json.get('estado')
+
+    if nuevo_estado not in ['pendiente', 'en proceso', 'en reparto', 'entregado']:
+        return jsonify({'status': 'error', 'message': 'Estado no válido'}), 400
+
+    pedido.Estado = nuevo_estado
+    db.session.commit()
+
+    # Crear notificación
+    notificacion = Notificaciones(
+        Titulo='Actualización de pedido',
+        Mensaje=f'El estado de tu pedido #{pedido.ID_Pedido} cambió a "{nuevo_estado}".',
+        ID_Usuario=pedido.ID_Usuario
+    )
+    db.session.add(notificacion)
+    db.session.commit()
+
+    return jsonify({'status': 'success', 'message': 'Estado actualizado'})
