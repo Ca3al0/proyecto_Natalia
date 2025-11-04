@@ -168,5 +168,9 @@ def reset_password(token):
         mensaje="Tu contraseña ha sido cambiada exitosamente."
     )
 
-    flash('Contraseña restablecida correctamente. Ahora puedes iniciar sesión.', 'success')
-    return jsonify({'status': 'success', 'redirect': url_for('index')})
+    return jsonify({
+    'status': 'success',
+    'message': 'Contraseña restablecida correctamente. Ahora puedes iniciar sesión.',
+    'redirect': url_for('index')
+})
+
