@@ -255,3 +255,114 @@ button.btn-success:active {
   transform: scale(0.95);
   box-shadow: 0 3px 10px rgba(76, 175, 80, 0.2);
 }
+
+:root {
+  --celeste-claro: #d1faff;
+  --celeste: #9bd1e5;
+  --verde: #57a773;
+  --verde-oscuro: #157145;
+  --gris-claro: #f8f9fa;
+  --text-dark: #2c3e50;
+  --shadow-light: rgba(0,0,0,0.08);
+  --shadow-medium: rgba(0,0,0,0.15);
+}
+
+body {
+  background-color: var(--celeste-claro);
+  font-family: 'Arial', sans-serif;
+}
+
+h2 {
+  color: var(--verde-oscuro);
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: bold;
+}
+
+.card {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px var(--shadow-medium);
+  margin-bottom: 50px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  background-color: var(--verde);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.8rem;
+  text-align: left;
+}
+
+tbody td {
+  padding: 0.6rem;
+  border-bottom: 1px solid var(--shadow-light);
+}
+
+.form-select-sm {
+  width: 100%;
+}
+
+.btn-sm {
+  width: 100%;
+  border-radius: 50px;
+}
+
+.flash-small {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.flash-success { background-color: #d4edda; color: #155724; }
+.flash-danger { background-color: #f8d7da; color: #721c24; }
+.flash-warning { background-color: #fff3cd; color: #856404; }
+.flash-info { background-color: #cce5ff; color: #004085; }
+
+.carousel-container {
+  overflow: hidden;
+  background-color: var(--gris-claro);
+  border-radius: 15px;
+  box-shadow: 0 4px 15px var(--shadow-light);
+  margin-top: 30px;
+  padding: 10px 0;
+}
+
+.carousel-track {
+  display: flex;
+  animation: scroll 20s linear infinite;
+}
+
+.carousel-item {
+  flex: 0 0 auto;
+  margin: 0 2rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  color: var(--verde-oscuro);
+}
+
+.carousel-item i {
+  margin-right: 8px;
+  color: var(--verde);
+}
+
+@keyframes scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@media (max-width: 768px) {
+  .carousel-item { margin: 0 1rem; font-size: 0.9rem; }
+  h2 { font-size: 1.5rem; }
+}

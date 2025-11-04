@@ -2,7 +2,6 @@
 
 {% block navbar %}
   {% include "common/partials/navbar_admin.html" %}
-  {% include "common/partials/navbar_secundario3.html" %}
 {% endblock %}
 
 {% block content %}
@@ -10,98 +9,118 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
 
 <style>
-  body {
-    font-family: 'Poppins', sans-serif;
-    background: #f4fbf7;
-    margin: 0;
-    padding: 0;
-  }
+:root {
+  --celeste-claro: #e7fcff;
+  --celeste: #d1faff;
+  --verde: #57a773;
+  --verde-oscuro: #157145;
+  --gris-claro: #f8f9fa;
+  --text-dark: #2c3e50;
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --shadow-medium: rgba(0, 0, 0, 0.15);
+}
 
-  .form-wrapper {
-    display: flex;
-    justify-content: center;
-    padding-top: 60px;
-  }
+/* Fondo general */
+body {
+  background-color: var(--celeste-claro);
+  font-family: 'Arial', sans-serif;
+}
 
+/* Form wrapper centrado */
+.form-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+/* Tarjeta del formulario */
+.form-card {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px var(--shadow-medium);
+  width: 100%;
+  max-width: 600px;
+  transition: transform 0.3s ease;
+}
+.form-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Título del formulario */
+.form-card h1 {
+  color: var(--verde-oscuro);
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+/* Inputs y selects */
+.form-input {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  margin-bottom: 1rem;
+  border: 2px solid var(--celeste);
+  border-radius: 50px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+.form-input:focus {
+  border-color: var(--verde);
+  box-shadow: 0 0 10px rgba(87,167,115,0.3);
+}
+
+/* Botón de enviar */
+button[type="submit"] {
+  width: 100%;
+  padding: 0.8rem;
+  background-color: var(--verde);
+  color: #fff;
+  font-weight: bold;
+  font-size: 1rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+button[type="submit"]:hover {
+  background-color: var(--verde-oscuro);
+}
+
+/* Flash messages */
+.flash-message {
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+.flash-success {
+  background-color: #d4edda;
+  color: #155724;
+}
+.flash-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+.flash-info {
+  background-color: #cce5ff;
+  color: #004085;
+}
+
+/* Iconos dentro del h1 */
+.form-card h1 i {
+  color: var(--verde);
+  margin-right: 8px;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
   .form-card {
-    background: #ffffff;
-    padding: 2rem;
-    max-width: 460px;
-    width: 100%;
-    border-radius: 20px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
   }
-
-  .form-card h1 {
-    text-align: center;
-    font-size: 1.6rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    color: #5f8f3f;
-  }
-
-  .form-card h1 i {
-    font-size: 1.4rem;
-    margin-right: 0.4rem;
-    vertical-align: middle;
-    color: #5f8f3f;
-  }
-
-  label {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #444;
-    margin-bottom: 6px;
-    display: block;
-  }
-
-  .form-input {
-    width: 100%;
-    padding: 12px 16px;
-    margin-bottom: 16px;
-    border-radius: 30px;
-    border: 1.5px solid #ced4da;
-    font-size: 0.95rem;
-  }
-
-  .form-card button {
-    background-color: #5f8f3f;
-    color: white;
-    font-size: 1rem;
-    font-weight: 600;
-    padding: 12px;
-    border: none;
-    border-radius: 30px;
-    width: 100%;
-    cursor: pointer;
-  }
-
-  .form-card button:hover {
-    background-color: #4c702f;
-  }
-
-  .flash-message {
-    max-width: 460px;
-    margin: 15px auto;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    text-align: center;
-  }
-
-  .flash-success { background: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
-  .flash-danger  { background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
-  .flash-warning { background: #fff3cd; color: #664d03; border: 1px solid #ffecb5; }
-  .flash-info    { background: #cff4fc; color: #055160; border: 1px solid #b6effb; }
-
-  @media (max-width: 500px) {
-    .form-card {
-      padding: 1.5rem;
-    }
-  }
+}
 </style>
-
 <div class="form-wrapper">
   <div class="form-card">
     <h1><i class="bi bi-box-seam-fill"></i>Agregar Producto</h1>

@@ -2,72 +2,40 @@
 
 {% block navbar %}
   {% include "common/partials/navbar_admin.html" %}
-  {% include "common/partials/navbar_secundario3.html" %}
 {% endblock %}
 
 {% block head %}
   {{ super() }}
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .card-header {
-      background-color: #2e7d32; /* verde oscuro */
-      color: white;
-    }
-    .badge-estado {
-      background-color: #81c784; /* verde claro */
-      color: #1b5e20; /* verde oscuro */
-      font-weight: 600;
-    }
-    .no-img {
-      background-color: #c8e6c9; /* verde muy claro */
-      color: #388e3c; /* verde medio */
-      font-size: 0.9rem;
-    }
-    .form-assign {
-      margin-top: 1rem;
-    }
-    /* Nueva clase para la cabecera de entregados (más gris) */
-    .card-header-entregado {
-      background-color: #616161; /* gris oscuro */
-      color: white;
-    }
-    .badge-entregado {
-      background-color: #bdbdbd; /* gris claro */
-      color: #424242; /* gris oscuro */
-      font-weight: 600;
-    }
-  </style>
 {% endblock %}
 
 {% block content %}
 <div class="container my-4">
-  <h2 class="mb-4 text-center text-success">Listado de Pedidos</h2>
+  <h2 class="mb-4 text-center text-success fw-bold">Listado de Pedidos</h2>
 
   <!-- Pedidos Pendientes -->
-  <h3 class="mb-3">Pedidos Pendientes</h3>
+  <h3 class="mb-3 text-success fw-semibold">Pedidos Pendientes</h3>
   {% if pedidos_pendientes %}
     <div class="row row-cols-1 row-cols-md-2 g-4 mb-5">
       {% for pedido in pedidos_pendientes %}
         <div class="col">
-          <div class="card shadow-sm h-100 border-success">
-            <div class="card-header d-flex justify-content-between align-items-center">
+          <div class="card shadow-sm h-100 border-success card-pedido">
+            <div class="card-header header-pendiente d-flex justify-content-between align-items-center">
               <strong>Pedido #{{ pedido.ID_Pedido }}</strong>
-              <span class="badge badge-estado rounded-pill">{{ pedido.Estado | capitalize }}</span>
+              <span class="badge badge-estado badge-pendiente rounded-pill">{{ pedido.Estado | capitalize }}</span>
             </div>
             <div class="card-body">
               <h5 class="card-title text-success">{{ pedido.NombreComprador }}</h5>
               <p class="card-text"><strong>Dirección:</strong> {{ pedido.Destino }}</p>
-
               <hr>
-
               <h6 class="text-success">Productos:</h6>
               <ul class="list-unstyled">
                 {% for detalle in pedido.detalles_pedido %}
                   <li class="d-flex align-items-center mb-2">
                     {% if detalle.producto.ImagenPrincipal %}
-                      <img src="{{ url_for('static', filename=detalle.producto.ImagenPrincipal) }}" alt="Imagen de {{ detalle.producto.NombreProducto }}" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
+                      <img src="{{ url_for('static', filename=detalle.producto.ImagenPrincipal) }}" alt="{{ detalle.producto.NombreProducto }}" class="me-3 rounded shadow-sm" style="width:50px; height:50px; object-fit: cover;">
                     {% else %}
-                      <img src="{{ url_for('static', filename='img/catalogo.png') }}" alt="Imagen no disponible" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
+                      <img src="{{ url_for('static', filename='img/catalogo.png') }}" alt="Imagen no disponible" class="me-3 rounded shadow-sm" style="width:50px; height:50px; object-fit: cover;">
                     {% endif %}
                     <div>
                       <strong>{{ detalle.producto.NombreProducto }}</strong> <br>
@@ -76,9 +44,7 @@
                   </li>
                 {% endfor %}
               </ul>
-
-              <!-- Formulario para asignar transportista -->
-              <form class="form-assign" method="POST" action="{{ url_for('admin.asignar_transportista', id_pedido=pedido.ID_Pedido) }}">
+              <form class="form-assign mt-3" method="POST" action="{{ url_for('admin.asignar_transportista', id_pedido=pedido.ID_Pedido) }}">
                 <div class="mb-3">
                   <label for="transportista_{{ pedido.ID_Pedido }}" class="form-label">Transportista:</label>
                   <select name="transportista_id" id="transportista_{{ pedido.ID_Pedido }}" class="form-select" required>
@@ -89,7 +55,7 @@
                   </select>
                 </div>
                 <div class="mb-3">
-                  <label for="hora_llegada_{{ pedido.ID_Pedido }}" class="form-label">Hora de llegada:</label>
+                  <label for="hora_llegada_{{ pedido.ID_Pedido }}" class="form-label">Hora de llegada estimada:</label>
                   <input type="datetime-local" name="hora_llegada" id="hora_llegada_{{ pedido.ID_Pedido }}" class="form-control" required>
                 </div>
                 <button type="submit" class="btn btn-success w-100">Asignar</button>
@@ -100,36 +66,32 @@
       {% endfor %}
     </div>
   {% else %}
-    <div class="alert alert-warning" role="alert">
-      No hay pedidos pendientes.
-    </div>
+    <div class="alert alert-warning">No hay pedidos pendientes.</div>
   {% endif %}
 
   <!-- Pedidos en Proceso -->
-  <h3 class="mb-3">Pedidos en Proceso</h3>
+  <h3 class="mb-3 text-warning fw-semibold">Pedidos en Proceso</h3>
   {% if pedidos_en_proceso %}
     <div class="row row-cols-1 row-cols-md-2 g-4 mb-5">
       {% for pedido in pedidos_en_proceso %}
         <div class="col">
-          <div class="card shadow-sm h-100 border-success">
-            <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #388e3c; color: white;">
+          <div class="card shadow-sm h-100 border-warning card-pedido">
+            <div class="card-header header-proceso d-flex justify-content-between align-items-center">
               <strong>Pedido #{{ pedido.ID_Pedido }}</strong>
-              <span class="badge badge-estado rounded-pill" style="background-color: #a5d6a7; color: #1b5e20;">{{ pedido.Estado | capitalize }}</span>
+              <span class="badge badge-estado badge-proceso rounded-pill">{{ pedido.Estado | capitalize }}</span>
             </div>
             <div class="card-body">
-              <h5 class="card-title text-success">{{ pedido.NombreComprador }}</h5>
+              <h5 class="card-title text-warning">{{ pedido.NombreComprador }}</h5>
               <p class="card-text"><strong>Dirección:</strong> {{ pedido.Destino }}</p>
-
               <hr>
-
-              <h6 class="text-success">Productos:</h6>
+              <h6 class="text-warning">Productos:</h6>
               <ul class="list-unstyled">
                 {% for detalle in pedido.detalles_pedido %}
                   <li class="d-flex align-items-center mb-2">
                     {% if detalle.producto.ImagenPrincipal %}
-                      <img src="{{ url_for('static', filename=detalle.producto.ImagenPrincipal) }}" alt="Imagen de {{ detalle.producto.NombreProducto }}" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
+                      <img src="{{ url_for('static', filename=detalle.producto.ImagenPrincipal) }}" alt="{{ detalle.producto.NombreProducto }}" class="me-3 rounded shadow-sm" style="width:50px; height:50px; object-fit: cover;">
                     {% else %}
-                      <img src="{{ url_for('static', filename='img/catalogo.png') }}" alt="Imagen no disponible" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
+                      <img src="{{ url_for('static', filename='img/catalogo.png') }}" alt="Imagen no disponible" class="me-3 rounded shadow-sm" style="width:50px; height:50px; object-fit: cover;">
                     {% endif %}
                     <div>
                       <strong>{{ detalle.producto.NombreProducto }}</strong> <br>
@@ -138,7 +100,6 @@
                   </li>
                 {% endfor %}
               </ul>
-
               <p><strong>Transportista asignado:</strong> {{ pedido.TransportistaNombre or 'No asignado' }}</p>
               <p><strong>Hora llegada:</strong> {{ pedido.HoraLlegada.strftime('%Y-%m-%d %H:%M') if pedido.HoraLlegada else 'No asignada' }}</p>
             </div>
@@ -147,36 +108,32 @@
       {% endfor %}
     </div>
   {% else %}
-    <div class="alert alert-info" role="alert">
-      No hay pedidos en proceso.
-    </div>
+    <div class="alert alert-info">No hay pedidos en proceso.</div>
   {% endif %}
 
   <!-- Pedidos Entregados -->
-  <h3 class="mb-3">Pedidos Entregados</h3>
+  <h3 class="mb-3 text-secondary fw-semibold">Pedidos Entregados</h3>
   {% if pedidos_entregados %}
     <div class="row row-cols-1 row-cols-md-2 g-4">
       {% for pedido in pedidos_entregados %}
         <div class="col">
-          <div class="card shadow-sm h-100 border-secondary">
-            <div class="card-header card-header-entregado d-flex justify-content-between align-items-center">
+          <div class="card shadow-sm h-100 border-secondary card-pedido">
+            <div class="card-header header-entregado d-flex justify-content-between align-items-center">
               <strong>Pedido #{{ pedido.ID_Pedido }}</strong>
-              <span class="badge badge-entregado rounded-pill">{{ pedido.Estado | capitalize }}</span>
+              <span class="badge badge-estado badge-entregado rounded-pill">{{ pedido.Estado | capitalize }}</span>
             </div>
             <div class="card-body">
               <h5 class="card-title text-secondary">{{ pedido.NombreComprador }}</h5>
               <p class="card-text"><strong>Dirección:</strong> {{ pedido.Destino }}</p>
-
               <hr>
-
               <h6 class="text-secondary">Productos:</h6>
               <ul class="list-unstyled">
                 {% for detalle in pedido.detalles_pedido %}
                   <li class="d-flex align-items-center mb-2">
                     {% if detalle.producto.ImagenPrincipal %}
-                      <img src="{{ url_for('static', filename=detalle.producto.ImagenPrincipal) }}" alt="Imagen de {{ detalle.producto.NombreProducto }}" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
+                      <img src="{{ url_for('static', filename=detalle.producto.ImagenPrincipal) }}" alt="{{ detalle.producto.NombreProducto }}" class="me-3 rounded shadow-sm" style="width:50px; height:50px; object-fit: cover;">
                     {% else %}
-                      <img src="{{ url_for('static', filename='img/catalogo.png') }}" alt="Imagen no disponible" class="me-3 rounded" style="width:50px; height:50px; object-fit: cover;">
+                      <img src="{{ url_for('static', filename='img/catalogo.png') }}" alt="Imagen no disponible" class="me-3 rounded shadow-sm" style="width:50px; height:50px; object-fit: cover;">
                     {% endif %}
                     <div>
                       <strong>{{ detalle.producto.NombreProducto }}</strong> <br>
@@ -185,7 +142,6 @@
                   </li>
                 {% endfor %}
               </ul>
-
               <p><strong>Transportista asignado:</strong> {{ pedido.TransportistaNombre or 'No asignado' }}</p>
               <p><strong>Hora llegada:</strong> {{ pedido.HoraLlegada.strftime('%Y-%m-%d %H:%M') if pedido.HoraLlegada else 'No asignada' }}</p>
             </div>
@@ -194,9 +150,75 @@
       {% endfor %}
     </div>
   {% else %}
-    <div class="alert alert-secondary" role="alert">
-      No hay pedidos entregados.
-    </div>
+    <div class="alert alert-secondary">No hay pedidos entregados.</div>
   {% endif %}
 </div>
+
+<style>
+/* Tarjetas generales */
+.card-pedido {
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+.card-pedido:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+}
+
+/* Headers por estado */
+.header-pendiente {
+  background-color: #e6f4ea;
+  color: #155724;
+  font-weight: 600;
+  border-radius: 12px 12px 0 0;
+}
+.header-proceso {
+  background-color: #fff3cd;
+  color: #856404;
+  font-weight: 600;
+  border-radius: 12px 12px 0 0;
+}
+.header-entregado {
+  background-color: #e2e3e5;
+  color: #6c757d;
+  font-weight: 600;
+  border-radius: 12px 12px 0 0;
+}
+
+/* Badges modernos */
+.badge-estado {
+  font-size: 0.85rem;
+  padding: 0.35em 0.65em;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.badge-pendiente {
+  background: linear-gradient(135deg, #a8e6cf, #57a773);
+  color: white;
+}
+.badge-proceso {
+  background: linear-gradient(135deg, #ffe29f, #ffc107);
+  color: #212529;
+}
+.badge-entregado {
+  background: linear-gradient(135deg, #cfd8dc, #6c757d);
+  color: white;
+}
+
+/* Productos */
+.list-unstyled li img {
+  border: 2px solid #f0f0f0;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* Botones formulario */
+.form-assign .btn {
+  background-color: #57a773;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+.form-assign .btn:hover {
+  background-color: #388e3c;
+}
+</style>
 {% endblock %}

@@ -1,9 +1,9 @@
 {% block navbar %}
 
-<!-- Estilos Navbar -->
 <style>
 :root {
   --celeste: #d1faff;
+  --celeste-claro: #e7fcff;
   --verde: #57a773;
   --verde-oscuro: #157145;
   --gris-claro: #f8f9fa;
@@ -11,42 +11,48 @@
 
 /* Navbar general */
 .navbar {
-  background-color: rgba(255,255,255,0.95);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  background-color: rgba(255,255,255,0.9);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.07);
   position: fixed;
   top: 0;
   width: 100%;
   z-index: 1050;
   padding: 0.8rem 1rem;
+  transition: all 0.3s ease;
+}
+.navbar.shrink {
+  padding: 0.5rem 1rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
 /* Logo */
 .navbar-brand {
   color: var(--verde-oscuro) !important;
   font-weight: 700;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
+  transition: color 0.3s ease;
 }
+.navbar-brand:hover { color: var(--verde); }
 
 /* Buscador */
-.search-container {
-  position: relative;
-  width: 50%;
-}
+.search-container { position: relative; width: 50%; }
 .search-input {
   border: 2px solid var(--celeste);
   border-radius: 50px;
   padding: 0.5rem 1rem 0.5rem 3rem;
   text-align: center;
   color: var(--verde-oscuro);
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
   width: 100%;
+  background-color: #fff;
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
 }
 .search-input:focus,
 .search-input:hover {
   outline: none;
   border-color: var(--verde);
-  box-shadow: 0 0 8px rgba(87,167,115,0.5);
+  box-shadow: 0 0 12px rgba(87,167,115,0.4), inset 0 2px 6px rgba(0,0,0,0.05);
 }
 .search-icon {
   color: var(--verde);
@@ -59,20 +65,20 @@
 
 /* Dropdown usuario */
 .nav-item .dropdown-menu {
-  width: 250px;
-  border-radius: 10px;
-  background-color: white;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  width: 260px;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
   padding: 0.5rem 0;
 }
-
 .nav-item .dropdown-item {
   color: var(--verde-oscuro);
   font-weight: 500;
   transition: all 0.3s ease;
+  border-radius: 6px;
 }
 .nav-item .dropdown-item:hover {
-  background-color: var(--celeste);
+  background-color: var(--celeste-claro);
   color: var(--verde-oscuro) !important;
 }
 
@@ -89,42 +95,32 @@
   justify-content: center;
   margin-right: 0.5rem;
   font-size: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* Iconos y badges */
+/* Iconos usuario */
 .nav-icon {
   position: relative;
   cursor: pointer;
   color: var(--verde);
+  transition: all 0.3s ease;
 }
-.nav-icon .badge {
-  font-size: 0.7rem;
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate(50%, -50%);
-  background-color: #dc3545;
-  color: #fff;
-}
+.nav-icon:hover { color: var(--verde-oscuro); }
 
 /* Botón toggler */
-.navbar-toggler {
-  border-color: var(--verde-oscuro);
-}
+.navbar-toggler { border-color: var(--verde-oscuro); transition: all 0.3s ease; }
+.navbar-toggler:hover { background-color: var(--celeste-claro); }
 
 /* Responsive */
 @media (max-width: 767px) {
-  .search-container {
-    width: 100%;
-    margin-top: 0.5rem;
-  }
+  .search-container { width: 100%; margin-top: 0.5rem; }
+  .search-input { font-size: 0.9rem; }
 }
 </style>
 
-<!-- Navbar HTML -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<nav class="navbar navbar-expand-lg shadow-sm">
+<nav class="navbar navbar-expand-lg">
   <div class="container-fluid d-flex justify-content-center align-items-center">
 
     <!-- Logo -->
@@ -136,16 +132,8 @@
       <i class="bi bi-search search-icon fs-5"></i>
     </div>
 
-    <!-- Iconos derecha -->
-    <div class="position-absolute end-0 d-flex align-items-center gap-3">
-
-      <!-- Favoritos -->
-      <div class="nav-icon" id="btn-favoritos" title="Favoritos">
-        <i class="bi bi-heart fs-4"></i>
-        <span id="contador-favoritos" class="badge rounded-pill" style="display:none">0</span>
-      </div>
-
-      <!-- Usuario Dropdown -->
+    <!-- Usuario Dropdown -->
+    <div class="position-absolute end-0">
       <div class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
           <i class="bi bi-person fs-4"></i>
@@ -153,9 +141,7 @@
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">
           {% if current_user.is_authenticated %}
           <li class="px-3 py-2 d-flex align-items-center">
-            <div class="user-initials">
-              {{ current_user.Nombre[0]|upper }}{{ current_user.Apellido[0]|upper }}
-            </div>
+            <div class="user-initials">{{ current_user.Nombre[0]|upper }}{{ current_user.Apellido[0]|upper }}</div>
             <strong class="text-uppercase">{{ current_user.Nombre }} {{ current_user.Apellido }}</strong>
           </li>
           <li><hr class="dropdown-divider"></li>
@@ -166,24 +152,25 @@
           <li><a class="dropdown-item" href="{{ url_for('admin.ver_notificaciones') }}">Notificaciones</a></li>
           <li><a class="dropdown-item" href="{{ url_for('admin.vista_proveedores') }}">Proveedores</a></li>
           <li><hr class="dropdown-divider"></li>
-          <li class="px-3">
-            <a href="{{ url_for('auth.logout') }}" class="btn btn-success w-100">Cerrar sesión</a>
-          </li>
+          <li class="px-3"><a href="{{ url_for('auth.logout') }}" class="btn btn-success w-100">Cerrar sesión</a></li>
           {% else %}
           <li><a class="dropdown-item" href="{{ url_for('auth.login') }}">Iniciar sesión</a></li>
           <li><a class="dropdown-item" href="{{ url_for('auth.register') }}">Registrarse</a></li>
           {% endif %}
         </ul>
       </div>
-
-      <!-- Carrito -->
-      <a href="#" class="nav-icon position-relative">
-        <i class="bi bi-cart fs-4"></i>
-        <span id="cart-count" class="badge rounded-pill">0</span>
-      </a>
-
     </div>
+
   </div>
 </nav>
+
+<script>
+// Shrink navbar al hacer scroll
+window.addEventListener('scroll', function() {
+  const navbar = document.querySelector('.navbar');
+  if (window.scrollY > 50) navbar.classList.add('shrink');
+  else navbar.classList.remove('shrink');
+});
+</script>
 
 {% endblock %}

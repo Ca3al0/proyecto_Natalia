@@ -2,13 +2,100 @@
 
 {% block navbar %}
   {% include "common/partials/navbar_admin.html" %}
-  {% include "common/partials/navbar_secundario3.html" %}
 {% endblock %}
 
 
 {% block title %}Gestión de Proveedores y Compras{% endblock %}
 
 {% block content %}
+<style>
+:root {
+  --primary-green: #d1faff;
+  --secondary-green: #57a773;
+  --light-green: #9bd1a5;
+  --accent-green: #157145;
+  --bg-cream: #f8f9fa;
+  --text-dark: #1b3e2b;
+  --shadow-light: rgba(0,0,0,0.05);
+  --shadow-medium: rgba(0,0,0,0.12);
+}
+
+
+/* Títulos */
+h3 {
+  color: var(--secondary-green);
+}
+
+/* Alertas */
+.alert {
+  border-radius: 15px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+/* Inputs y selects */
+.form-control, .form-select {
+  border-radius: 50px;
+  box-shadow: 0 2px 6px var(--shadow-light);
+  border: 1px solid var(--light-green);
+  transition: all 0.3s ease;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--secondary-green);
+  box-shadow: 0 0 12px var(--light-green);
+  outline: none;
+}
+
+/* Botones */
+.btn-success {
+  background-color: var(--secondary-green);
+  border-color: var(--secondary-green);
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.btn-success:hover {
+  background-color: var(--accent-green);
+  border-color: var(--accent-green);
+  box-shadow: 0 4px 10px var(--shadow-medium);
+}
+
+/* Cards */
+.card {
+  border-radius: 15px;
+  box-shadow: 0 4px 12px var(--shadow-light);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px var(--shadow-medium);
+}
+
+/* Tablas */
+.table {
+  border-radius: 15px;
+  overflow: hidden;
+  background-color: #fff;
+}
+.table thead {
+  background-color: var(--primary-green);
+  color: var(--text-dark);
+}
+.table tbody tr:hover {
+  background-color: var(--light-green);
+  color: var(--text-dark);
+  cursor: pointer;
+}
+
+/* Botones de acción en tabla */
+.table button {
+  border-radius: 50px;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+.table button:hover {
+  transform: translateY(-2px);
+}
+</style>
 <div class="container mt-5 p-4 bg-light rounded-4 shadow-sm">
 
     <h3 class="text-center text-success mb-5 fw-bold">Gestión de Proveedores y Compras</h3>
