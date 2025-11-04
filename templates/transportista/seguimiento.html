@@ -1,3 +1,86 @@
+<style>
+  :root {
+    --celeste-claro: #e7fcff;
+    --celeste: #d1faff;
+    --azul-gris: #d1faffe;
+    --verde: #57a773;
+    --verde-oscuro: #157145;
+  }
+
+  /* Panel principal */
+  .panel {
+    background-color: var(--celeste-claro);
+    border: 2px solid var(--verde);
+    border-radius: 12px;
+    padding: 20px;
+    max-width: 500px;
+    margin: 30px auto;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    font-family: 'Arial', sans-serif;
+  }
+
+  .panel h2 {
+    color: var(--verde-oscuro);
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  /* Bloque de datos */
+  .data-block {
+    background-color: var(--celeste);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .data-block p {
+    margin: 5px 0;
+    color: #333;
+  }
+
+  /* Formulario */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid var(--verde);
+    font-size: 1rem;
+    background-color: #fff;
+  }
+
+  button {
+    padding: 10px;
+    background-color: var(--verde);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: var(--verde-oscuro);
+  }
+
+  /* Mensaje informativo */
+  .info {
+    background-color: var(--azul-gris);
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #333;
+    text-align: center;
+  }
+</style>
+
 <!-- PANEL TRANSPORTISTA -->
 <div class="panel">
   <h2>🚚 Panel del Transportista</h2>
