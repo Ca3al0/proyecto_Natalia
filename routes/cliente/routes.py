@@ -8,9 +8,7 @@ from basedatos.notificaciones import crear_notificacion
 from datetime import date,datetime
 from flask import render_template
 from sqlalchemy import text
-from flask import render_template, session, abort, send_file
-from weasyprint import HTML
-import io
+
 
 
 favoritos_usuario = set() 
