@@ -2,44 +2,64 @@
 
 {% block navbar %}
   {% include "common/partials/navbar_transpoinsta.html" %}
+
 {% endblock %}
 
 {% block content %}
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/calendario.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
 
-<style>
-.modal { display: none; position: fixed; z-index: 1000; left:0; top:0; width:100%; height:100%; overflow:auto; background:rgba(0,0,0,0.5); }
-.modal-content { background:#fff; margin:5% auto; padding:20px; border-radius:8px; width:90%; max-width:600px; position:relative; }
-.modal-header { font-size:18px; font-weight:bold; margin-bottom:10px; }
-.modal-footer { margin-top:15px; text-align:right; }
-.modal-footer button { padding:5px 10px; margin-left:5px; }
-#registroPreview img { max-width:100px; margin:5px; border-radius:6px; }
-button.btn-registro { margin-top:5px; display:block; width:100%; }
-</style>
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    {% for category, message in messages %}
+      <div class="alert alert-{{ category }} flash-small d-flex align-items-center mt-3" role="alert">
+        {% if category == 'success' %}
+          <i class="bi bi-check-circle-fill me-2"></i>
+        {% elif category == 'danger' %}
+          <i class="bi bi-x-circle-fill me-2"></i>
+        {% elif category == 'warning' %}
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        {% elif category == 'info' %}
+          <i class="bi bi-info-circle-fill me-2"></i>
+        {% endif %}
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
 
 <div id="calendar"></div>
 
-<!-- Modal Registro Fotográfico -->
+<!-- Modal Evento -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" id="modalTitle"></div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer">
+            <button onclick="closeModal()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+
 <div id="registroFotograficoModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">Registro Fotográfico</div>
         <div class="modal-body">
-            <form id="registroFotograficoForm" enctype="multipart/form-data">
-                <input type="hidden" name="pedido_id" id="pedido_id" value="">
-
+            <form id="registroFotograficoForm">
+             
                 <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
                     <label><strong>Fotos Antes:</strong></label><br>
-                    <input type="file" name="fotos_antes" multiple accept="image/*"><br><br>
+                    <input type="file" name="fotos_antes" multiple accept="image/*" capture="environment"><br><br>
                     <label><strong>Descripción Antes:</strong></label><br>
                     <textarea name="desc_antes" rows="3" style="width:100%;border-radius:6px;border:1px solid #ccc;padding:5px;"></textarea>
                 </div>
 
+                
                 <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
                     <label><strong>Fotos Después:</strong></label><br>
-                    <input type="file" name="fotos_despues" multiple accept="image/*"><br><br>
+                    <input type="file" name="fotos_despues" multiple accept="image/*" capture="environment"><br><br>
                     <label><strong>Descripción Después:</strong></label><br>
                     <textarea name="desc_despues" rows="3" style="width:100%;border-radius:6px;border:1px solid #ccc;padding:5px;"></textarea>
                 </div>
@@ -50,6 +70,7 @@ button.btn-registro { margin-top:5px; display:block; width:100%; }
                 </div>
             </form>
 
+            
             <div id="registroPreview" style="display:none; margin-top:20px;">
                 <h4>Registro Guardado</h4>
                 <div id="previewAntes">
@@ -70,91 +91,11 @@ button.btn-registro { margin-top:5px; display:block; width:100%; }
     </div>
 </div>
 
+<!-- FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
-
-<script>
-function abrirRegistro(pedidoId){
-    document.getElementById('pedido_id').value = pedidoId;
-    document.getElementById('registroFotograficoForm').style.display = 'block';
-    document.getElementById('registroPreview').style.display = 'none';
-    document.getElementById('registroFotograficoModal').style.display = 'block';
-
-    // Cargar registros existentes desde la base
-    fetch(`/registro_fotografico/${pedidoId}`)
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById('imagenesAntes').innerHTML = '';
-        document.getElementById('imagenesDespues').innerHTML = '';
-        document.getElementById('descripcionAntes').innerText = '';
-        document.getElementById('descripcionDespues').innerText = '';
-
-        data.forEach(r => {
-            const img = document.createElement('img');
-            img.src = `/${r.imagen_url}`;
-            if(r.tipo==='antes'){
-                document.getElementById('imagenesAntes').appendChild(img);
-                document.getElementById('descripcionAntes').innerText = r.descripcion;
-            } else {
-                document.getElementById('imagenesDespues').appendChild(img);
-                document.getElementById('descripcionDespues').innerText = r.descripcion;
-            }
-        });
-
-        if(data.length>0) document.getElementById('registroPreview').style.display='block';
-    });
-}
-
-function cerrarRegistro(){
-    document.getElementById('registroFotograficoForm').reset();
-    document.getElementById('registroPreview').style.display='none';
-    document.getElementById('registroFotograficoModal').style.display='none';
-}
-
-window.onclick = function(event){
-    const modal = document.getElementById('registroFotograficoModal');
-    if(event.target==modal) cerrarRegistro();
-}
-
-document.getElementById('registroFotograficoForm').addEventListener('submit', async function(e){
-    e.preventDefault();
-    const formData = new FormData(this);
-    const response = await fetch('{{ url_for("transportista.guardar_registro") }}', { method:'POST', body: formData });
-    const result = await response.json();
-    if(result.status==='success'){
-        alert('Registro guardado correctamente');
-        abrirRegistro(document.getElementById('pedido_id').value);
-    } else {
-        alert('Error: '+result.message);
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    var calendarEl = document.getElementById('calendar');
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'es',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay'
-        },
-        events: [
-            { id: '1', title: 'Evento 1', start: '2025-11-05' },
-            { id: '2', title: 'Evento 2', start: '2025-11-06' }
-        ],
-        eventDidMount: function(info) {
-            let btn = document.createElement('button');
-            btn.innerText = 'Registro Fotográfico';
-            btn.className = 'btn-registro';
-            btn.onclick = function(){ abrirRegistro(info.event.id); };
-            info.el.appendChild(btn);
-        }
-    });
-    calendar.render();
-});
-</script>
-
 <script src="{{ url_for('static', filename='js/calendario.js') }}"></script>
+
 
 {% endblock %}
