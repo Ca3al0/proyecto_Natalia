@@ -16,33 +16,101 @@
 
 <body>
 
-  <!-- ===================== NAVBAR ===================== -->
-  <nav class="navbar navbar-expand-lg shadow-sm py-3 bg-white fixed-top">
-    <div class="container">
-      <a class="navbar-brand fw-bold text-success" href="#">Casa en el Árbol</a>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg shadow-sm py-3 bg-white fixed-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-success" href="#">Casa en el Árbol</a>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto align-items-center gap-3">
-          <li class="nav-item"><a href="#" class="nav-link"><i class="bi bi-heart fs-4"></i></a></li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-              <i class="bi bi-person fs-4"></i>
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end shadow">
-              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalLogin"><i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión</a></li>
-              <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalRegister"><i class="bi bi-person-plus me-2"></i>Registrarse</a></li>
-            </ul>
-          </li>
-          <li class="nav-item"><a href="#" class="nav-link"><i class="bi bi-cart fs-4"></i></a></li>
-        </ul>
-      </div>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto align-items-center gap-3">
+
+        <!-- Icono de búsqueda -->
+        <li class="nav-item position-relative">
+          <a class="nav-link fs-4" href="#" id="searchIcon"><i class="bi bi-search"></i></a>
+        </li>
+
+        <!-- Usuario -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person fs-4"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow">
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalLogin">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión</a></li>
+            <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#modalRegister">
+              <i class="bi bi-person-plus me-2"></i>Registrarse</a></li>
+          </ul>
+        </li>
+
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>
+
+<!-- Buscador Fullscreen -->
+<div id="searchOverlay" style="
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      backdrop-filter: blur(5px);
+      background-color: rgba(0,0,0,0.4);
+      z-index: 1050;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.3s ease;
+    ">
+  <div style="width: 90%; max-width: 600px;">
+    <input type="text" id="searchInputOverlay" class="form-control form-control-lg rounded-pill"
+           placeholder="Escribe tu búsqueda..." style="padding: 1rem; font-size: 1.25rem;">
+  </div>
+</div>
+
+<script>
+  const searchIcon = document.getElementById('searchIcon');
+  const searchOverlay = document.getElementById('searchOverlay');
+  const searchInputOverlay = document.getElementById('searchInputOverlay');
+
+  // Abrir buscador
+  searchIcon.addEventListener('click', (e) => {
+    e.preventDefault();
+    searchOverlay.style.display = 'flex';
+    searchOverlay.style.opacity = 0;
+    let op = 0;
+    const fadeIn = setInterval(() => {
+      if (op >= 1) clearInterval(fadeIn);
+      searchOverlay.style.opacity = op;
+      op += 0.1;
+    }, 20);
+    searchInputOverlay.focus();
+  });
+
+  // Cerrar buscador
+  function closeSearch() {
+    searchOverlay.style.display = 'none';
+    searchInputOverlay.value = '';
+  }
+
+  // Presionar Escape cierra
+  searchInputOverlay.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSearch();
+  });
+
+  // Click fuera del input cierra
+  searchOverlay.addEventListener('click', (e) => {
+    if (e.target === searchOverlay) closeSearch();
+  });
+</script>
+
+
+
+
 
   <!-- ===================== HERO ===================== -->
   <section class="hero">
