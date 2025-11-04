@@ -478,32 +478,35 @@ def seguimiento_cliente(id_pedido):
     return render_template('cliente/seguimiento.html', pedido=pedido)
 
 
+
 @cliente.route('/historial')
 @login_required
 def historial():
     cliente_id = current_user.ID_Usuario
     
-    # Obtenemos los pedidos del cliente
     pedidos = Pedido.query.filter_by(ID_Usuario=cliente_id).order_by(Pedido.FechaPedido.desc()).all()
     
-    historial = []
-
+    # Calculamos subtotal por pedido
     for pedido in pedidos:
-        subtotal = sum([detalle.subtotal for detalle in pedido.detalles_pedido])
-        pagos = [
-            {
-                "MetodoPago": pago.MetodoPago,
-                "Monto": pago.Monto,
-                "FechaPago": pago.FechaPago
-            } for pago in pedido.pagos
-        ]
-        
-        historial.append({
-            "ID_Pedido": pedido.ID_Pedido,
-            "Estado": pedido.Estado,
-            "FechaPedido": pedido.FechaPedido,
-            "Subtotal": subtotal,
-            "Pagos": pagos
-        })
+        pedido.subtotal = sum(detalle.Cantidad * detalle.PrecioUnidad for detalle in pedido.detalles_pedido)
+    
+    return render_template('cliente/historial_transacciones.html', pedidos=pedidos)
 
-    return render_template('cliente/historial_transacciones.html', historial=historial)
+
+
+@cliente.route('/pedido/<int:pedido_id>')
+@login_required
+def ver_pedido(pedido_id):
+    pedido = Pedido.query.filter_by(ID_Pedido=pedido_id, ID_Usuario=current_user.ID_Usuario).first_or_404()
+    return render_template('cliente/ver_pedido.html', pedido=pedido)
+
+
+@cliente.route('/pedido/<int:pedido_id>/eliminar', methods=['POST'])
+@login_required
+def eliminar_pedido(pedido_id):
+    pedido = Pedido.query.filter_by(ID_Pedido=pedido_id, ID_Usuario=current_user.ID_Usuario).first_or_404()
+    
+    db.session.delete(pedido)
+    db.session.commit()
+    flash('Pedido eliminado correctamente.', 'success')
+    return redirect(url_for('cliente.historial'))
