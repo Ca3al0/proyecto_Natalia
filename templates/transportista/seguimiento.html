@@ -1,3 +1,60 @@
+<style>
+    .tracking-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    margin: 40px auto;
+    width: 80%;
+    max-width: 800px;
+}
+
+.tracking-container::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: #ccc;
+    z-index: 1;
+}
+
+.step {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    width: 25%;
+}
+
+.step i {
+    font-size: 28px;
+    color: #ccc;
+    background: white;
+    padding: 10px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+}
+
+.step.active i {
+    color: #1a73e8;
+    border-color: #1a73e8;
+}
+
+.step.active p {
+    font-weight: bold;
+    color: #1a73e8;
+}
+
+.step p {
+    margin-top: 8px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <h2>Seguimiento del pedido #{{ pedido.ID_Pedido }}</h2>
 <p><strong>Cliente:</strong> {{ pedido.usuario.Nombre }} {{ pedido.usuario.Apellido }}</p>
 <p><strong>Estado actual:</strong> {{ pedido.Estado }}</p>
@@ -5,10 +62,32 @@
 <form method="POST">
     <label for="estado">Actualizar estado:</label>
     <select name="estado" id="estado" class="form-select">
-        <option value="pendiente" {% if pedido.Estado=='pendiente' %}selected{% endif %}>Pendiente</option>
-        <option value="en proceso" {% if pedido.Estado=='en proceso' %}selected{% endif %}>En proceso</option>
-        <option value="en reparto" {% if pedido.Estado=='en reparto' %}selected{% endif %}>En reparto</option>
-        <option value="entregado" {% if pedido.Estado=='entregado' %}selected{% endif %}>Entregado</option>
+        <option value="pendiente" {% if pedido.Estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+        <option value="en proceso" {% if pedido.Estado == 'en proceso' %}selected{% endif %}>En proceso</option>
+        <option value="en reparto" {% if pedido.Estado == 'en reparto' %}selected{% endif %}>En reparto</option>
+        <option value="entregado" {% if pedido.Estado == 'entregado' %}selected{% endif %}>Entregado</option>
     </select>
     <button type="submit" class="btn btn-success mt-2">Actualizar estado</button>
 </form>
+
+<hr>
+
+<h3>Estado del pedido</h3>
+<div class="tracking-container">
+    <div class="step {% if pedido.Estado in ['pendiente','en proceso','en reparto','entregado'] %}active{% endif %}">
+        <i class="fas fa-file-alt"></i>
+        <p>Pendiente</p>
+    </div>
+    <div class="step {% if pedido.Estado in ['en proceso','en reparto','entregado'] %}active{% endif %}">
+        <i class="fas fa-cogs"></i>
+        <p>En proceso</p>
+    </div>
+    <div class="step {% if pedido.Estado in ['en reparto','entregado'] %}active{% endif %}">
+        <i class="fas fa-truck"></i>
+        <p>En reparto</p>
+    </div>
+    <div class="step {% if pedido.Estado == 'entregado' %}active{% endif %}">
+        <i class="fas fa-box-open"></i>
+        <p>Entregado</p>
+    </div>
+</div>
