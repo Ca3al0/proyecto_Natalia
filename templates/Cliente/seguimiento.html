@@ -28,6 +28,7 @@
 .panel h2 i {
     color: #4caf50;
     font-size: 2.2rem;
+    margin-right: 10px;
 }
 
 /* Bloque de datos */
@@ -127,10 +128,8 @@
         font-size: 1.1rem;
     }
 }
-
 </style>
 {% endblock %}
-
 
 {% block navbar %}
     {% include "common/partials/navbar_cliente.html" %}
@@ -139,7 +138,7 @@
 {% block content %}
 <div class="container-tracking">
     <div class="panel">
-        <h2><i class="bi bi-geo-alt-fill me-2"></i> Seguimiento de Pedido</h2>
+        <h2><i class="bi bi-geo-alt-fill"></i> Seguimiento de Pedido</h2>
 
         <div class="data-block">
             <p><strong>ID Pedido:</strong> #{{ pedido.ID_Pedido }}</p>
@@ -160,8 +159,8 @@
             <div class="progress-line-fill" style="width: {{ progreso_porcentaje }}%;"></div>
 
             {% for i in range(4) %}
-                <div class="step {% if estado_actual_index >= i %}active{% endif %}">
-                    <div class="circle">
+                <div class="step" style="left: {{ (i*100/3)|round(2) }}%;">
+                    <div class="circle {% if estado_actual_index >= i %}active{% endif %}">
                         <i class="bi {{ iconos[i] }}"></i>
                     </div>
                     <p>{{ estados[i] | replace('_',' ') | capitalize }}</p>
@@ -170,7 +169,7 @@
         </div>
 
         <div class="status-message" id="mensajeCliente">
-            <i class="bi bi-info-circle-fill me-2"></i> Estado actual: {{ pedido.Estado | replace('_',' ') | capitalize }}
+            <i class="bi bi-info-circle-fill"></i> Estado actual: {{ pedido.Estado | replace('_',' ') | capitalize }}
         </div>
     </div>
 </div>
