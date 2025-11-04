@@ -103,6 +103,27 @@
     </div>
 </div>
 
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="modalConfirmacion" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title"><i class="bi bi-check-circle-fill me-2"></i> ¡Pago Aprobado!</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center py-4">
+        <p class="fs-5 mb-3">Tu pedido ha sido confirmado correctamente.</p>
+        <p id="total-modal" class="fs-6 fw-bold"></p>
+        <i class="bi bi-bag-check display-1 text-success"></i>
+      </div>
+      <div class="modal-footer justify-content-center">
+        <a href="{{ url_for('catalogo') }}" class="btn btn-success btn-lg w-50">Seguir Comprando</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
@@ -113,23 +134,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const subtotalEl = document.getElementById('checkout-subtotal');
     const envioEl = document.getElementById('checkout-envio');
     const totalEl = document.getElementById('checkout-total');
+    const carritoInput = document.getElementById('carrito-json');
 
-    // Renderizar carrito simple
+    // Renderizar resumen del carrito
     let subtotal = 0;
     carrito.forEach(item => {
         const cantidad = item.cantidad || 1;
         const precio = item.precio || 0;
         subtotal += precio * cantidad;
+
         const li = document.createElement('li');
         li.className = 'list-group-item d-flex justify-content-between align-items-center';
         li.innerHTML = `${item.nombre} x ${cantidad} <span class="text-secondary">$${(precio*cantidad).toFixed(2)}</span>`;
         resumen.appendChild(li);
     });
+
     totalFinal = subtotal + costoEnvio;
     subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
     envioEl.textContent = `$${costoEnvio.toFixed(2)}`;
     totalEl.textContent = `$${totalFinal.toFixed(2)}`;
-    document.getElementById('carrito-json').value = JSON.stringify(carrito);
+    carritoInput.value = JSON.stringify(carrito);
 
     // Toggle inputs según método de pago
     const datosTarjetaDiv = document.getElementById('datos-tarjeta');
@@ -142,13 +166,51 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('input[name="pago"]').forEach(r => r.addEventListener('change', toggleInputs));
     toggleInputs();
 
-    // Botón pagar simple
-    document.getElementById('btn-pagar').addEventListener('click', () => {
+    // Botón pagar
+    const btnPagar = document.getElementById('btn-pagar');
+    btnPagar.addEventListener('click', async (e) => {
+        e.preventDefault();
+
+        if (carrito.length === 0) {
+            alert("El carrito está vacío.");
+            return;
+        }
+
+        const direccion = document.getElementById('select-direccion').value;
         const metodo = document.querySelector('input[name="pago"]:checked').value;
-        alert(`✅ Pago simulado con ${metodo}. Total: $${totalFinal.toFixed(2)}`);
-        localStorage.setItem('carrito', '[]');
-        document.getElementById('checkout-form').submit();
+
+        btnPagar.disabled = true;
+        btnPagar.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span> Procesando...';
+
+        try {
+            const response = await fetch("{{ url_for('cliente.checkout') }}", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ direccion, carrito, metodo })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                // Mostrar modal
+                const modal = new bootstrap.Modal(document.getElementById('modalConfirmacion'));
+                document.getElementById('total-modal').textContent = `Total: $${totalFinal.toFixed(2)}`;
+                modal.show();
+
+                // Vaciar carrito
+                localStorage.setItem('carrito', '[]');
+
+            } else {
+                alert(data.mensaje);
+            }
+        } catch (error) {
+            alert("Ocurrió un error inesperado: " + error.message);
+        } finally {
+            btnPagar.disabled = false;
+            btnPagar.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Confirmar y Pagar';
+        }
     });
 });
+
+
 </script>
 {% endblock %}

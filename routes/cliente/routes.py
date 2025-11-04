@@ -387,19 +387,71 @@ def mensajes_cliente_ajax():
         } for m in mensajes
     ])
 
-# En tu archivo de rutas del cliente (cliente.py)
+
 @cliente.route('/carrito')
 @login_required
 def ver_carrito():
-    # Puedes obtener los productos del carrito desde localStorage con JS
-    # O si quieres sincronizar con base de datos, consulta aquí
     return render_template('Cliente/carrito.html')
 
-@cliente.route('/checkout')
+@cliente.route('/checkout', methods=['GET', 'POST'])
+@login_required
 def checkout():
-    # Obtener direcciones del usuario actual
+    if request.method == 'POST':
+        data = request.json
+        carrito = data.get('carrito', [])
+        direccion_id = data.get('direccion')
+
+        if not carrito:
+            return jsonify({"success": False, "mensaje": "El carrito está vacío."})
+
+        direccion_obj = Direccion.query.get(direccion_id)
+        if not direccion_obj:
+            return jsonify({"success": False, "mensaje": "Dirección no válida."})
+
+        try:
+            # Crear pedido
+            pedido = Pedido(
+                NombreComprador=current_user.Nombre,
+                Estado='pendiente',
+                FechaPedido=date.today(),
+                Destino=f"{direccion_obj.Direccion}, {direccion_obj.Barrio}, {direccion_obj.Ciudad}",
+                ID_Usuario=current_user.ID_Usuario
+            )
+            db.session.add(pedido)
+            db.session.flush()  # Para obtener ID_Pedido
+
+            # Agregar detalles y restar stock
+            for item in carrito:
+                producto_id = item.get('id_producto') or item.get('ID_Producto') or item.get('id')
+                producto = Producto.query.get(producto_id)
+                if not producto:
+                    continue
+
+                if producto.Stock < item['cantidad']:
+                    db.session.rollback()
+                    return jsonify({"success": False, "mensaje": f"No hay suficiente stock de {producto.NombreProducto}."})
+
+                detalle = Detalle_Pedido(
+                    ID_Pedido=pedido.ID_Pedido,
+                    ID_Producto=producto.ID_Producto,
+                    Cantidad=item['cantidad'],
+                    PrecioUnidad=producto.PrecioUnidad
+                )
+                db.session.add(detalle)
+
+                # Restar stock
+                producto.Stock -= item['cantidad']
+
+            db.session.commit()
+            return jsonify({"success": True, "mensaje": "Pedido confirmado correctamente."})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"success": False, "mensaje": f"Ocurrió un error: {str(e)}"})
+
+    # GET: renderiza la plantilla con direcciones
     direcciones = Direccion.query.filter_by(ID_Usuario=current_user.ID_Usuario).all()
     return render_template('Cliente/pagos.html', direcciones=direcciones)
+
 
 @cliente.route('/finalizar-compra', methods=['POST'])
 @login_required
