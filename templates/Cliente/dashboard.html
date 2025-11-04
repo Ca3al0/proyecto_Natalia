@@ -169,14 +169,16 @@
 
 {% if mostrar_bienvenida %}
 <div class="modal fade" id="modalBienvenida" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-md">
-    <div class="modal-content bg-success text-white rounded-4 position-relative overflow-hidden p-4 text-center">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content bg-success text-white position-relative overflow-hidden">
 
-      <!-- Contenido -->
-      <h2 class="fw-bold mb-2">¡Bienvenido, {{ username }}!</h2>
-      <p class="mb-4">¡Estamos felices de verte por aquí!</p>
-      <button type="button" class="btn btn-light fw-bold px-4" data-bs-dismiss="modal">¡Continuar!</button>
+      <canvas id="confettiCanvas" class="position-absolute top-0 start-0 w-100 h-100"></canvas>
 
+      <div class="d-flex flex-column justify-content-center align-items-center text-center h-100 position-relative" style="z-index: 2; padding: 2rem;">
+        <h1 id="bienvenidaTexto" class="display-3 fw-bold mb-3"></h1>
+        <p class="fs-4 mb-4">¡Estamos felices de verte por aquí!</p>
+        <button type="button" class="btn btn-light btn-lg fw-bold" data-bs-dismiss="modal">¡Continuar!</button>
+      </div>
     </div>
   </div>
 </div>
@@ -184,25 +186,43 @@
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  const modal = new bootstrap.Modal(document.getElementById('modalBienvenida'));
+  const modalEl = document.getElementById('modalBienvenida');
+  const modal = new bootstrap.Modal(modalEl);
   modal.show();
 
-  // Confeti sencillo
+  
+  const canvas = document.getElementById('confettiCanvas');
+  const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
   const confettiInterval = setInterval(() => {
-    confetti({
-      particleCount: 4,
+    myConfetti({
+      particleCount: 6,
       spread: 60,
       origin: { y: 0 },
       colors: ['#ffffff', '#ffe066', '#57a773', '#9bd1a5']
     });
-  }, 300);
+  }, 250);
 
-  document.getElementById('modalBienvenida').addEventListener('hidden.bs.modal', () => {
+  modalEl.addEventListener('hidden.bs.modal', () => {
     clearInterval(confettiInterval);
   });
+
+  const text = "¡Bienvenido, {{ nombre_completo }}!";
+  const container = document.getElementById('bienvenidaTexto');
+  let i = 0;
+  function escribir() {
+      if (i < text.length) {
+          container.textContent += text.charAt(i);
+          i++;
+          setTimeout(escribir, 100);
+      }
+  }
+  escribir();
 });
 </script>
 {% endif %}
+
+
+
 
 
 

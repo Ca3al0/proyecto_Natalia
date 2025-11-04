@@ -19,9 +19,15 @@ reviews = []
 @login_required
 @role_required("cliente")
 def dashboard():
-    # Verifica si hay que mostrar la bienvenida (después del login)
     mostrar_bienvenida = session.pop('mostrar_bienvenida', False)
-    return render_template("cliente/dashboard.html", mostrar_bienvenida=mostrar_bienvenida)
+    nombre_completo = session.get('username', '')  # <-- usar session['username']
+    
+    return render_template(
+        "cliente/dashboard.html",
+        mostrar_bienvenida=mostrar_bienvenida,
+        nombre_completo=nombre_completo
+    )
+
 
 # ---------- NOTIFICACIONES ----------
 @cliente.route("/notificaciones", methods=["GET", "POST"])
