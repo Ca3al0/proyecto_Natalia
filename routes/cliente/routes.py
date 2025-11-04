@@ -467,12 +467,3 @@ def finalizar_compra():
     return redirect(url_for('catalogo'))
 
 
-@cliente.route('/registro_pedido/<int:pedido_id>')
-@login_required
-def ver_registro_pedido(pedido_id):
-    registro = RegistroFotografico.query.filter_by(ID_Pedido=pedido_id).first()
-    if not registro:
-        flash("No hay registro fotográfico para este pedido", "warning")
-        return redirect(url_for('cliente.ver_pedidos'))
-
-    return render_template('cliente/ver_registro_pedido.html', registro=registro)
