@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Recibo Pedido {{ pedido.ID_Pedido }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h2 { text-align: center; color: #5f8f3f; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; }
+        th { background-color: #5f8f3f; color: white; }
+    </style>
+</head>
+<body>
+    <h2>Recibo de Pedido #{{ pedido.ID_Pedido }}</h2>
+    <p><strong>Cliente:</strong> {{ pedido.NombreComprador }}</p>
+    <p><strong>Transportista:</strong> {{ pedido.TransportistaNombre or 'No asignado' }}</p>
+    <p><strong>Dirección de Entrega:</strong> {{ pedido.Destino }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detalle in pedido.detalles_pedido %}
+            <tr>
+                <td>{{ detalle.producto.NombreProducto }}</td>
+                <td>{{ detalle.Cantidad }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
