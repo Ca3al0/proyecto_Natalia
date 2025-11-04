@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/catalogo.css') }}">
 
-<!-- Flash messages -->
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
@@ -24,13 +23,15 @@
   {% endif %}
 {% endwith %}
 
-<!-- Botón flotante Comparar productos -->
-<a href="{{ url_for('cliente.comparar') }}" 
-   class="btn btn-warning shadow-lg position-fixed rounded-pill px-4 py-2"
-   style="bottom: 30px; right: 100px; z-index: 1050;">
-   <i class="bi bi-bar-chart me-1"></i> Comparar productos
+<!-- Botones flotantes -->
+<a href="{{ url_for('cliente.comparar') }}" class="btn btn-warning shadow-lg position-fixed rounded-pill px-4 py-2" style="bottom: 30px; right: 100px; z-index: 1050;">
+  <i class="bi bi-bar-chart me-1"></i> Comparar productos
 </a>
 
+<a href="{{ url_for('cliente.ver_carrito') }}" class="btn btn-primary shadow-lg position-fixed rounded-circle d-flex justify-content-center align-items-center" style="bottom: 30px; right: 30px; width: 60px; height: 60px; z-index: 1050;">
+  <i class="bi bi-cart-fill" style="font-size: 1.5rem;"></i>
+  <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display:none;"></span>
+</a>
 
 <div class="container mt-5">
   <h2 class="mb-4 text-center text-success"><b>Catálogo de Productos</b></h2>
@@ -38,11 +39,7 @@
     {% for producto in productos %}
     <div class="col">
       <div class="card h-100 shadow-sm position-relative">
-        {% if producto.ImagenPrincipal %}
-          <img src="{{ url_for('static', filename=producto.ImagenPrincipal) }}" class="card-img-top" alt="Imagen de {{ producto.NombreProducto }}">
-        {% else %}
-          <img src="{{ url_for('static', filename='img/catalogo.png') }}" class="card-img-top" alt="Imagen no disponible">
-        {% endif %}
+        <img src="{{ url_for('static', filename=producto.ImagenPrincipal or 'img/catalogo.png') }}" class="card-img-top" alt="Imagen de {{ producto.NombreProducto }}">
 
         <button type="button" class="btn btn-light btn-favorite position-absolute top-0 end-0 m-2" title="Agregar a favoritos" data-id="{{ producto.ID_Producto|string }}">
           <i class="bi bi-heart"></i>
@@ -57,7 +54,11 @@
             <i class="bi bi-star me-1"></i> Añadir reseña
           </a>
 
-          <button type="button" class="btn btn-primary btn-add-cart mt-auto mb-2" data-id="{{ producto.ID_Producto|string }}">
+          <button type="button" class="btn btn-primary btn-add-cart"
+            data-id="{{ producto.ID_Producto|string }}"
+            data-nombre="{{ producto.NombreProducto }}"
+            data-precio="{{ '%.2f'|format(producto.PrecioUnidad) }}"
+            data-imagen="{{ url_for('static', filename=producto.ImagenPrincipal or 'img/catalogo.png') }}">
             <i class="bi bi-cart-plus me-2"></i> Agregar al carrito
           </button>
         </div>
@@ -68,113 +69,91 @@
 </div>
 
 <style>
-  #cart-count {
-    font-size: 0.8rem;
-    padding: 0.25em 0.5em;
-  }
+  #cart-count { font-size: 0.8rem; padding: 0.25em 0.5em; }
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // --- FAVORITOS ---
+
+  // --- Favoritos ---
   let favoritos = JSON.parse(localStorage.getItem('favoritos') || '[]').map(String);
-
-  const actualizarContadorFavoritos = () => {
-    const contador = document.getElementById('contador-favoritos');
-    contador.style.display = favoritos.length > 0 ? 'inline-block' : 'none';
-    contador.textContent = favoritos.length;
-  };
-
-  const toggleFavorito = (id) => {
-    id = id.toString();
-    const index = favoritos.indexOf(id);
-    if (index === -1) { favoritos.push(id); }
-    else { favoritos.splice(index, 1); }
-    localStorage.setItem('favoritos', JSON.stringify(favoritos));
-    actualizarContadorFavoritos();
-  };
-
-  document.querySelectorAll('.btn-favorite').forEach(btn => {
-    const id = btn.dataset.id;
-    btn.addEventListener('click', () => toggleFavorito(id));
-  });
-
-  actualizarContadorFavoritos();
-
-  // Abrir modal favoritos
-  document.getElementById('btn-favoritos')?.addEventListener('click', () => {
-    const container = document.getElementById('favoritosContent');
-    if (favoritos.length === 0) {
-      container.innerHTML = '<p>No tienes productos favoritos aún.</p>';
+  const actualizarIconoFavorito = (btn, agregado) => {
+    const icon = btn.querySelector('i');
+    if(!icon) return;
+    if(agregado){
+      icon.classList.remove('bi-heart');
+      icon.classList.add('bi-heart-fill','text-danger');
     } else {
-      let html = '<div class="row g-3">';
-      favoritos.forEach(id => {
-        const card = document.querySelector(`.btn-favorite[data-id='${id}']`)?.closest('.card');
-        if (card) {
-          const nombre = card.querySelector('.card-title')?.textContent || '';
-          const precio = card.querySelector('.card-text')?.textContent || '';
-          const imgSrc = card.querySelector('img')?.getAttribute('src') || '';
-          html += `
-            <div class="col-6 col-md-4">
-              <div class="card h-100 shadow-sm">
-                <img src="${imgSrc}" class="card-img-top" alt="${nombre}">
-                <div class="card-body">
-                  <h6 class="card-title">${nombre}</h6>
-                  <p class="card-text">${precio}</p>
-                </div>
-              </div>
-            </div>
-          `;
-        }
-      });
-      html += '</div>';
-      container.innerHTML = html;
+      icon.classList.add('bi-heart');
+      icon.classList.remove('bi-heart-fill','text-danger');
     }
-    const modal = new bootstrap.Modal(document.getElementById('favoritosModal'));
-    modal.show();
+  };
+  document.querySelectorAll('.btn-favorite').forEach(btn=>{ actualizarIconoFavorito(btn, favoritos.includes(btn.dataset.id)); });
+  document.addEventListener('click', e=>{
+    const btn = e.target.closest('.btn-favorite');
+    if(!btn) return;
+    const id = btn.dataset.id.toString();
+    const index = favoritos.indexOf(id);
+    let agregado = false;
+    if(index === -1){ favoritos.push(id); agregado = true; }
+    else { favoritos.splice(index,1); }
+    localStorage.setItem('favoritos', JSON.stringify(favoritos));
+    actualizarIconoFavorito(btn, agregado);
   });
 
-  // --- CARRITO ---
+  // --- Carrito ---
   let carrito = JSON.parse(localStorage.getItem('carrito') || '[]');
 
   const actualizarContadorCarrito = () => {
     const contador = document.getElementById('cart-count');
-    if (!contador) return;
-    contador.style.display = carrito.length > 0 ? 'inline-block' : 'none';
-    contador.textContent = carrito.length;
-  };
-
-  const agregarAlCarrito = (id) => {
-    id = id.toString();
-    if (!carrito.includes(id)) {
-      carrito.push(id);
-      localStorage.setItem('carrito', JSON.stringify(carrito));
-      actualizarContadorCarrito();
-      mostrarMensaje("Producto agregado al carrito", "success");
+    if(!contador) return;
+    if(carrito.length > 0){
+      contador.textContent = carrito.length;
+      contador.style.display = 'inline-block';
     } else {
-      mostrarMensaje("Producto ya está en el carrito", "info");
+      contador.style.display = 'none';
     }
   };
 
-  const mostrarMensaje = (texto, tipo) => {
+  const mostrarMensaje = (texto,tipo) => {
     const alert = document.createElement('div');
-    alert.className = `alert alert-${tipo} position-fixed top-0 end-0 m-4 shadow`;
-    alert.style.zIndex = 2000;
-    alert.innerHTML = `<i class="bi bi-check-circle-fill me-2"></i>${texto}`;
+    alert.className=`alert alert-${tipo} position-fixed top-0 end-0 m-4 shadow`;
+    let iconClass = 'bi-info-circle-fill';
+    if(tipo==='success') iconClass='bi-check-circle-fill';
+    else if(tipo==='danger') iconClass='bi-x-circle-fill';
+    else if(tipo==='warning') iconClass='bi-exclamation-triangle-fill';
+    alert.innerHTML=`<i class="bi ${iconClass} me-2"></i>${texto}`;
+    alert.style.zIndex=2000;
     document.body.appendChild(alert);
-    setTimeout(() => alert.remove(), 3000);
+    setTimeout(()=>alert.remove(),3000);
   };
 
-  document.querySelectorAll('.btn-add-cart').forEach(btn => {
-    btn.addEventListener('click', () => agregarAlCarrito(btn.dataset.id));
+  const agregarAlCarrito = (btn) => {
+    const id = btn.dataset.id.toString();
+    // Revisar si ya existe
+    let productoExistente = carrito.find(p=>p.id === id);
+    if(productoExistente){
+      productoExistente.cantidad += 1;
+    } else {
+      carrito.push({
+        id: id,
+        nombre: btn.dataset.nombre,
+        precio: parseFloat(btn.dataset.precio),
+        imagen: btn.dataset.imagen,
+        cantidad: 1
+      });
+    }
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    actualizarContadorCarrito();
+    mostrarMensaje("Producto agregado al carrito","success");
+  };
+
+  document.querySelectorAll('.btn-add-cart').forEach(btn=>{
+    btn.addEventListener('click', ()=> agregarAlCarrito(btn));
   });
 
-  // Inicializar contador al cargar
   actualizarContadorCarrito();
 });
 </script>
-
-
 {% endblock %}

@@ -1,0 +1,26 @@
+{% extends "common/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-primary mb-4">Finalizar Compra (Checkout)</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Detalles de Envío y Pago</h2>
+            <p>Formularios de envío y pago irán aquí...</p>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h4 class="card-title">Resumen del Pedido</h4>
+                    <p>Subtotal: $XXX.XX</p>
+                    <p>Envío: $YY.YY</p>
+                    <hr>
+                    <h5 class="text-success">Total a Pagar: $ZZZ.ZZ</h5>
+                    <button class="btn btn-success btn-lg w-100 mt-3" type="submit">Pagar Ahora</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

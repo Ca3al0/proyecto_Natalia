@@ -394,3 +394,9 @@ def ver_carrito():
     # Puedes obtener los productos del carrito desde localStorage con JS
     # O si quieres sincronizar con base de datos, consulta aquí
     return render_template('Cliente/carrito.html')
+
+@cliente.route('/checkout')
+@login_required # Si aplica
+def checkout():
+    # Lógica para procesar el pago o mostrar el formulario de checkout
+    return render_template('Cliente/pago.html')
