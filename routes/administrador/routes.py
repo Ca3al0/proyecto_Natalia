@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from datetime import date,datetime, timedelta
 from flask import current_app
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido, Calendario
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido, Mensaje
 from werkzeug.security import generate_password_hash
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
@@ -679,3 +679,33 @@ def reporte_entregas():
 
     return render_template('administrador/reportes_entregas.html',
                            pedidos_entregados=pedidos_entregados)
+
+@admin.route('/admin/chat')
+def chat_admin():
+    return render_template('admin/chat.html')
+
+@admin.route('/admin/api/mensajes', methods=['GET', 'POST'])
+def api_mensajes():
+    if request.method == 'GET':
+        
+        mensajes = Mensaje.query.order_by(Mensaje.fecha.asc()).limit(50).all()
+        return jsonify([
+            {
+                'id': m.id,
+                'cliente_id': m.cliente_id,
+                'contenido': m.contenido,
+                'enviado_por_admin': m.enviado_por_admin,
+                'fecha': m.fecha.strftime('%Y-%m-%d %H:%M:%S')
+            } for m in mensajes
+        ])
+    else:
+        # Enviar mensaje
+        data = request.json
+        mensaje = Mensaje(
+            cliente_id=data.get('cliente_id'),
+            contenido=data.get('contenido'),
+            enviado_por_admin=True
+        )
+        db.session.add(mensaje)
+        db.session.commit()
+        return jsonify({'status':'ok', 'mensaje':'Mensaje enviado'})

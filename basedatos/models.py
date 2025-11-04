@@ -262,3 +262,20 @@ class Compra(db.Model):
 
     def __repr__(self):
         return f'<Compra {self.Producto} - {self.Cantidad} unidades>'
+
+# ------------------ Mensajes ------------------
+class Mensaje(db.Model):
+    __tablename__ = 'Mensajes'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    cliente_id = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    contenido = db.Column(db.Text, nullable=False)
+    enviado_admin = db.Column(db.Boolean, default=False, nullable=False)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relación con el cliente
+    cliente = db.relationship('Usuario', backref=db.backref('mensajes', lazy=True))
+
+    def __repr__(self):
+        remitente = "Admin" if self.enviado_admin else self.cliente.Nombre
+        return f'<Mensaje de {remitente} a las {self.fecha}>'
