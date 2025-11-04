@@ -76,38 +76,41 @@ def register():
 # ------------------ LOGIN ------------------ #
 @auth.route('/login', methods=['POST'])
 def login():
-    correo = request.form.get('correo', '').strip().lower()
-    password = request.form.get('password', '').strip()
+    try:
+        correo = request.form.get('correo', '').strip().lower()
+        password = request.form.get('password', '').strip()
 
-    if not correo or not password:
-        return jsonify({'status': 'warning', 'message': 'Debes ingresar correo y contraseña.'})
+        if not correo or not password:
+            return jsonify({'status': 'warning', 'message': 'Debes ingresar correo y contraseña.'})
 
-    usuario = Usuario.query.filter(func.lower(Usuario.Correo) == correo).first()
+        usuario = Usuario.query.filter(func.lower(Usuario.Correo) == correo).first()
 
-    if usuario and check_password_hash(usuario.Contraseña, password):
-        login_user(usuario)
-        session['username'] = f"{usuario.Nombre} {usuario.Apellido or ''}".strip()
+        if usuario and check_password_hash(usuario.Contraseña, password):
+            login_user(usuario)
+            session['username'] = f"{usuario.Nombre} {usuario.Apellido or ''}".strip()
 
-        rutas_por_rol = {
-            'admin': 'admin.dashboard',
-            'cliente': 'cliente.dashboard',
-            'transportista': 'transportista.dashboard',
-            'instalador': 'instalador.dashboard'
-        }
-        destino = rutas_por_rol.get(usuario.Rol, 'index')
+            rutas_por_rol = {
+                'admin': 'admin.dashboard',
+                'cliente': 'cliente.dashboard',
+                'transportista': 'transportista.dashboard',
+                'instalador': 'instalador.dashboard'
+            }
+            destino = rutas_por_rol.get(usuario.Rol, 'index')
 
-        # ⚡ Solo para clientes, mostramos la bienvenida
-        if usuario.Rol == 'cliente':
-            session['mostrar_bienvenida'] = True
+            if usuario.Rol == 'cliente':
+                session['mostrar_bienvenida'] = True
 
-        return jsonify({
-            'status': 'success',
-            'message': 'Inicio de sesión exitoso.',
-            'redirect': url_for(destino)
-        })
+            return jsonify({
+                'status': 'success',
+                'message': 'Inicio de sesión exitoso.',
+                'redirect': url_for(destino)
+            })
 
-    return jsonify({'status': 'danger', 'message': 'Correo o contraseña incorrectos.'})
+        return jsonify({'status': 'danger', 'message': 'Correo o contraseña incorrectos.'})
 
+    except Exception as e:
+        print("❌ ERROR LOGIN:", e)
+        return jsonify({'status': 'danger', 'message': f'Error interno: {str(e)}'})
 
 
 # ------------------ LOGOUT ------------------ #
