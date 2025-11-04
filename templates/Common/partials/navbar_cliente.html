@@ -28,12 +28,15 @@
     </button>
 
 <!-- Usuario -->
-<div class="nav-item dropdown">
-  <a class="nav-link dropdown-toggle fs-4" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+<div class="nav-item dropdown" style="position: relative;">
+  <a class="nav-link dropdown-toggle fs-4 p-0" href="#" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+    <!-- Icono de usuario (opcional, puedes ocultarlo si quieres solo la bolita) -->
     <i class="bi bi-person" style="color: #57a773;"></i>
   </a>
+
   {% if current_user.is_authenticated %}
-  <ul class="dropdown-menu dropdown-menu-end shadow p-3" style="width: 250px; background-color: white; border-radius: 10px;">
+  <ul class="dropdown-menu shadow p-3"
+      style="width: 250px; background-color: white; border-radius: 10px; top: 100%; left: auto; right: 0;">
     <li class="d-flex align-items-center mb-3">
       <!-- Bolita con iniciales -->
       <div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center me-2"
@@ -49,12 +52,14 @@
     </li>
   </ul>
   {% else %}
-  <ul class="dropdown-menu dropdown-menu-end shadow" style="background-color: white; border-radius: 10px;">
+  <ul class="dropdown-menu shadow"
+      style="width: 250px; background-color: white; border-radius: 10px; top: 100%; left: auto; right: 0;">
     <li><a class="dropdown-item" href="{{ url_for('auth.login') }}">Iniciar sesión</a></li>
     <li><a class="dropdown-item" href="{{ url_for('auth.register') }}">Registrarse</a></li>
   </ul>
   {% endif %}
 </div>
+
 
 
       <!-- Carrito -->

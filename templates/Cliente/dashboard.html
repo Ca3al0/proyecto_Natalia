@@ -2,10 +2,183 @@
 
 {% block navbar %}
   {% include "common/partials/navbar_cliente.html" %}
-  {% include "common/partials/navbar_secundario2.html" %}
 {% endblock %}
 
 {% block content %}
+
+<style>
+  :root {
+    --verde: #57a773;
+    --verde-oscuro: #157145;
+    --celeste: #9bd1e5;
+    --celeste-claro: #d1faff;
+    --gris: #6a8eae;
+    --blanco: #fff;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; font-family: 'Segoe UI', sans-serif; }
+
+  body { background: var(--celeste-claro); overflow-x: hidden; }
+
+.hero {
+  height: 100vh;
+  background: url("{{ url_for('static', filename='img/imagendashboard.jpg') }}") no-repeat center center;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  color: white;
+}
+
+  .hero::after {
+    content:'';
+    position:absolute;
+    top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.4);
+  }
+
+  .hero-content { position: relative; z-index:1; max-width:900px; }
+
+  .hero h1 { font-size:4rem; margin-bottom:1rem; text-shadow:2px 2px 5px rgba(0,0,0,0.5); }
+  .hero p { font-size:1.5rem; margin-bottom:2rem; text-shadow:1px 1px 3px rgba(0,0,0,0.5); }
+
+  .hero-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .btn-section {
+    padding:1rem 2rem;
+    border:none;
+    border-radius:50px;
+    background: var(--verde);
+    color: white;
+    font-size:1.2rem;
+    cursor:pointer;
+    transition: 0.3s;
+  }
+
+  .btn-section:hover { background: var(--verde-oscuro); transform: scale(1.05); }
+
+  /* Secciones tipo tarjeta gigante */
+  .secciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 4rem 2rem;
+    gap: 2rem;
+  }
+
+  .tarjeta {
+    flex: 1 1 300px;
+    height: 200px;
+    background: white;
+    border-radius: 25px;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align:center;
+    font-weight:bold;
+    color: var(--verde-oscuro);
+    font-size:1.5rem;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    cursor:pointer;
+    transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+  }
+
+  .tarjeta:hover {
+    transform: translateY(-10px) scale(1.05);
+    box-shadow: 0 20px 30px rgba(0,0,0,0.3);
+    background: var(--verde);
+    color: white;
+  }
+
+  /* Galería interactiva */
+  .galeria {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
+    gap:2rem;
+    padding:4rem 2rem;
+  }
+
+  .mueble {
+    position: relative;
+    border-radius:20px;
+    overflow:hidden;
+    cursor:pointer;
+    transition: transform 0.3s;
+  }
+
+  .mueble img {
+    width:100%;
+    height:250px;
+    object-fit:cover;
+    transition: transform 0.3s;
+  }
+
+  .mueble:hover img { transform: scale(1.1); }
+
+  .mueble .info {
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    background: rgba(0,0,0,0.6);
+    color:white;
+    padding:1rem;
+    text-align:center;
+    opacity:0;
+    transition: opacity 0.3s;
+  }
+
+  .mueble:hover .info { opacity:1; }
+
+  footer {
+    background: var(--verde);
+    color:white;
+    text-align:center;
+    padding:2rem 1rem;
+  }
+
+  /* Icono flotante de Chatbot */
+  .chatbot {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--verde);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    transition: transform 0.3s, background 0.3s;
+    z-index: 1000;
+  }
+
+  .chatbot:hover { transform: scale(1.1); background: var(--verde-oscuro); }
+
+  .chatbot img {
+    width: 30px;
+    height: 30px;
+  }
+
+  @media(max-width:768px){
+    .hero h1 { font-size:2.5rem; }
+    .hero p { font-size:1.2rem; }
+    .tarjeta { font-size:1.2rem; height:180px; }
+    .chatbot { width:50px; height:50px; }
+    .chatbot img { width:25px; height:25px; }
+  }
+</style>
 
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
@@ -30,29 +203,20 @@
   {% endif %}
 {% endwith %}
 
-<!-- Carrusel principal -->
-<div id="carouselEjemplo" class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-indicators">
-    <button type="button" data-bs-target="#carouselEjemplo" data-bs-slide-to="0" class="active"></button>
-    <button type="button" data-bs-target="#carouselEjemplo" data-bs-slide-to="1"></button>
-  </div>
 
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img src="{{ url_for('static', filename='img/carruselindex1.png') }}" class="d-block w-100" alt="Muebles" />
-    </div>
-    <div class="carousel-item">
-      <img src="{{ url_for('static', filename='img/carruselindex2.png') }}" class="d-block w-100" alt="Muebles" />
+<section class="hero">
+  <div class="hero-content">
+    <h1>Bienvenido a Muebles Creativos</h1>
+    <p>Explora y transforma tu hogar de forma interactiva</p>
+    <div class="hero-buttons">
+      <button class="btn-section" onclick="document.getElementById('categorias').scrollIntoView({behavior:'smooth'})">CATEGORÍAS</button>
+      <button class="btn-section" onclick="document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})">CATÁLOGO</button>
+      <button class="btn-section" onclick="document.getElementById('ofertas').scrollIntoView({behavior:'smooth'})">OFERTAS</button>
+      <button class="btn-section" onclick="document.getElementById('garantias').scrollIntoView({behavior:'smooth'})">GARANTÍAS</button>
+      <button class="btn-section" onclick="document.getElementById('instalaciones').scrollIntoView({behavior:'smooth'})">INSTALACIONES</button>
     </div>
   </div>
-
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselEjemplo" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon"></span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselEjemplo" data-bs-slide="next">
-    <span class="carousel-control-next-icon"></span>
-  </button>
-</div>
+</section>
 
 <!-- Sección Diseño con Identidad -->
 <div class="container-fluid my-5">
