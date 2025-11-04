@@ -58,6 +58,7 @@
       </div>
       <strong class="text-uppercase">{{ current_user.Nombre }} {{ current_user.Apellido }}</strong>
     </li>
+    <li><a class="dropdown-item" href="{{ url_for('cliente.historial') }}">Historial</a></li>
     <li><a class="dropdown-item" href="{{ url_for('cliente.actualizacion_datos') }}">Perfil</a></li>
     <li><a class="dropdown-item" href="{{ url_for('cliente.ver_notificaciones_cliente') }}">Notificaciones</a></li>
     <li class="mt-3">

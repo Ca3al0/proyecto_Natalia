@@ -1,8 +1,41 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Historial de Pedidos</title>
+{% extends "common/base.html" %}
+
+{% block navbar %}
+  {% include "common/partials/navbar_cliente.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5"> <!-- Agregado mb-5 para espacio inferior -->
+    <h1><b>Historial de Pedidos</b></h1>
+
+    {% if pedidos %}
+    <table>
+        <thead>
+            <tr>
+                <th>ID Pedido</th>
+                <th>Fecha</th>
+                <th>Subtotal</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pedido in pedidos %}
+            <tr>
+                <td>{{ pedido.ID_Pedido }}</td>
+                <td>{{ pedido.FechaPedido.strftime('%d/%m/%Y') }}</td>
+                <td>${{ '%.2f' | format(pedido.subtotal) }}</td>
+                <td>
+                    <a class="btn btn-ver" href="{{ url_for('cliente.ver_pedido', pedido_id=pedido.ID_Pedido) }}">Ver detalles</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="no-pedidos">No tienes pedidos aún.</p>
+    {% endif %}
+</div>
+
 <style>
 :root {
   --celeste-claro: #e7fcff;
@@ -10,14 +43,6 @@
   --azul-gris: #d1faffe;
   --verde: #57a773;
   --verde-oscuro: #157145;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: var(--celeste-claro);
-    margin: 0;
-    padding: 20px;
-    color: #333;
 }
 
 h1 {
@@ -89,40 +114,4 @@ form {
     color: #7f8c8d;
 }
 </style>
-
-
-</head>
-<body>
-    <h1>Historial de Pedidos</h1>
-
-    {% if pedidos %}
-    <table>
-        <thead>
-            <tr>
-                <th>ID Pedido</th>
-                <th>Fecha</th>
-                <th>Subtotal</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pedido in pedidos %}
-            <tr>
-                <td>{{ pedido.ID_Pedido }}</td>
-                <td>{{ pedido.FechaPedido.strftime('%d/%m/%Y') }}</td>
-                <td>${{ '%.2f' | format(pedido.subtotal) }}</td>
-                <td>
-                    <a class="btn btn-ver" href="{{ url_for('cliente.ver_pedido', pedido_id=pedido.ID_Pedido) }}">Ver detalles</a>
-                    <form style="display:inline;" method="POST" action="{{ url_for('cliente.eliminar_pedido', pedido_id=pedido.ID_Pedido) }}">
-                        <button class="btn btn-eliminar" type="submit" onclick="return confirm('¿Estás seguro de eliminar este pedido?');">Eliminar</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>No tienes pedidos aún.</p>
-    {% endif %}
-</body>
-</html>
+{% endblock %}
