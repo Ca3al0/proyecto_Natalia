@@ -1,67 +1,128 @@
 {% extends "common/base.html" %}
 
 {% block content %}
-<h2>Chat con Admin</h2>
+<!-- Botón flotante -->
+<button id="chatToggle" title="Abrir chat" style="
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #57a773;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    z-index: 1000;
+">💬</button>
 
-<div id="chatContainer" style="max-width:600px; margin:auto; border:1px solid #ddd; border-radius:10px; padding:10px;">
-    <div id="chatBody" style="height:400px; overflow-y:auto;">
-        {% for msg in mensajes %}
-            <div class="{{ 'admin-msg' if msg.enviado_admin else 'cliente-msg' }}">
-                <strong>{{ 'Admin' if msg.enviado_admin else current_user.Nombre }}:</strong> {{ msg.contenido }}
-            </div>
-        {% endfor %}
+<!-- Panel de chat oculto -->
+<div id="chatPanel" style="
+    display: none;
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 350px;
+    max-height: 500px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+">
+    <div id="chatHeader" style="background: #57a773; color: white; padding: 10px; text-align:center; font-weight:bold; cursor: grab;">
+        Chat con Admin
+        <span id="closeChat" style="float:right; cursor:pointer;">✖</span>
     </div>
-    <div style="margin-top:10px; display:flex;">
-        <input type="text" id="chatInput" placeholder="Escribe un mensaje..." style="flex:1; margin-right:5px;">
-        <button id="sendChat">Enviar</button>
+    <div id="chatBody" style="flex:1; padding:10px; overflow-y:auto; background:#f9f9f9;"></div>
+    <div id="chatInputContainer" style="display:flex; border-top:1px solid #ccc; padding:10px;">
+        <input type="text" id="chatInput" placeholder="Escribe un mensaje..." style="flex:1; padding:8px; border-radius:5px; border:1px solid #ccc;">
+        <button id="sendChat" style="padding:8px 12px; margin-left:5px; border:none; background:#57a773; color:white; border-radius:5px; cursor:pointer;">Enviar</button>
     </div>
 </div>
 
 <style>
-.cliente-msg { text-align: right; margin-bottom:5px; background:#d1faff; padding:5px 10px; border-radius:10px; }
-.admin-msg { text-align: left; margin-bottom:5px; background:#57a773; color:white; padding:5px 10px; border-radius:10px; }
+.cliente-msg {
+    text-align: right;
+    margin-bottom: 8px;
+    background: #d1faff;
+    padding: 8px 12px;
+    border-radius: 12px;
+    max-width: 80%;
+    word-wrap: break-word;
+    margin-left: auto;
+}
+.admin-msg {
+    text-align: left;
+    margin-bottom: 8px;
+    background: #57a773;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 12px;
+    max-width: 80%;
+    word-wrap: break-word;
+    margin-right: auto;
+}
+#chatBody::-webkit-scrollbar {
+    width: 6px;
+}
+#chatBody::-webkit-scrollbar-thumb {
+    background-color: #57a773;
+    border-radius: 3px;
+}
 </style>
 
 <script>
-const sendBtn = document.getElementById('sendChat');
-const chatInput = document.getElementById('chatInput');
+const chatToggle = document.getElementById('chatToggle');
+const chatPanel = document.getElementById('chatPanel');
 const chatBody = document.getElementById('chatBody');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendChat');
+const closeChat = document.getElementById('closeChat');
 
-sendBtn.addEventListener('click', async () => {
-    const contenido = chatInput.value.trim();
-    if(!contenido) return;
+// Abrir/cerrar chat
+chatToggle.addEventListener('click', () => chatPanel.style.display = 'flex');
+closeChat.addEventListener('click', () => chatPanel.style.display = 'none');
 
-    const response = await fetch('{{ url_for("cliente.enviar_mensaje_cliente") }}', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({contenido})
-    });
-
-    const data = await response.json();
-    if(data.status === 'ok'){
-        const div = document.createElement('div');
-        div.className = 'cliente-msg';
-        div.innerHTML = `<strong>{{ current_user.Nombre }}:</strong> ${contenido}`;
-        chatBody.appendChild(div);
-        chatInput.value = '';
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-});
-
-async function actualizarMensajes() {
-    const response = await fetch('{{ url_for("cliente.mensajes_cliente_ajax") }}');
+// Función para cargar mensajes
+async function cargarMensajes() {
+    const response = await fetch(`/cliente/chat/mensajes`);
     const mensajes = await response.json();
-    
     chatBody.innerHTML = '';
     mensajes.forEach(msg => {
         const div = document.createElement('div');
         div.className = msg.enviado_admin ? 'admin-msg' : 'cliente-msg';
-        div.innerHTML = `<strong>${msg.enviado_admin ? 'Admin' : '{{ current_user.Nombre }}'}:</strong> ${msg.contenido}`;
+        div.innerHTML = `<strong>${msg.enviado_admin ? 'Admin' : 'Tú'}:</strong> ${msg.contenido}`;
         chatBody.appendChild(div);
     });
     chatBody.scrollTop = chatBody.scrollHeight;
 }
 
-setInterval(actualizarMensajes, 3000);
+// Enviar mensaje
+sendBtn.addEventListener('click', async () => {
+    const contenido = chatInput.value.trim();
+    if(!contenido) return;
+    
+    const response = await fetch('{{ url_for("cliente.enviar_mensaje_cliente") }}', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({contenido})
+    });
+    const data = await response.json();
+    if(data.status === 'ok'){
+        chatInput.value = '';
+        cargarMensajes();
+    }
+});
+
+// Auto actualizar cada 3s
+setInterval(cargarMensajes, 3000);
+
+// Cargar mensajes al abrir
+chatToggle.addEventListener('click', cargarMensajes);
 </script>
 {% endblock %}

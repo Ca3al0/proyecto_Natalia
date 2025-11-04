@@ -683,13 +683,20 @@ def reporte_entregas():
 @admin.route('/chat', methods=['GET'])
 @login_required
 def chat_admin():
-    # Traer todos los mensajes ordenados por fecha
-    mensajes = Mensaje.query.order_by(Mensaje.fecha).all()
-    
-    # Traer todos los clientes
-    usuarios = Usuario.query.filter_by(Rol='cliente').all()
+    # Traer todos los clientes que han enviado mensajes
+    clientes = (
+        db.session.query(Usuario)
+        .join(Mensaje, Usuario.ID_Usuario == Mensaje.cliente_id)
+        .filter(Mensaje.enviado_admin == False)  # solo clientes
+        .distinct()
+        .all()
+    )
 
-    return render_template('Administrador/chat.html', mensajes=mensajes, usuarios=usuarios)
+    # Traer los mensajes (puedes dejar vacío al inicio)
+    mensajes = []
+
+    return render_template('Administrador/chat.html', clientes=clientes, mensajes=mensajes)
+
 
 
 
@@ -708,14 +715,16 @@ def enviar_mensaje_admin():
     db.session.commit()
     return jsonify({'status': 'ok'})
 
-@admin.route('/chat/mensajes/<int:cliente_id>')
+@admin.route('/chat/mensajes/<int:cliente_id>', methods=['GET'])
 @login_required
 def mensajes_cliente(cliente_id):
     mensajes = Mensaje.query.filter_by(cliente_id=cliente_id).order_by(Mensaje.fecha).all()
-    return jsonify([
+    mensajes_list = [
         {
             'contenido': m.contenido,
             'enviado_admin': m.enviado_admin,
             'cliente_nombre': m.cliente.Nombre
         } for m in mensajes
-    ])
+    ]
+    return jsonify(mensajes_list)
+

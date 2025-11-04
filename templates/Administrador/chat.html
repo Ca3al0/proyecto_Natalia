@@ -1,65 +1,204 @@
 {% extends "common/base.html" %}
 
 {% block content %}
-<h2>Chat con Clientes</h2>
+<h2 style="text-align:center; margin-bottom:30px; color:#157145; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Chat con Clientes</h2>
 
-<div id="chatContainer" style="max-width:600px; margin:auto; border:1px solid #ddd; border-radius:10px; padding:10px;">
-    <div id="chatBody" style="height:400px; overflow-y:auto;">
-        {% for msg in mensajes %}
-            <div class="{{ 'admin-msg' if msg.enviado_admin else 'cliente-msg' }}">
-                <strong>{{ 'Admin' if msg.enviado_admin else msg.cliente.Nombre }}:</strong> {{ msg.contenido }}
-            </div>
-        {% endfor %}
-    </div>
-    <div style="margin-top:10px; display:flex;">
-        <select id="clienteSelect" style="flex:1; margin-right:5px;">
-            {% for user in usuarios %}
-                <option value="{{ user.ID_Usuario }}">{{ user.Nombre }}</option>
+<div id="chatWrapper">
+    <!-- Panel de clientes -->
+    <div id="clientesPanel">
+        <h4>Clientes</h4>
+        <ul id="listaClientes">
+            {% for user in clientes %}
+                <li data-id="{{ user.ID_Usuario }}">{{ user.Nombre }}</li>
             {% endfor %}
-        </select>
-        <input type="text" id="chatInput" placeholder="Escribe un mensaje..." style="flex:3; margin-right:5px;">
-        <button id="sendChat">Enviar</button>
+        </ul>
+    </div>
+
+    <!-- Panel de chat -->
+    <div id="chatPanel">
+        <div id="chatBody"></div>
+        <div id="chatInputContainer">
+            <input type="text" id="chatInput" placeholder="Escribe un mensaje...">
+            <button id="sendChat">Enviar</button>
+        </div>
     </div>
 </div>
 
 <style>
-.cliente-msg { text-align: left; margin-bottom:5px; background:#d1faff; padding:5px 10px; border-radius:10px; }
-.admin-msg { text-align: right; margin-bottom:5px; background:#57a773; color:white; padding:5px 10px; border-radius:10px; }
+/* Contenedor principal */
+#chatWrapper {
+    display: flex;
+    max-width: 1000px;
+    margin: 0 auto;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 550px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Panel de clientes */
+#clientesPanel {
+    width: 280px;
+    border-right: 1px solid #ccc;
+    background: #f0f8ff;
+    padding: 15px;
+    overflow-y: auto;
+}
+#clientesPanel h4 {
+    margin-bottom: 15px;
+    color: #157145;
+}
+#clientesPanel ul {
+    list-style: none;
+    padding: 0;
+}
+#clientesPanel li {
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: 0.3s;
+    background: #e6f7ff;
+    color: #157145;
+}
+#clientesPanel li:hover,
+#clientesPanel li.active {
+    background: #57a773;
+    color: white;
+    transform: scale(1.03);
+}
+
+/* Panel de chat */
+#chatPanel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+}
+#chatBody {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #f9f9f9;
+}
+.cliente-msg {
+    text-align: right;
+    margin-bottom: 10px;
+    background: #d1faff;
+    padding: 10px 15px;
+    border-radius: 20px 20px 0 20px;
+    max-width: 75%;
+    word-wrap: break-word;
+    margin-left: auto;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+.cliente-msg:hover {
+    background: #a0e0ff;
+}
+.admin-msg {
+    text-align: left;
+    margin-bottom: 10px;
+    background: #57a773;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 20px 20px 20px 0;
+    max-width: 75%;
+    word-wrap: break-word;
+    margin-right: auto;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: 0.3s;
+}
+.admin-msg:hover {
+    background: #45925c;
+}
+
+/* Scroll personalizado */
+#chatBody::-webkit-scrollbar {
+    width: 8px;
+}
+#chatBody::-webkit-scrollbar-thumb {
+    background-color: #57a773;
+    border-radius: 4px;
+}
+#chatBody::-webkit-scrollbar-track {
+    background: #e6f7ff;
+}
+
+/* Input y botón */
+#chatInputContainer {
+    display: flex;
+    padding: 12px;
+    border-top: 1px solid #ccc;
+    background: #f0f8ff;
+}
+#chatInput {
+    flex: 1;
+    padding: 10px;
+    margin-right: 8px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+}
+#chatInput:focus {
+    outline: none;
+    border-color: #57a773;
+    box-shadow: 0 0 5px rgba(87,167,115,0.5);
+}
+#sendChat {
+    padding: 10px 18px;
+    border: none;
+    background: #57a773;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+#sendChat:hover {
+    background: #45925c;
+}
 </style>
 
 <script>
-const sendBtn = document.getElementById('sendChat');
-const chatInput = document.getElementById('chatInput');
+let clienteSeleccionado = null;
 const chatBody = document.getElementById('chatBody');
-const clienteSelect = document.getElementById('clienteSelect');
+const chatInput = document.getElementById('chatInput');
+const sendBtn = document.getElementById('sendChat');
 
+// Seleccionar cliente
+document.querySelectorAll('#listaClientes li').forEach(li => {
+    li.addEventListener('click', () => {
+        document.querySelectorAll('#listaClientes li').forEach(el => el.classList.remove('active'));
+        li.classList.add('active');
+        clienteSeleccionado = li.dataset.id;
+        cargarMensajes(clienteSeleccionado);
+    });
+});
+
+// Enviar mensaje
 sendBtn.addEventListener('click', async () => {
+    if(!clienteSeleccionado) return alert('Selecciona un cliente primero.');
     const contenido = chatInput.value.trim();
-    const cliente_id = clienteSelect.value;
-
     if(!contenido) return;
 
     const response = await fetch('{{ url_for("admin.enviar_mensaje_admin") }}', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({contenido, cliente_id})
+        body: JSON.stringify({contenido, cliente_id: clienteSeleccionado})
     });
-
     const data = await response.json();
     if(data.status === 'ok'){
-        const div = document.createElement('div');
-        div.className = 'admin-msg';
-        div.innerHTML = `<strong>Admin:</strong> ${contenido}`;
-        chatBody.appendChild(div);
         chatInput.value = '';
-        chatBody.scrollTop = chatBody.scrollHeight;
+        cargarMensajes(clienteSeleccionado);
     }
 });
-async function actualizarMensajes() {
-    const cliente_id = clienteSelect.value;
-    const response = await fetch(`/admin/chat/mensajes/${cliente_id}`);
+
+// Cargar mensajes
+async function cargarMensajes(clienteId){
+    const response = await fetch(`/admin/chat/mensajes/${clienteId}`);
     const mensajes = await response.json();
-    
     chatBody.innerHTML = '';
     mensajes.forEach(msg => {
         const div = document.createElement('div');
@@ -70,7 +209,11 @@ async function actualizarMensajes() {
     chatBody.scrollTop = chatBody.scrollHeight;
 }
 
-setInterval(actualizarMensajes, 3000);
-
+// Actualizar cada 3s
+setInterval(() => {
+    if(clienteSeleccionado){
+        cargarMensajes(clienteSeleccionado);
+    }
+}, 3000);
 </script>
 {% endblock %}
