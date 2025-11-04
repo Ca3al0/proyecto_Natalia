@@ -442,6 +442,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
+<script>
+document.getElementById("formRegister").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formData = new FormData(e.target);
+  const response = await fetch("/register", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await response.json();
+  const alertBox = document.getElementById("register-alert");
+
+  if (alertBox) {
+    alertBox.innerHTML = `
+      <div class="alert alert-${data.status}" role="alert">
+        ${data.message}
+      </div>`;
+  }
+
+  // ✅ Si el registro fue exitoso, mostrar modal de login
+  if (data.status === "success") {
+    setTimeout(() => {
+      const registroModal = bootstrap.Modal.getInstance(document.getElementById("modalRegister"));
+      registroModal.hide(); // cierra el modal de registro
+
+      const loginModal = new bootstrap.Modal(document.getElementById("modalLogin"));
+      loginModal.show(); // abre el modal de login
+    }, 4000); // espera 1.5 segundos para mostrar el login
+  }
+});
+</script>
 
 
 

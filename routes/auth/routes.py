@@ -14,7 +14,7 @@ s = URLSafeTimedSerializer("mi_clave_super_secreta_y_unica")
 @auth.route('/register', methods=['POST'])
 def register():
     nombre_completo = request.form.get('name', '').strip()
-    correo = request.form.get('email', '').strip()
+    correo = request.form.get('email', '').strip().lower()  # 👈 corrección aquí
     telefono = request.form.get('phone', '').strip()
     password = request.form.get('password', '').strip()
 
@@ -51,9 +51,7 @@ def register():
             mensaje="Tu cuenta se ha creado correctamente."
         )
 
-        # Agregamos mensaje flash y redirección al login
-        flash('Cuenta creada correctamente. Ahora puedes iniciar sesión.', 'success')
-        return jsonify({'status': 'success', 'redirect': url_for('index')})
+        return jsonify({'status': 'success', 'message': 'Cuenta creada correctamente. Ahora puedes iniciar sesión.'})
 
     except Exception as e:
         db.session.rollback()
