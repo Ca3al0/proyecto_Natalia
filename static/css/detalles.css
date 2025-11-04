@@ -1,87 +1,158 @@
-  body, .container {
-    font-family: 'Poppins', sans-serif;
+/* ---------- Fondo general ---------- */
+body {
+    background: #f0fdf4; /* Verde muy suave */
+    font-family: 'Segoe UI', sans-serif;
     color: #333;
-  }
+}
 
+/* ---------- Tarjeta del producto ---------- */
+.card {
+    border-radius: 25px;
+    padding: 30px;
+    background: linear-gradient(135deg, #ffffff, #e6f7ef);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    transition: none;
+}
 
-  .img-fluid {
-    border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-  }
+/* ---------- Imagen ---------- */
+.img-fluid {
+    border-radius: 20px;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+    object-fit: contain;
+    width: 100%;
+    max-height: 450px;
+    background: white;
+    padding: 10px;
+}
 
-  .img-fluid:hover {
-    transform: scale(1.06);
-  }
+/* ---------- Títulos ---------- */
+h2.fw-bold {
+    color: #157145;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
 
-
-  h2.fw-bold {
+h4.text-success {
+    color: #57a773 !important;
     font-weight: 700;
-    font-size: 2.4rem;
-    margin-bottom: 0.4rem;
-  }
+    margin-bottom: 20px;
+}
 
-  h4.text-success {
-    font-weight: 600;
-    font-size: 1.8rem;
-    color: #28a745 !important; 
-    margin-bottom: 1.2rem;
-  }
-
-
-  ul.list-unstyled li {
-    font-size: 1.05rem;
-    margin-bottom: 0.5rem;
-  }
-
-  ul.list-unstyled li strong {
-    color: #555;
-  }
-
-  
-  h5 {
-    font-weight: 600;
-    margin-bottom: 0.6rem;
-  }
-
-  p {
-    font-size: 1.05rem;
-    line-height: 1.6;
-    color: #444;
-  }
-
- 
-  .mt-4 h5 {
-    font-weight: 600;
-    margin-bottom: 0.8rem;
-  }
-
-  .mt-4 p.text-muted {
+/* ---------- Lista de detalles ---------- */
+ul.list-unstyled li {
     font-size: 1rem;
-    font-style: italic;
-    color: #888;
-  }
+    margin-bottom: 8px;
+    color: #555;
+}
 
-  
-  .btn-secondary {
-    font-weight: 600;
-    padding: 0.6rem 1.3rem;
-    border-radius: 6px;
-    background-color: #6c757d;
+/* ---------- Descripción ---------- */
+p {
+    font-size: 1rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+/* ---------- Botones ---------- */
+.btn-success,
+.btn-verde {
+    background-color: #57a773;
+    color: white;
     border: none;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-  }
+    border-radius: 50px;
+    font-weight: 700;
+    padding: 12px 28px;
+    box-shadow: 0 5px 20px rgba(87,167,115,0.3);
+    transition: none;
+}
 
-  .btn-secondary:hover {
-    background-color: #5a6268;
-    transform: translateY(-1px);
-    color: #fff;
-  }
+.btn-secondary {
+    background-color: #d1faff;
+    color: #157145;
+    border: 2px solid #9bd1e5;
+    border-radius: 50px;
+    font-weight: 700;
+    padding: 12px 28px;
+    transition: none;
+}
 
+/* Iconos de botones */
+.btn i {
+    vertical-align: middle;
+    margin-right: 6px;
+}
 
-  @media (max-width: 768px) {
+/* ---------- Modal de compra ---------- */
+.modal-content {
+    border-radius: 25px;
+    padding: 30px;
+    background: linear-gradient(145deg, #ffffff, #e9f7ef);
+    box-shadow: 0 15px 50px rgba(0,0,0,0.08);
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-header h5 {
+    font-weight: 800;
+    color: #157145;
+}
+
+.modal-body .form-label {
+    font-weight: 600;
+    color: #157145;
+}
+
+.modal-body .form-select {
+    border-radius: 50px;
+    border: 2px solid #9bd1e5;
+    padding: 10px 15px;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.modal-footer .btn-success,
+.modal-footer .btn-secondary {
+    width: 100%;
+    border-radius: 50px;
+    font-weight: 700;
+}
+
+/* ---------- Flash messages ---------- */
+.alert {
+    border-radius: 20px;
+    font-weight: 600;
+    padding: 12px 20px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+}
+
+.alert i {
+    margin-right: 8px;
+    font-size: 1.2rem;
+}
+
+/* ---------- Separación entre imagen y detalles ---------- */
+.row > .col-md-6 {
+    margin-bottom: 20px;
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 768px) {
     .img-fluid {
-      max-height: 320px;
+        max-height: 300px;
     }
-  }
-
+    h2.fw-bold {
+        font-size: 1.5rem;
+    }
+    h4.text-success {
+        font-size: 1.2rem;
+    }
+    .btn-success, .btn-verde, .btn-secondary {
+        padding: 10px 20px;
+    }
+}

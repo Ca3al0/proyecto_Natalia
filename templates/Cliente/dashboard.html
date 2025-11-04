@@ -305,12 +305,12 @@
 </section>
 
 <style>
-  /* Hover sutil en la imagen */
+
   #bienvenida img:hover {
     transform: scale(1.05);
   }
 
-  /* Botón con sombra suave */
+  
   #bienvenida .btn-success {
     transition: all 0.3s ease;
   }
@@ -326,7 +326,7 @@
 
 {% if mostrar_bienvenida %}
 <style>
-  /* Fondo borroso cuando el modal está abierto */
+ 
   body.modal-open::before {
     content: "";
     position: fixed;
@@ -334,8 +334,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    backdrop-filter: blur(5px); /* borroso */
-    z-index: 1040; /* por debajo del modal */
+    backdrop-filter: blur(5px); 
+    z-index: 1040;
   }
 </style>
 

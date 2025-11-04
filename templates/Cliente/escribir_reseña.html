@@ -2,52 +2,106 @@
 
 {% block navbar %}
   {% include "common/partials/navbar_cliente.html" %}
-  {% include "common/partials/navbar_secundario2.html" %}
+  
 {% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/notificaciones.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
 <style>
-  .fade-in-up {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInUp 0.8s ease-out forwards;
-  }
+  
 
-  @keyframes fadeInUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
+
+.card {
+    border-radius: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    transition: none; 
+    background: #ffffff;
+}
+
+.card-header {
+    background-color: #57a773; 
+    color: white;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.card-header i {
+    font-size: 1.2rem;
+}
+
+.card-body {
+    background: #f9fdf7;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    padding: 25px;
+}
+
+/* Formulario */
+form .form-label {
+    font-weight: 600;
+    color: #157145;
+}
+
+form .form-control {
+    border-radius: 50px;
+    border: 2px solid #9bd1e5;
+    padding: 12px 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: none; /* nada de animación */
+}
+
+form .form-control:focus {
+    border-color: #57a773;
+    box-shadow: 0 0 8px rgba(87,167,115,0.4);
+}
+
+/* Botón de enviar */
+.btn-verde {
+    background-color: #57a773;
+    color: white;
+    border-radius: 50px;
+    font-weight: 700;
+    transition: none; /* estático */
+}
+
+.btn-verde i {
+    font-size: 1rem;
+}
+
+/* Flash messages */
+.flash-small {
+    border-radius: 20px;
+    font-size: 0.95rem;
+    padding: 12px 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.flash-small i {
+    font-size: 1.3rem;
+    margin-right: 8px;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .card {
+        border-radius: 20px;
     }
-  }
+    .card-header {
+        font-size: 1.1rem;
+    }
+    form .form-control {
+        padding: 10px 15px;
+    }
+    .btn-verde {
+        padding: 10px 20px;
+    }
+}
 
-  .card {
-    border-radius: 12px;
-    overflow: hidden;
-  }
-
-  .card-header.bg-verde {
-    background-color: #7cb342;
-    color: white;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  .form-control:focus {
-    border-color: #7cb342;
-    box-shadow: 0 0 0 0.25rem rgba(124, 179, 66, 0.25);
-  }
-
-  .btn-verde {
-    background-color: #7cb342;
-    border: none;
-    color: white;
-    transition: background-color 0.3s ease;
-  }
-
-  .btn-verde:hover {
-    background-color: #689f38;
-  }
 </style>
 
 
