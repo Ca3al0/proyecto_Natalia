@@ -284,10 +284,13 @@ class RegistroFotografico(db.Model):
     __tablename__ = 'registro_fotografico'
 
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
-    pedido_id = db.Column(db.Integer, nullable=False)
+    pedido_id = db.Column(db.Integer, db.ForeignKey('Pedido.ID_Pedido'), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
     tipo = db.Column(db.String(10))
     descripcion = db.Column(db.Text)
     imagen_url = db.Column(db.Text, nullable=False)
     creado_en = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Relaciones
     usuario = db.relationship('Usuario', backref=db.backref('registros_fotograficos', lazy=True))
+    pedido = db.relationship('Pedido', backref=db.backref('registros_fotograficos', lazy=True))
