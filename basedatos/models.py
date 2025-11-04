@@ -27,6 +27,7 @@ class Usuario(UserMixin, db.Model):
     pedidos_asignados = db.relationship('Pedido', foreign_keys='Pedido.ID_Empleado', lazy=True)
     direcciones = db.relationship('Direccion', backref='usuario', lazy=True, cascade="all, delete-orphan")
     resenas = db.relationship('Resena', back_populates='usuario', lazy=True)
+    historial = db.relationship('HistorialActividad', backref='usuario', lazy=True)
 
     def get_id(self):
         return str(self.ID_Usuario)
@@ -141,7 +142,7 @@ class Pedido(db.Model):
     detalles_pedido = db.relationship('Detalle_Pedido', backref='pedido', lazy=True)
     firmas = db.relationship('Firmas', backref='pedido', lazy=True)
     comentarios = db.relationship('Comentarios', backref='pedido', lazy=True)
-    calendario = db.relationship('Calendario', backref='pedido', lazy=True)
+    
 
     # Relación con empleado (transportista)
     empleado = db.relationship('Usuario', foreign_keys=[ID_Empleado])
@@ -312,3 +313,4 @@ class RegistroFotografico(db.Model):
     # Relaciones
     usuario = db.relationship('Usuario', backref=db.backref('registros_fotograficos', lazy=True))
     pedido = db.relationship('Pedido', backref=db.backref('registros_fotograficos', lazy=True))
+
