@@ -396,10 +396,10 @@ def ver_carrito():
     return render_template('Cliente/carrito.html')
 
 @cliente.route('/checkout')
-@login_required # Si aplica
 def checkout():
-    # Lógica para procesar el pago o mostrar el formulario de checkout
-    return render_template('Cliente/pago.html')
+    # Obtener direcciones del usuario actual
+    direcciones = Direccion.query.filter_by(ID_Usuario=current_user.ID_Usuario).all()
+    return render_template('Cliente/pagos.html', direcciones=direcciones)
 
 @cliente.route('/finalizar-compra', methods=['POST'])
 @login_required
