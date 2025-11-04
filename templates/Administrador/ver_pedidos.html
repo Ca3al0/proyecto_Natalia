@@ -11,7 +11,7 @@
 
 {% block content %}
 <div class="container my-4">
-  <h2 class="mb-4 text-center text-success fw-bold">Listado de Pedidos</h2>
+  <h2 class="mb-4 text-center text-success fw-bold"><b></b>Listado de Pedidos</h2>
 
   <!-- Pedidos Pendientes -->
   <h3 class="mb-3 text-success fw-semibold">Pedidos Pendientes</h3>
@@ -153,6 +153,31 @@
     <div class="alert alert-secondary">No hay pedidos entregados.</div>
   {% endif %}
 </div>
+<!-- Botón flotante -->
+<a href="{{ url_for('admin.reporte_entregas') }}" class="btn btn-success btn-float">
+    Ver Reportes
+</a>
+
+<style>
+/* Botón flotante */
+.btn-float {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    border-radius: 50px;
+    padding: 12px 20px;
+    font-size: 16px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.btn-float:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+</style>
+
 
 <style>
 /* Tarjetas generales */
