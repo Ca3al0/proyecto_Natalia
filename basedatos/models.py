@@ -27,7 +27,6 @@ class Usuario(UserMixin, db.Model):
     pedidos_asignados = db.relationship('Pedido', foreign_keys='Pedido.ID_Empleado', lazy=True)
     direcciones = db.relationship('Direccion', backref='usuario', lazy=True, cascade="all, delete-orphan")
     resenas = db.relationship('Resena', back_populates='usuario', lazy=True)
-    historial = db.relationship('HistorialActividad', backref='usuario', lazy=True)
 
     def get_id(self):
         return str(self.ID_Usuario)
@@ -122,7 +121,7 @@ class ImagenProducto(db.Model):
 
 
 
-
+# ------------------ Pedido ------------------
 # ------------------ Pedido ------------------
 class Pedido(db.Model):
     __tablename__ = 'Pedido'
@@ -313,4 +312,3 @@ class RegistroFotografico(db.Model):
     # Relaciones
     usuario = db.relationship('Usuario', backref=db.backref('registros_fotograficos', lazy=True))
     pedido = db.relationship('Pedido', backref=db.backref('registros_fotograficos', lazy=True))
-
