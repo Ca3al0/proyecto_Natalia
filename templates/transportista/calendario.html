@@ -2,10 +2,10 @@
 
 {% block navbar %}
   {% include "common/partials/navbar_transpoinsta.html" %}
-  {% include "common/partials/navbar_secundario2.html" %}
 {% endblock %}
 
 {% block content %}
+
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/calendario.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/flash.css') }}">
@@ -42,35 +42,29 @@
     </div>
 </div>
 
-
 <div id="registroFotograficoModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">Registro Fotográfico</div>
         <div class="modal-body">
             <form id="registroFotograficoForm">
-             
                 <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
                     <label><strong>Fotos Antes:</strong></label><br>
                     <input type="file" name="fotos_antes" multiple accept="image/*" capture="environment"><br><br>
                     <label><strong>Descripción Antes:</strong></label><br>
-                    <textarea name="desc_antes" rows="3" style="width:100%;border-radius:6px;border:1px solid #ccc;padding:5px;"></textarea>
+                    <textarea name="desc_antes" rows="3"></textarea>
                 </div>
-
-                
                 <div style="margin-bottom:15px; border-bottom:1px solid #ccc; padding-bottom:10px;">
                     <label><strong>Fotos Después:</strong></label><br>
                     <input type="file" name="fotos_despues" multiple accept="image/*" capture="environment"><br><br>
                     <label><strong>Descripción Después:</strong></label><br>
-                    <textarea name="desc_despues" rows="3" style="width:100%;border-radius:6px;border:1px solid #ccc;padding:5px;"></textarea>
+                    <textarea name="desc_despues" rows="3"></textarea>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" onclick="cerrarRegistro()">Cancelar</button>
                     <button type="submit">Guardar Registro</button>
                 </div>
             </form>
 
-            
             <div id="registroPreview" style="display:none; margin-top:20px;">
                 <h4>Registro Guardado</h4>
                 <div id="previewAntes">
@@ -96,6 +90,5 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
 <script src="{{ url_for('static', filename='js/calendario.js') }}"></script>
-
 
 {% endblock %}
