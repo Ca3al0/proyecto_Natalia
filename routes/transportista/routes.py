@@ -204,21 +204,19 @@ def ver_pedidos_transportista():
 def actualizar_estado_pedido(pedido_id):
     pedido = Pedido.query.get_or_404(pedido_id)
 
-    # Validar que el pedido está asignado al transportista
     if pedido.ID_Empleado != current_user.ID_Usuario:
         return jsonify({'status': 'error', 'message': 'No puedes modificar este pedido'}), 403
 
-    # Obtener el estado enviado desde JS
     nuevo_estado = request.json.get('estado')
-
     if nuevo_estado not in ['pendiente', 'en proceso', 'en reparto', 'entregado']:
         return jsonify({'status': 'error', 'message': 'Estado no válido'}), 400
 
     try:
-        pedido.Estado = nuevo_estado
-        db.session.commit()  # ✅ Esto guarda en la base de datos
+        # Asignar el nuevo estado
+        setattr(pedido, 'Estado', nuevo_estado)  # <- más seguro que pedido.Estado
+        db.session.commit()
 
-        # Crear notificación para el cliente
+        # Notificación
         notificacion = Notificaciones(
             Titulo='Actualización de pedido',
             Mensaje=f'El estado de tu pedido #{pedido.ID_Pedido} cambió a "{nuevo_estado}".',
