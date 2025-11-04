@@ -312,3 +312,37 @@ class RegistroFotografico(db.Model):
     # Relaciones
     usuario = db.relationship('Usuario', backref=db.backref('registros_fotograficos', lazy=True))
     pedido = db.relationship('Pedido', backref=db.backref('registros_fotograficos', lazy=True))
+
+class Garantia(db.Model):
+    __tablename__ = 'Garantia'
+
+    ID_Garantia = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ID_Pedido = db.Column(db.Integer, db.ForeignKey('Pedido.ID_Pedido'), nullable=False)
+    ID_Usuario = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
+    FechaSolicitud = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    Estado = db.Column(Enum('pendiente', 'aprobada', 'rechazada', 'completada', name='estado_garantia'), default='pendiente', nullable=False)
+    Motivo = db.Column(db.Text, nullable=False)
+    ComentarioAdmin = db.Column(db.Text)
+    FechaResolucion = db.Column(db.DateTime)
+    
+    # Archivos relacionados con la garantía
+    archivos = db.relationship('GarantiaArchivo', backref='garantia', lazy=True, cascade="all, delete-orphan")
+    
+    # Relaciones
+    pedido = db.relationship('Pedido', backref=db.backref('garantias', lazy=True))
+    usuario = db.relationship('Usuario', backref=db.backref('garantias', lazy=True))
+    
+    def __repr__(self):
+        return f"<Garantia {self.ID_Garantia} - Estado: {self.Estado}>"
+    
+class GarantiaArchivo(db.Model):
+    __tablename__ = 'GarantiaArchivo'
+
+    ID_Archivo = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ID_Garantia = db.Column(db.Integer, db.ForeignKey('Garantia.ID_Garantia', ondelete='CASCADE'), nullable=False)
+    NombreArchivo = db.Column(db.String(200))
+    RutaArchivo = db.Column(db.String(500), nullable=False)
+    FechaSubida = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f"<Archivo {self.NombreArchivo} para Garantia {self.ID_Garantia}>"
