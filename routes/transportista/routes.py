@@ -218,10 +218,11 @@ def actualizar_estado(id_pedido):
 
     if nuevo_idx < actual_idx:
         flash("⚠️ No puedes regresar a un estado anterior.", "warning")
-        return redirect(url_for("seguimiento_pedido", id_pedido=id_pedido))
+        return redirect(url_for("transportista.seguimiento_pedido", pedido_id=id_pedido))
 
     pedido.Estado = nuevo_estado
     db.session.commit()
     flash("✅ Estado actualizado correctamente.", "success")
 
-    return redirect(url_for("transportista/seguimiento.html", id_pedido=id_pedido))
+    # Redirige correctamente al seguimiento del pedido
+    return redirect(url_for("transportista.seguimiento_pedido", pedido_id=id_pedido))

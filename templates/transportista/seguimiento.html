@@ -9,17 +9,16 @@
     <p><strong>Artículo:</strong> {{ pedido.NomArticulo }}</p>
   </div>
 
-  <form method="POST" onsubmit="return validarAvance();">
-    <label for="estado">Actualizar estado del pedido:</label>
-    <select id="estado" name="estado" class="form-select">
-      <option value="pendiente" {% if pedido.Estado == 'pendiente' %}selected{% endif %}>🕓 Pendiente</option>
-      <option value="en proceso" {% if pedido.Estado == 'en proceso' %}selected{% endif %}>🛠️ En proceso</option>
-      <option value="en reparto" {% if pedido.Estado == 'en reparto' %}selected{% endif %}>🚚 En reparto</option>
-      <option value="entregado" {% if pedido.Estado == 'entregado' %}selected{% endif %}>✅ Entregado</option>
+<form action="{{ url_for('transportista.actualizar_estado', id_pedido=pedido.ID_Pedido) }}" method="POST">
+    <select name="estado">
+        <option value="pendiente" {% if pedido.Estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+        <option value="en proceso" {% if pedido.Estado == 'en proceso' %}selected{% endif %}>En proceso</option>
+        <option value="en reparto" {% if pedido.Estado == 'en reparto' %}selected{% endif %}>En reparto</option>
+        <option value="entregado" {% if pedido.Estado == 'entregado' %}selected{% endif %}>Entregado</option>
     </select>
+    <button type="submit">Actualizar</button>
+</form>
 
-    <button type="submit" class="btn btn-success mt-2">Actualizar estado</button>
-  </form>
 
   <div class="info">
     Cambia el estado actual solo para avanzar en el proceso. No se puede volver atrás.
