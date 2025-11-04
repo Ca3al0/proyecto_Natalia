@@ -33,7 +33,7 @@ def register():
     # Evita falsos duplicados
     usuario_existente = Usuario.query.filter(func.lower(Usuario.Correo) == correo).first()
     if usuario_existente:
-        return jsonify({'status': 'danger', 'message': 'Este correo ya está registrado. Usa otro o inicia sesión.'})
+        return jsonify({'status': 'danger', 'message': 'Este correo ya está registrado. Usa otro por favor.'})
 
     nombre, apellido = (nombre_completo.split(" ", 1) + [""])[:2]
 
@@ -56,10 +56,10 @@ def register():
             mensaje="Tu cuenta se ha creado correctamente."
         )
 
-        # ✅ Muestra mensaje y abre modal de login tras 3 segundos
+      
         return jsonify({
             'status': 'success',
-            'message': 'Cuenta creada correctamente. Redirigiendo al login...',
+            'message': 'Cuenta creada correctamente.Ahora puedes iniciar sesión.',
             'redirect': url_for('index'),
             'delay': 3000  # milisegundos
         })
@@ -122,7 +122,7 @@ def forgot_password():
     try:
         token = s.dumps(email, salt='password-recovery')
         send_reset_email(user_email=email, user_name=user.Nombre, token=token)
-        return jsonify({'status': 'success', 'message': 'Correo enviado para restablecer contraseña. El campo se limpiará.'})
+        return jsonify({'status': 'success', 'message': 'Correo enviado para restablecer contraseña.'})
     except Exception as e:
         return jsonify({'status': 'danger', 'message': f'Error al enviar correo: {str(e)}'})
 
