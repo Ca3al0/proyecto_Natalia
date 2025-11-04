@@ -21,7 +21,7 @@ reviews = []
 @role_required("cliente")
 def dashboard():
     mostrar_bienvenida = session.pop('mostrar_bienvenida', False)
-    nombre_completo = session.get('username', '')  # <-- usar session['username']
+    nombre_completo = session.get('username', '')  
     
     return render_template(
         "cliente/dashboard.html",

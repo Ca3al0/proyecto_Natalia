@@ -55,7 +55,7 @@
             <strong class="text-uppercase">{{ current_user.Nombre }} {{ current_user.Apellido }}</strong>
           </li>
           <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="#">Perfil</a></li>
+          <li><a class="dropdown-item" href="{{ url_for('transportista.actualizacion_datos') }}">Perfil</a></li>
           <li><a class="dropdown-item" href="{{ url_for('transportista.calendario') }}">Calendario</a></li>
           <li><hr class="dropdown-divider"></li>
           <li class="px-3">

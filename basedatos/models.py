@@ -24,7 +24,7 @@ class Usuario(UserMixin, db.Model):
     notificaciones = db.relationship('Notificaciones', backref='usuario', lazy=True)
     novedades = db.relationship('Novedades', backref='usuario', lazy=True)
     pedidos = db.relationship('Pedido', backref='usuario', lazy=True, foreign_keys='Pedido.ID_Usuario')
-    pedidos_asignados = db.relationship('Pedido', backref='empleado', lazy=True, foreign_keys='Pedido.ID_Empleado')
+    pedidos_asignados = db.relationship('Pedido', foreign_keys='Pedido.ID_Empleado', lazy=True)
     direcciones = db.relationship('Direccion', backref='usuario', lazy=True, cascade="all, delete-orphan")
     resenas = db.relationship('Resena', back_populates='usuario', lazy=True)
 
@@ -37,7 +37,6 @@ class Usuario(UserMixin, db.Model):
 
     def __repr__(self):
         return f'<Usuario {self.Nombre} {self.Apellido or ""}>'
-
 
 # ------------------ Direccion ------------------
 class Direccion(db.Model):
@@ -121,6 +120,8 @@ class ImagenProducto(db.Model):
     ID_Producto = db.Column(db.Integer, db.ForeignKey('Producto.ID_Producto'), nullable=False)
 
 
+
+# ------------------ Pedido ------------------
 # ------------------ Pedido ------------------
 class Pedido(db.Model):
     __tablename__ = 'Pedido'
@@ -141,6 +142,23 @@ class Pedido(db.Model):
     firmas = db.relationship('Firmas', backref='pedido', lazy=True)
     comentarios = db.relationship('Comentarios', backref='pedido', lazy=True)
     calendario = db.relationship('Calendario', backref='pedido', lazy=True)
+
+    # Relación con empleado (transportista)
+    empleado = db.relationship('Usuario', foreign_keys=[ID_Empleado])
+
+    @property
+    def ImagenProducto(self):
+        """Devuelve la ImagenPrincipal del primer producto del pedido."""
+        if self.detalles_pedido and len(self.detalles_pedido) > 0:
+            return self.detalles_pedido[0].producto.ImagenPrincipal
+        return None
+    
+    @property
+    def TransportistaNombre(self):
+        return f"{self.empleado.Nombre} {self.empleado.Apellido}" if self.empleado else "No asignado"
+
+
+
 
 
 # ------------------ Detalle Pedido ------------------

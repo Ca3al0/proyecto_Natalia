@@ -10,10 +10,12 @@ from flask_login import login_required
 from datetime import datetime
 from flask import current_app
 from flask_login import current_user
-from basedatos.models import db, Usuario,Pedido, RegistroFotografico,Calendario, Notificaciones
-from basedatos.decoradores import role_required
+from basedatos.models import db, Usuario,Pedido, RegistroFotografico,Calendario, Notificaciones,Direccion
+from basedatos.decoradores import role_required 
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash
 from sqlalchemy import func
+from basedatos.notificaciones import crear_notificacion
 
 
 from . import transportista
@@ -191,9 +193,9 @@ def get_registro_fotografico(pedido_id):
 
 @transportista.route('/pedidos')
 @login_required
-@role_required('transportista')  # Solo transportistas
+@role_required('transportista')  
 def ver_pedidos_transportista():
-    # Trae solo los pedidos asignados al transportista actual
+   
     pedidos = Pedido.query.filter_by(ID_Empleado=current_user.ID_Usuario).all()
     return render_template('transportista/pedidos.html', pedidos=pedidos)
 
@@ -226,3 +228,115 @@ def actualizar_estado(id_pedido):
 
     # Redirige correctamente al seguimiento del pedido
     return redirect(url_for("transportista.seguimiento_pedido", pedido_id=id_pedido))
+
+
+# ---------- ACTUALIZACION_DATOS ----------
+@transportista.route("/actualizacion_datos", methods=["GET", "POST"])
+@login_required
+@role_required("transportista")
+def actualizacion_datos():
+    usuario = current_user
+    direcciones = Direccion.query.filter_by(ID_Usuario=usuario.ID_Usuario).all()
+    notificaciones = Notificaciones.query.filter_by(ID_Usuario=usuario.ID_Usuario).order_by(Notificaciones.Fecha.desc()).all()
+
+    if request.method == "POST":
+        nombre = request.form.get("nombre", "").strip()
+        apellido = request.form.get("apellido", "").strip()
+        correo = request.form.get("correo", "").strip()
+        password = request.form.get("password", "").strip()
+
+        if not nombre or not apellido or not correo:
+            flash("⚠️ Los campos Nombre, Apellido y Correo son obligatorios.", "warning")
+        else:
+          
+            usuario_existente = Usuario.query.filter(
+                Usuario.Correo == correo,
+                Usuario.ID_Usuario != usuario.ID_Usuario
+            ).first()
+
+            if usuario_existente:
+                flash("El correo ya está registrado por otro usuario.", "danger")
+            else:
+                usuario.Nombre = nombre
+                usuario.Apellido = apellido
+                usuario.Correo = correo
+
+                if password:
+                    usuario.Contraseña = generate_password_hash(password)
+
+                try:
+                    db.session.commit()
+                    crear_notificacion(
+                        user_id=usuario.ID_Usuario,
+                        titulo="Perfil actualizado ✏️",
+                        mensaje="Tus datos personales se han actualizado correctamente."
+                    )
+                    flash("✅ Perfil actualizado correctamente", "success")
+                except Exception as e:
+                    db.session.rollback()
+                    flash(f"❌ Error al actualizar perfil: {str(e)}", "danger")
+
+    return render_template(
+        "transportista/actualizacion_datos.html",
+        usuario=usuario,
+        direcciones=direcciones,
+        notificaciones=notificaciones
+    )
+
+
+# ---------- AGREGAR DIRECCION ----------
+@transportista.route("/direccion/agregar", methods=["POST"])
+@login_required
+def agregar_direccion():
+    try:
+        direccion_valor = request.form.get("direccion", "").strip()
+        if not direccion_valor:
+            flash("⚠️ La dirección es obligatoria.", "warning")
+            return redirect(url_for("transportista.actualizacion_datos"))
+
+        nueva_direccion = Direccion(
+            ID_Usuario=current_user.ID_Usuario,
+            Pais="Colombia",
+            Departamento="Bogotá, D.C.",
+            Ciudad="Bogotá",
+            Direccion=direccion_valor,
+            InfoAdicional=request.form.get("infoAdicional", "").strip(),
+            Barrio=request.form.get("barrio", "").strip(),
+            Destinatario=request.form.get("destinatario", "").strip()
+        )
+        db.session.add(nueva_direccion)
+        db.session.commit()
+
+        crear_notificacion(
+            user_id=current_user.ID_Usuario,
+            titulo="Dirección agregada 🏠",
+            mensaje=f"Se ha agregado una nueva dirección: {nueva_direccion.Direccion}"
+        )
+        flash("Dirección agregada correctamente 🏠", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"❌ Error al agregar dirección: {str(e)}", "danger")
+
+    return redirect(url_for("transportista.actualizacion_datos"))
+
+
+# ---------- BORRAR DIRECCION ----------
+@transportista.route("/direccion/borrar/<int:id_direccion>", methods=["POST"])
+@login_required
+def borrar_direccion(id_direccion):
+    try:
+        direccion = Direccion.query.get_or_404(id_direccion)
+        db.session.delete(direccion)
+        db.session.commit()
+
+        crear_notificacion(
+            user_id=current_user.ID_Usuario,
+            titulo="Dirección eliminada 🗑️",
+            mensaje=f"La dirección '{direccion.Direccion}' ha sido eliminada."
+        )
+        flash("Dirección eliminada correctamente 🗑️", "success")
+    except Exception as e:
+        db.session.rollback()
+        flash(f"❌ Error al eliminar dirección: {str(e)}", "danger")
+
+    return redirect(url_for("transportista.actualizacion_datos"))
