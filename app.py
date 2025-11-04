@@ -3,6 +3,7 @@ from flask import Flask, render_template, session, redirect, request, flash, url
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from sqlalchemy.orm import joinedload
+from flask_login import current_user
 
 # ------------------ MODELOS ------------------ #
 from basedatos.models import db, Usuario, Producto,Pedido
@@ -65,6 +66,11 @@ app.register_blueprint(cliente)
 app.register_blueprint(admin)
 app.register_blueprint(transportista)
 # ------------------ RUTAS PÚBLICAS ------------------ #
+
+@app.context_processor
+def inject_user():
+    return dict(current_user=current_user)
+
 @app.route("/")
 def index():
     return render_template("common/index.html")
