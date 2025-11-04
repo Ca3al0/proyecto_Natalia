@@ -24,7 +24,12 @@
                         <div class="mb-3">
                             <label for="select-direccion" class="form-label">Seleccionar Dirección Existente</label>
                             <select class="form-select" id="select-direccion" required>
-                                <option value="">Selecciona una dirección...</option>
+                               {% for dir in direcciones %}
+                            <option value="{{ dir.ID_Direccion }}">
+                                {{ dir.Destinatario }} - {{ dir.Direccion }}, {{ dir.Barrio }}, {{ dir.Ciudad }}
+                            </option>
+                            {% endfor %}
+
                                 </select>
                         </div>
                         <h4 class="mt-4 mb-3"><i class="bi bi-cash-stack me-2"></i> Método de Pago</h4>
