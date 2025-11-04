@@ -1,24 +1,37 @@
 {% block navbar %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-<!-- Navbar -->
+<style>
+ 
+#favoritosModal {
+  z-index: 1100; 
+}
+
+
+.modal-backdrop.show {
+  backdrop-filter: blur(8px);
+  background-color: rgba(0,0,0,0.3);
+}
+
+</style>
+
+
 <nav class="navbar navbar-expand-lg shadow-sm py-3 bg-white fixed-top">
   <div class="container position-relative d-flex justify-content-center align-items-center">
 
-    <!-- Logo -->
+   
     <a class="navbar-brand fw-bold text-success position-absolute start-0" href="{{ url_for('index') }}">Casa en el Árbol</a>
 
-    <!-- Buscador centrado -->
+  
     <div class="position-relative w-50">
       <input type="text" class="form-control form-control-lg rounded-pill ps-5 search-input"
              placeholder="¿Qué estás buscando hoy?">
       <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 fs-5 search-icon"></i>
     </div>
 
-    <!-- Iconos usuario, favoritos y carrito -->
+
     <div class="position-absolute end-0 d-flex align-items-center gap-3">
 
-      <!-- Favoritos -->
+     
       <button type="button" class="nav-icon position-relative" id="btn-favoritos" title="Ver favoritos"
               style="background:none; border:none; cursor:pointer;" aria-label="Ver favoritos">
         <i class="bi bi-heart fs-4 text-success"></i>

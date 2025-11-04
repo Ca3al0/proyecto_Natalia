@@ -1,3 +1,4 @@
+from flask_login import current_user
 from flask import Blueprint, render_template, jsonify
 from flask_login import login_required
 from sqlalchemy import or_

@@ -1,147 +1,187 @@
- :root {
-      --primary-green: #5f8f3f;
-      --secondary-green: #4e7b33;
-      --light-green: #6c9a50;
-      --accent-green: #7cb342;
-      --bg-cream: #f8f6f0;
-      --text-dark: #2c3e50;
-      --shadow-light: rgba(0, 0, 0, 0.08);
-      --shadow-medium: rgba(0, 0, 0, 0.15);
-    }
-    body {
-       background-color: var(--bg-cream);
-       font-family: 'Segoe UI', sans-serif; 
-       color: var(--text-dark);
+.container-fluid {
+    padding-top: 100px; 
+    padding-bottom: 100px; 
+    font-family: 'Segoe UI', sans-serif;
+    color: #333;
+    background: #f0fdf4; 
+}
 
-       }
+.sidebar {
+    background: linear-gradient(145deg, #d1faff, #9bd1e5);
+    border-radius: 20px;
+    padding: 25px 15px;
+    position: sticky;
+    top: 100px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    transition: all 0.3s;
+}
 
+.sidebar h4 {
+    color: #157145;
+    font-weight: 700;
+    margin-bottom: 25px;
+    font-size: 1.5rem;
+}
 
-    .sidebar { 
-        background: #fff;
-        border-radius: 15px; 
-        padding: 1.5rem 1rem;
-        min-height: 100vh;
-        box-shadow: 0 4px 8px var(--shadow-light);
-         }
-        
-    .sidebar h4 { 
-       color: var(--primary-green);
-       font-weight: 700; 
-       margin-bottom: 2rem; 
-       text-align: center;
-       }
-
-    .sidebar a {
-       display: block; 
-      padding: 12px 15px; 
-      margin-bottom: 8px; 
-      color: var(--text-dark); 
-      border-radius: 12px; 
-      text-decoration: none; 
-      transition: all 0.25s ease;
-       font-weight: 500;
-        cursor: pointer;
-       }
-
-    .sidebar a:hover {
-       background-color: var(--accent-green-light);
-       color: #fff; 
-      }
-
-    .sidebar a.active { background-color: var(--accent-green);
-       color: #fff; 
-       font-weight: 600;
-        box-shadow: 0 2px 6px var(--shadow-medium); 
-      }
-
-      
-    .card { border-radius: 15px; 
-      border: none; 
-      box-shadow: 0 4px 10px var(--shadow-light);
-       margin-bottom: 1.5rem;
-       }
-
-
-    .form-control { 
-      border-radius: 50px; 
-      border: 1px solid var(--light-green);
-      transition: all 0.2s ease;
-      height: 50px;
-       }
-
-
-    .form-control:focus { 
-      border-color: var(--accent-green);
-      box-shadow: 0 0 6px var(--accent-green-light);
-       }
-
-
-    .profile-header { 
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-       }
-
-
-    .profile-header h5 {
-       color: var(--primary-green);
-       font-weight: 700; 
-      }
-
-    .btn-green { background: var(--accent-green);
-      color: #fff; 
-      border-radius: 50px;
-      padding: 8px 20px; 
-      font-weight: 600;
-      border: none;
-      transition: all 0.3s ease;
-     }
-
-
-    .btn-green:hover { 
-      background: var(--secondary-green);
-       color: #fff; 
-      }
-
-        .carousel-container {
-    width: 100%;
-    overflow: hidden;
-    background-color: #c1f38b; 
-    padding: 10px 0;
-  }
-
-  .carousel-track {
-    display: flex;
-    width: max-content;
-    animation: scroll 15s linear infinite;
-  }
-
-  .carousel-item {
+.sidebar a {
     display: flex;
     align-items: center;
-    gap: 5px;
-    margin: 0 20px;
-    white-space: nowrap;
-    font-weight: 500;
-    color: #4e7b33;
-  }
+    gap: 12px;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    border-radius: 15px;
+    color: #157145;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+}
 
-  .carousel-item i {
-    font-size: 1.5rem;
-  }
+.sidebar a.active,
+.sidebar a:hover {
+    background: #57a773;
+    color: white;
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
 
-  @keyframes scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); } 
-  }
+
+.card {
+    border-radius: 25px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    transition: all 0.4s;
+    background: white;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+}
 
 
-  @media (max-width: 768px) {
-    .carousel-item {
-      margin: 0 10px;
-      font-size: 0.9rem;
+.profile-header h5 {
+    font-weight: 800;
+    color: #157145;
+    font-size: 1.4rem;
+}
+
+form .form-label {
+    font-weight: 600;
+    color: #157145;
+}
+
+form .form-control {
+    border-radius: 50px;
+    border: 2px solid #9bd1e5;
+    transition: all 0.3s;
+    padding: 12px 20px;
+}
+
+form .form-control:focus {
+    border-color: #57a773;
+    box-shadow: 0 0 12px rgba(87,167,115,0.5);
+}
+
+
+.btn-green {
+    background-color: #57a773;
+    color: white;
+    border-radius: 50px;
+    font-weight: 700;
+    padding: 10px 25px;
+    font-size: 1rem;
+    transition: all 0.3s;
+    box-shadow: 0 5px 15px rgba(87,167,115,0.4);
+}
+
+.btn-green:hover {
+    background-color: #157145;
+    transform: translateY(-3px) scale(1.05);
+}
+
+
+.list-group-item {
+    border-radius: 20px;
+    margin-bottom: 15px;
+    padding: 20px 25px;
+    transition: all 0.3s;
+    background: #ffffff;
+    border: 1px solid #e0f0ea;
+}
+
+.list-group-item:hover {
+    background: #d1faff;
+    transform: translateY(-3px);
+}
+
+.btn-borrar-direccion {
+    transition: all 0.2s;
+}
+
+.btn-borrar-direccion:hover {
+    color: #c82333;
+}
+
+
+.modal-content {
+    border-radius: 25px;
+    padding: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    background: linear-gradient(to bottom right, #ffffff, #e9f7ef);
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-header h5 {
+    font-weight: 800;
+    color: #157145;
+    font-size: 1.3rem;
+}
+
+.modal-body .form-control {
+    border-radius: 50px;
+    border: 2px solid #9bd1e5;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.modal-footer .btn-green {
+    width: 100%;
+    font-weight: 700;
+}
+
+
+.flash-small {
+    border-radius: 20px;
+    font-size: 0.95rem;
+    padding: 12px 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    font-weight: 600;
+}
+
+
+.flash-small i {
+    font-size: 1.3rem;
+    margin-right: 8px;
+}
+
+
+@media (max-width: 992px) {
+    .sidebar {
+        position: relative;
+        top: 0;
+        margin-bottom: 20px;
     }
-    .carousel-item i {
-      font-size: 1.2rem;
+}
+
+@media (max-width: 576px) {
+    form .form-control {
+        padding: 10px 15px;
     }
-  }
+    .sidebar h4 {
+        font-size: 1.3rem;
+    }
+}
