@@ -467,3 +467,45 @@ def finalizar_compra():
     return redirect(url_for('catalogo'))
 
 
+@cliente.route('/pedido/<int:pedido_id>/estado', methods=['POST'])
+@login_required
+def actualizar_estado_pedido(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    nuevo_estado = request.json.get('estado')
+
+    if nuevo_estado not in ['pendiente', 'en proceso', 'en reparto', 'entregado']:
+        return jsonify({'status': 'error', 'message': 'Estado no válido'}), 400
+
+    pedido.Estado = nuevo_estado
+    db.session.commit()
+
+    notificacion = Notificaciones(
+        Titulo='Actualización de pedido',
+        Mensaje=f'El estado de tu pedido #{pedido.ID_Pedido} cambió a "{nuevo_estado}".',
+        ID_Usuario=pedido.ID_Usuario
+    )
+    db.session.add(notificacion)
+    db.session.commit()
+
+    return jsonify({'status': 'success', 'message': 'Estado actualizado'})
+
+from flask_socketio import SocketIO, emit
+
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+# Emitir notificación cuando cambia el estado
+@app.route('/pedido/<int:pedido_id>/estado', methods=['POST'])
+@login_required
+def actualizar_estado_pedido_ws(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    nuevo_estado = request.json.get('estado')
+    pedido.Estado = nuevo_estado
+    db.session.commit()
+
+    # Emitir evento a los clientes conectados
+    socketio.emit('pedido_actualizado', {
+        'pedido_id': pedido.ID_Pedido,
+        'estado': nuevo_estado
+    }, room=f'user_{pedido.ID_Usuario}')
+
+    return jsonify({'status': 'success', 'message': 'Estado actualizado'})
