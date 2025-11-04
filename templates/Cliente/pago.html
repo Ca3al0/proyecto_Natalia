@@ -18,13 +18,13 @@
                     <form id="checkout-form">
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre Completo</label>
-                            <input type="text" class="form-control" id="nombre" required value="">
+                            <input type="text" class="form-control" id="nombre" required value="Natalia Gómez">
                         </div>
                         
                         <div class="mb-3">
-                            <label for="select-direccion" class="form-label">Seleccionar Dirección de Envío</label>
+                            <label for="select-direccion" class="form-label">Seleccionar Dirección Existente</label>
                             <select class="form-select" id="select-direccion" required>
-                                <option value="">Selecciona una dirección de tu cuenta...</option>
+                                <option value="">Selecciona una dirección...</option>
                                 </select>
                         </div>
                         <h4 class="mt-4 mb-3"><i class="bi bi-cash-stack me-2"></i> Método de Pago</h4>
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const costoEnvio = 5.00; 
     let totalFinal = 0; 
     
-    // --- SIMULACIÓN DE DATOS DE DIRECCIÓN (SIMULACIÓN DE TU TABLA 'direccion') ---
+    // --- SIMULACIÓN DE DATOS DE DIRECCIÓN (Lo que vendría de tu base de datos) ---
     const direccionesGuardadas = [
         { id: 1, alias: 'Casa Principal', direccion: 'Calle 10 # 5-20, Apto 301, Bogotá' },
         { id: 2, alias: 'Oficina (Trabajo)', direccion: 'Av. Cra 7 # 75-10, Piso 12, Medellín' },
@@ -194,14 +194,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const select = document.getElementById('select-direccion');
         direccionesGuardadas.forEach(dir => {
             const option = document.createElement('option');
-            // La mejor práctica es usar el ID, pero aquí usamos la dirección completa como valor para la simulación
             option.value = dir.direccion;
-            option.textContent = `${dir.alias} (${dir.direccion})`;
+            option.textContent = `${dir.alias}: ${dir.direccion.substring(0, 30)}...`;
             select.appendChild(option);
         });
     };
 
-    // --- SIMULACIÓN DE PAGO ---
+    // --- SIMULACIÓN DE PAGO (AJUSTADA) ---
     const simularPago = (metodo, total) => {
         return new Promise((resolve) => {
             const delay = 1000; 
@@ -213,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
                          resolve({ success: false, message: "Error: El número de tarjeta debe ser de 16 dígitos.", redirect: false });
                          return;
                     }
-                    // Simular fallo
                     if (numTarjeta.slice(-4) === '0000') {
                         resolve({ success: false, message: `Transacción **FALLIDA** (Tarjeta rechazada). Intenta con otra tarjeta.`, redirect: false });
                     } else {
@@ -226,16 +224,16 @@ document.addEventListener('DOMContentLoaded', () => {
                          resolve({ success: false, message: `Error en ${metodo}: El número de celular debe ser de 10 dígitos.`, redirect: false });
                          return;
                     }
-                    // Simular fallo
+
                     if (celular.slice(-4) === '1234') {
                         resolve({ success: false, message: `Transacción con **${metodo.toUpperCase()}** FALLIDA. Saldo insuficiente.`, redirect: false });
                     } else {
-                        // Pago instantáneo
+                        // Pago instantáneo (simulando que el usuario aprobó en la app)
                         resolve({ success: true, message: `✅ Pago de $${total.toFixed(2)} con **${metodo.toUpperCase()}** **APROBADO** de inmediato.`, redirect: true, delay: 1500 });
                     }
 
                 } else if (metodo === 'efectivo') {
-                    // Pago en efectivo solo confirma la orden
+                    // Pago en efectivo solo confirma la orden, no el pago
                     resolve({ success: true, message: `🛍️ Orden Confirmada. Prepara $${total.toFixed(2)} para el pago en **Efectivo** al recibir.`, redirect: true, delay: 2500 });
                 } else {
                     resolve({ success: false, message: "Método de pago no reconocido.", redirect: false });
@@ -276,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
 
         const form = document.getElementById('checkout-form');
-        // Validar campos de envío/nombre (ahora vacío, por lo que el usuario debe llenarlo) y la dirección seleccionada.
+        // Validar campos de envío/nombre y los campos de pago requeridos
         if (!form.reportValidity()) {
             return; 
         }
@@ -300,6 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.location.href = "{{ url_for('catalogo') }}"; 
                     }, resultado.delay || 1500); 
                 } else {
+                    // Pago manual (ej. Transferencia, aunque lo quitamos, se deja por si acaso), re-habilitar botón
                     btnPagar.disabled = false;
                     btnPagar.innerHTML = '<i class="bi bi-lock-fill me-2"></i> Confirmar y Pagar';
                 }

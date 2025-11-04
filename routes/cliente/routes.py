@@ -400,3 +400,18 @@ def ver_carrito():
 def checkout():
     # Lógica para procesar el pago o mostrar el formulario de checkout
     return render_template('Cliente/pago.html')
+
+@cliente.route('/finalizar-compra', methods=['POST'])
+@login_required
+def finalizar_compra():
+    nombre = request.form.get('nombre')
+    direccion_id = request.form.get('select-direccion')
+    metodo_pago = request.form.get('pago')
+    numero_tarjeta = request.form.get('numero-tarjeta')
+    numero_celular = request.form.get('numero-celular')
+
+    # Aquí podrías agregar lógica de simulación de pago
+    # Por ejemplo: aprobar siempre si no termina en '0000' o '1234'
+
+    flash(f'✅ Pago con {metodo_pago} realizado correctamente', 'success')
+    return redirect(url_for('catalogo'))
