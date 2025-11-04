@@ -1,76 +1,67 @@
 {% extends "common/base.html" %}
 
 {% block content %}
-<h2>Chat con Clientes</h2>
+<h2>Chat con Admin</h2>
 
 <div id="chatContainer" style="max-width:600px; margin:auto; border:1px solid #ddd; border-radius:10px; padding:10px;">
     <div id="chatBody" style="height:400px; overflow-y:auto;">
         {% for msg in mensajes %}
             <div class="{{ 'admin-msg' if msg.enviado_admin else 'cliente-msg' }}">
-                <strong>{{ 'Admin' if msg.enviado_admin else msg.cliente.Nombre }}:</strong> {{ msg.contenido }}
+                <strong>{{ 'Admin' if msg.enviado_admin else current_user.Nombre }}:</strong> {{ msg.contenido }}
             </div>
         {% endfor %}
     </div>
     <div style="margin-top:10px; display:flex;">
-        <select id="clienteSelect" style="flex:1; margin-right:5px;">
-            {% for user in usuarios %}
-                <option value="{{ user.ID_Usuario }}">{{ user.Nombre }}</option>
-            {% endfor %}
-        </select>
-        <input type="text" id="chatInput" placeholder="Escribe un mensaje..." style="flex:3; margin-right:5px;">
+        <input type="text" id="chatInput" placeholder="Escribe un mensaje..." style="flex:1; margin-right:5px;">
         <button id="sendChat">Enviar</button>
     </div>
 </div>
 
 <style>
-.cliente-msg { text-align: left; margin-bottom:5px; background:#d1faff; padding:5px 10px; border-radius:10px; }
-.admin-msg { text-align: right; margin-bottom:5px; background:#57a773; color:white; padding:5px 10px; border-radius:10px; }
+.cliente-msg { text-align: right; margin-bottom:5px; background:#d1faff; padding:5px 10px; border-radius:10px; }
+.admin-msg { text-align: left; margin-bottom:5px; background:#57a773; color:white; padding:5px 10px; border-radius:10px; }
 </style>
 
 <script>
 const sendBtn = document.getElementById('sendChat');
 const chatInput = document.getElementById('chatInput');
 const chatBody = document.getElementById('chatBody');
-const clienteSelect = document.getElementById('clienteSelect');
 
 sendBtn.addEventListener('click', async () => {
     const contenido = chatInput.value.trim();
-    const cliente_id = clienteSelect.value;
-
     if(!contenido) return;
 
-    const response = await fetch('{{ url_for("admin.enviar_mensaje_admin") }}', {
+    const response = await fetch('{{ url_for("cliente.enviar_mensaje_cliente") }}', {
         method:'POST',
         headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({contenido, cliente_id})
+        body: JSON.stringify({contenido})
     });
 
     const data = await response.json();
     if(data.status === 'ok'){
         const div = document.createElement('div');
-        div.className = 'admin-msg';
-        div.innerHTML = `<strong>Admin:</strong> ${contenido}`;
+        div.className = 'cliente-msg';
+        div.innerHTML = `<strong>{{ current_user.Nombre }}:</strong> ${contenido}`;
         chatBody.appendChild(div);
         chatInput.value = '';
         chatBody.scrollTop = chatBody.scrollHeight;
     }
 });
+
 async function actualizarMensajes() {
-    const cliente_id = clienteSelect.value;
-    const response = await fetch(`/admin/chat/mensajes/${cliente_id}`);
+    const response = await fetch('{{ url_for("cliente.mensajes_cliente_ajax") }}');
     const mensajes = await response.json();
     
     chatBody.innerHTML = '';
     mensajes.forEach(msg => {
         const div = document.createElement('div');
         div.className = msg.enviado_admin ? 'admin-msg' : 'cliente-msg';
-        div.innerHTML = `<strong>${msg.enviado_admin ? 'Admin' : msg.cliente_nombre}:</strong> ${msg.contenido}`;
+        div.innerHTML = `<strong>${msg.enviado_admin ? 'Admin' : '{{ current_user.Nombre }}'}:</strong> ${msg.contenido}`;
         chatBody.appendChild(div);
     });
     chatBody.scrollTop = chatBody.scrollHeight;
 }
 
 setInterval(actualizarMensajes, 3000);
-
 </script>
 {% endblock %}

@@ -685,7 +685,12 @@ def reporte_entregas():
 def chat_admin():
     # Traer todos los mensajes ordenados por fecha
     mensajes = Mensaje.query.order_by(Mensaje.fecha).all()
-    return render_template('Administrador/chat.html', mensajes=mensajes)
+    
+    # Traer todos los clientes
+    usuarios = Usuario.query.filter_by(Rol='cliente').all()
+
+    return render_template('Administrador/chat.html', mensajes=mensajes, usuarios=usuarios)
+
 
 
 @admin.route('/chat/enviar_mensaje', methods=['POST'])
@@ -702,3 +707,15 @@ def enviar_mensaje_admin():
     db.session.add(msg)
     db.session.commit()
     return jsonify({'status': 'ok'})
+
+@admin.route('/chat/mensajes/<int:cliente_id>')
+@login_required
+def mensajes_cliente(cliente_id):
+    mensajes = Mensaje.query.filter_by(cliente_id=cliente_id).order_by(Mensaje.fecha).all()
+    return jsonify([
+        {
+            'contenido': m.contenido,
+            'enviado_admin': m.enviado_admin,
+            'cliente_nombre': m.cliente.Nombre
+        } for m in mensajes
+    ])

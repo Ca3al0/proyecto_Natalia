@@ -353,21 +353,36 @@ def get_direcciones():
     return jsonify(data)
 
 
-@cliente.route('/', methods=['GET'])
+@cliente.route('/chat', methods=['GET'])
 @login_required
 def chat_cliente():
-    mensajes = Mensaje.query.order_by(Mensaje.fecha).all()
-    return render_template('cliente.html', mensajes=mensajes)
+    # Filtrar mensajes solo del cliente actual
+    mensajes = Mensaje.query.filter_by(cliente_id=current_user.ID_Usuario).order_by(Mensaje.fecha).all()
+    return render_template('Cliente/chat.html', mensajes=mensajes)
 
-@cliente.route('/enviar_mensaje', methods=['POST'])
+
+@cliente.route('/chat/enviar_mensaje', methods=['POST'])
 @login_required
-def enviar_mensaje():
+def enviar_mensaje_cliente():
     data = request.get_json()
     contenido = data.get('contenido')
+
     if not contenido:
-        return jsonify({'status': 'error', 'message': 'Mensaje vacío'})
-    
+        return jsonify({'status': 'error', 'message': 'Faltan datos'})
+
     msg = Mensaje(cliente_id=current_user.ID_Usuario, contenido=contenido, enviado_admin=False)
     db.session.add(msg)
     db.session.commit()
     return jsonify({'status': 'ok'})
+
+@cliente.route('/chat/mensajes')
+@login_required
+def mensajes_cliente_ajax():
+    mensajes = Mensaje.query.filter_by(cliente_id=current_user.ID_Usuario).order_by(Mensaje.fecha).all()
+    return jsonify([
+        {
+            'contenido': m.contenido,
+            'enviado_admin': m.enviado_admin,
+            'cliente_nombre': m.cliente.Nombre
+        } for m in mensajes
+    ])
