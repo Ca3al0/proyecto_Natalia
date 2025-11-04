@@ -2,7 +2,6 @@
 
 {% block navbar %}
   {% include "common/partials/navbar_transpoinsta.html" %}
-
 {% endblock %}
 
 {% block content %}
@@ -90,6 +89,8 @@
         </div>
     </div>
 </div>
+
+
 <script>
 function abrirRegistro(pedidoId){
     document.getElementById('pedido_id').value = pedidoId;
@@ -131,6 +132,7 @@ document.getElementById('registroFotograficoForm').addEventListener('submit', as
     }
 });
 </script>
+
 
 <!-- FullCalendar -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
