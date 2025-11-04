@@ -685,7 +685,8 @@ def reporte_entregas():
 def chat_admin():
     # Traer todos los mensajes ordenados por fecha
     mensajes = Mensaje.query.order_by(Mensaje.fecha).all()
-    return render_template('admin_chat.html', mensajes=mensajes)
+    return render_template('Administrador/chat.html', mensajes=mensajes)
+
 
 @admin.route('/chat/enviar_mensaje', methods=['POST'])
 @login_required
