@@ -281,12 +281,13 @@ class Mensaje(db.Model):
         return f'<Mensaje de {remitente} a las {self.fecha}>'
 
 class RegistroFotografico(db.Model):
-    ID = db.Column(db.Integer, primary_key=True)
-    ID_Usuario = db.Column(db.Integer, db.ForeignKey('usuario.ID_Usuario'))
-    fotos_antes = db.Column(db.Text)   
-    fotos_despues = db.Column(db.Text)
-    desc_antes = db.Column(db.Text)
-    desc_despues = db.Column(db.Text)
-    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+    __tablename__ = 'registro_fotografico'
 
-    usuario = db.relationship('Usuario')
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    pedido_id = db.Column(db.Integer, nullable=False)
+    tipo = db.Column(db.String(10))
+    descripcion = db.Column(db.Text)
+    imagen_url = db.Column(db.Text, nullable=False)
+    creado_en = db.Column(db.DateTime, default=datetime.utcnow)
+
+    usuario = db.relationship('Usuario', backref=db.backref('registros_fotograficos', lazy=True))
