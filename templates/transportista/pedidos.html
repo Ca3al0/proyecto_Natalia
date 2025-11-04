@@ -1,39 +1,23 @@
-<table>
-  <tr>
-    <th>Pedido</th>
-    <th>Estado</th>
-    <th>Acción</th>
-  </tr>
-  {% for pedido in pedidos %}
-  <tr>
-    <td>{{ pedido.ID_Pedido }}</td>
-    <td id="estado-{{ pedido.ID_Pedido }}">{{ pedido.Estado }}</td>
-    <td>
-      <select onchange="cambiarEstadoPedido({{ pedido.ID_Pedido }}, this.value)">
-        <option value="pendiente" {% if pedido.Estado=='pendiente' %}selected{% endif %}>Pendiente</option>
-        <option value="en proceso" {% if pedido.Estado=='en proceso' %}selected{% endif %}>En proceso</option>
-        <option value="en reparto" {% if pedido.Estado=='en reparto' %}selected{% endif %}>En reparto</option>
-        <option value="entregado" {% if pedido.Estado=='entregado' %}selected{% endif %}>Entregado</option>
-      </select>
-    </td>
-  </tr>
-  {% endfor %}
+<h2>Pedidos asignados</h2>
+<table border="1" class="table">
+    <thead>
+        <tr>
+            <th>ID Pedido</th>
+            <th>Cliente</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pedido in pedidos %}
+        <tr>
+            <td>{{ pedido.ID_Pedido }}</td>
+            <td>{{ pedido.usuario.Nombre }} {{ pedido.usuario.Apellido }}</td>
+            <td>{{ pedido.Estado }}</td>
+            <td>
+                <a href="{{ url_for('transportista.seguimiento_pedido', pedido_id=pedido.ID_Pedido) }}" class="btn btn-primary">Hacer seguimiento</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
-
-<script>
-function cambiarEstadoPedido(pedidoId, estado) {
-    fetch(`/cliente/pedido/${pedidoId}/estado`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({estado: estado})
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message);
-        // Actualizar el texto del estado en la tabla
-        document.getElementById(`estado-${pedidoId}`).textContent = estado;
-    });
-}
-</script>

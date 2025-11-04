@@ -5,7 +5,7 @@ from basedatos.decoradores import role_required
 from datetime import datetime, time
 import os
 import json
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from flask_login import login_required
 from datetime import datetime
 from flask import current_app
@@ -197,35 +197,36 @@ def ver_pedidos_transportista():
     pedidos = Pedido.query.filter_by(ID_Empleado=current_user.ID_Usuario).all()
     return render_template('transportista/pedidos.html', pedidos=pedidos)
 
-
-@transportista.route('/pedido/<int:pedido_id>/estado', methods=['POST'])
+@transportista.route('/pedido/<int:pedido_id>/seguimiento', methods=['GET', 'POST'])
 @login_required
 @role_required('transportista')
-def actualizar_estado_pedido(pedido_id):
+def seguimiento_pedido(pedido_id):
     pedido = Pedido.query.get_or_404(pedido_id)
 
+    # Validar que el pedido está asignado al transportista
     if pedido.ID_Empleado != current_user.ID_Usuario:
-        return jsonify({'status': 'error', 'message': 'No puedes modificar este pedido'}), 403
+        flash("No puedes ver este pedido", "danger")
+        return redirect(url_for('transportista.ver_pedidos_transportista'))
 
-    nuevo_estado = request.json.get('estado')
-    if nuevo_estado not in ['pendiente', 'en proceso', 'en reparto', 'entregado']:
-        return jsonify({'status': 'error', 'message': 'Estado no válido'}), 400
+    if request.method == 'POST':
+        nuevo_estado = request.form.get('estado')
+        if nuevo_estado not in ['pendiente', 'en proceso', 'en reparto', 'entregado']:
+            flash("Estado no válido", "danger")
+        else:
+            try:
+                pedido.Estado = nuevo_estado
+                db.session.commit()  # ✅ Esto guarda en la base
+                # Crear notificación
+                notificacion = Notificaciones(
+                    Titulo='Actualización de pedido',
+                    Mensaje=f'El estado de tu pedido #{pedido.ID_Pedido} cambió a "{nuevo_estado}".',
+                    ID_Usuario=pedido.ID_Usuario
+                )
+                db.session.add(notificacion)
+                db.session.commit()
+                flash("Estado actualizado correctamente", "success")
+            except Exception as e:
+                db.session.rollback()
+                flash(f"Error al actualizar: {e}", "danger")
 
-    try:
-        # Asignar el nuevo estado
-        setattr(pedido, 'Estado', nuevo_estado)  # <- más seguro que pedido.Estado
-        db.session.commit()
-
-        # Notificación
-        notificacion = Notificaciones(
-            Titulo='Actualización de pedido',
-            Mensaje=f'El estado de tu pedido #{pedido.ID_Pedido} cambió a "{nuevo_estado}".',
-            ID_Usuario=pedido.ID_Usuario
-        )
-        db.session.add(notificacion)
-        db.session.commit()
-
-        return jsonify({'status': 'success', 'message': 'Estado actualizado'})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'status': 'error', 'message': f'Error al actualizar: {str(e)}'}), 500
+    return render_template('transportista/seguimiento.html', pedido=pedido)

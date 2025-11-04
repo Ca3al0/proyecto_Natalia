@@ -1,0 +1,14 @@
+<h2>Seguimiento del pedido #{{ pedido.ID_Pedido }}</h2>
+<p><strong>Cliente:</strong> {{ pedido.usuario.Nombre }} {{ pedido.usuario.Apellido }}</p>
+<p><strong>Estado actual:</strong> {{ pedido.Estado }}</p>
+
+<form method="POST">
+    <label for="estado">Actualizar estado:</label>
+    <select name="estado" id="estado" class="form-select">
+        <option value="pendiente" {% if pedido.Estado=='pendiente' %}selected{% endif %}>Pendiente</option>
+        <option value="en proceso" {% if pedido.Estado=='en proceso' %}selected{% endif %}>En proceso</option>
+        <option value="en reparto" {% if pedido.Estado=='en reparto' %}selected{% endif %}>En reparto</option>
+        <option value="entregado" {% if pedido.Estado=='entregado' %}selected{% endif %}>Entregado</option>
+    </select>
+    <button type="submit" class="btn btn-success mt-2">Actualizar estado</button>
+</form>
