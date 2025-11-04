@@ -8,7 +8,7 @@ from basedatos.decoradores import validar_password, validar_email, send_reset_em
 from basedatos.notificaciones import crear_notificacion
 from . import auth
 
-# Serializador de tokens
+
 s = URLSafeTimedSerializer("mi_clave_super_secreta_y_unica")
 
 # ------------------ REGISTRO ------------------ #
