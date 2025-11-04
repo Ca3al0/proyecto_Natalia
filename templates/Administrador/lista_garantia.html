@@ -1,0 +1,33 @@
+{% extends "common/base.html" %}
+{% block content %}
+<h1>Administración de Garantías</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Pedido</th>
+            <th>Cliente</th>
+            <th>Motivo</th>
+            <th>Estado</th>
+            <th>Fecha Solicitud</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for g in garantias %}
+        <tr>
+            <td>{{ g.ID_Garantia }}</td>
+            <td>{{ g.pedido.ID_Pedido }}</td>
+            <td>{{ g.usuario.Nombre }} {{ g.usuario.Apellido }}</td>
+            <td>{{ g.Motivo }}</td>
+            <td>{{ g.Estado }}</td>
+            <td>{{ g.FechaSolicitud.strftime('%Y-%m-%d %H:%M') }}</td>
+            <td>
+                <a href="{{ url_for('admin_garantia.editar_garantia', id=g.ID_Garantia) }}" class="btn btn-primary btn-sm">Editar</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

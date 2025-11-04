@@ -2,7 +2,7 @@ from flask_login import current_user
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Calendario,Pedido, Producto, Resena, Detalle_Pedido, Pagos,Mensaje
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Calendario,Pedido, Producto, Resena, Detalle_Pedido, Pagos,Mensaje,Garantia ,GarantiaArchivo
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
 from datetime import date,datetime
@@ -512,6 +512,43 @@ def eliminar_pedido(pedido_id):
     db.session.commit()
     flash('Pedido eliminado correctamente.', 'success')
     return redirect(url_for('cliente.historial'))
+
+@cliente.route('/crear/<int:pedido_id>', methods=['GET', 'POST'])
+@login_required
+def crear_garantia(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+
+    if request.method == 'POST':
+        motivo = request.form['motivo']
+        archivos = request.files.getlist('archivos')  
+       
+        garantia = Garantia(ID_Pedido=pedido.ID_Pedido, ID_Usuario=current_user.ID_Usuario,
+                            Motivo=motivo)
+        db.session.add(garantia)
+        db.session.commit()
+
+        
+        for f in archivos:
+            if f.filename:
+                ruta = f"/uploads/garantias/{f.filename}"
+                f.save(f".{ruta}")  
+                archivo = GarantiaArchivo(ID_Garantia=garantia.ID_Garantia,
+                                          NombreArchivo=f.filename,
+                                          RutaArchivo=ruta)
+                db.session.add(archivo)
+        db.session.commit()
+
+        flash("Garantía creada correctamente.", "success")
+        return redirect(url_for('mis_garantias'))
+
+    return render_template('cliente/crear_garantia.html', pedido=pedido)
+
+
+@cliente.route('/mis_garantias')
+@login_required
+def mis_garantias():
+    garantias = Garantia.query.filter_by(ID_Usuario=current_user.ID_Usuario).all()
+    return render_template('cliente/garantias.html', garantias=garantias)
 
 
 

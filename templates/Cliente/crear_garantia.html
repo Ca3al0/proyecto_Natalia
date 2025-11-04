@@ -1,0 +1,16 @@
+{% extends "common/base.html" %}
+{% block content %}
+<h2>Solicitar Garantía para Pedido #{{ pedido.ID_Pedido }}</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label>Motivo:</label>
+        <textarea name="motivo" class="form-control" required></textarea>
+    </div>
+    <div class="mb-3">
+        <label>Archivos (opcional):</label>
+        <input type="file" name="archivos" multiple class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">Enviar garantía</button>
+</form>
+{% endblock %}

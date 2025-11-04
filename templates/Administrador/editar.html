@@ -1,0 +1,44 @@
+{% extends "common/base.html" %}
+{% block content %}
+<h2>Editar Garantía #{{ garantia.ID_Garantia }}</h2>
+
+<form method="POST">
+    <div class="mb-3">
+        <label>Pedido:</label>
+        <input type="text" class="form-control" value="{{ garantia.pedido.ID_Pedido }}" disabled>
+    </div>
+    <div class="mb-3">
+        <label>Cliente:</label>
+        <input type="text" class="form-control" value="{{ garantia.usuario.Nombre }} {{ garantia.usuario.Apellido }}" disabled>
+    </div>
+    <div class="mb-3">
+        <label>Motivo:</label>
+        <textarea class="form-control" disabled>{{ garantia.Motivo }}</textarea>
+    </div>
+    <div class="mb-3">
+        <label>Estado:</label>
+        <select name="estado" class="form-control">
+            <option value="pendiente" {% if garantia.Estado=='pendiente' %}selected{% endif %}>Pendiente</option>
+            <option value="aprobada" {% if garantia.Estado=='aprobada' %}selected{% endif %}>Aprobada</option>
+            <option value="rechazada" {% if garantia.Estado=='rechazada' %}selected{% endif %}>Rechazada</option>
+            <option value="completada" {% if garantia.Estado=='completada' %}selected{% endif %}>Completada</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>Comentario Admin:</label>
+        <textarea name="comentario" class="form-control">{{ garantia.ComentarioAdmin or '' }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-success">Guardar cambios</button>
+    <a href="{{ url_for('admin_garantia.listar_garantias') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+
+{% if garantia.archivos %}
+<h3 class="mt-4">Archivos adjuntos</h3>
+<ul>
+    {% for archivo in garantia.archivos %}
+        <li><a href="{{ archivo.RutaArchivo }}" target="_blank">{{ archivo.NombreArchivo }}</a></li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}

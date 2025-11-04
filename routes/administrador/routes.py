@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from datetime import date,datetime, timedelta
 from flask import current_app
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido, Mensaje
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido, Mensaje, Garantia
 from werkzeug.security import generate_password_hash
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
@@ -711,4 +711,24 @@ def mensajes_cliente(cliente_id):
     ]
     return jsonify(mensajes_list)
 
+@admin.route('/lista_garantia')
+@login_required
+def listar_garantias():
+    garantias = Garantia.query.order_by(Garantia.FechaSolicitud.desc()).all()
+    return render_template('administrador/lista_garantia.html', garantias=garantias)
 
+@admin.route('/<int:id>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_garantia(id):
+    garantia = Garantia.query.get_or_404(id)
+    if request.method == 'POST':
+        estado = request.form.get('estado')
+        comentario = request.form.get('comentario')
+        garantia.Estado = estado
+        garantia.ComentarioAdmin = comentario
+        if estado in ['aprobada', 'rechazada']:
+            garantia.FechaResolucion = datetime.utcnow()
+        db.session.commit()
+        flash("Garantía actualizada correctamente", "success")
+        return redirect(url_for('admin_garantia.listar_garantias'))
+    return render_template('administrador/editar.html', garantia=garantia)
