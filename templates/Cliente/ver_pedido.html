@@ -158,9 +158,6 @@ document.getElementById("btnPDF").addEventListener("click", () => {
         startY: 60
     });
 
-    // Subtotal
-    doc.text(`Subtotal: ${{ '%.2f'|format(subtotal) }}`, 150, doc.lastAutoTable.finalY + 10);
-
     // Pagos
     {% if pedido.pagos %}
         let pagos_text = "Pagos:\n";
