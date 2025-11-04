@@ -66,7 +66,7 @@
 
   .btn-section:hover { background: var(--verde-oscuro); transform: scale(1.05); }
 
-
+  /* Secciones tipo tarjeta gigante */
   .secciones {
     display: flex;
     flex-wrap: wrap;
@@ -100,7 +100,7 @@
     color: white;
   }
 
- 
+  /* Galería interactiva */
   .galeria {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px,1fr));
@@ -147,7 +147,7 @@
     padding:2rem 1rem;
   }
 
-
+  /* Icono flotante de Chatbot */
   .chatbot {
     position: fixed;
     bottom: 30px;
@@ -211,17 +211,122 @@
     <p>Explora y transforma tu hogar de forma interactiva</p>
     <div class="hero-buttons">
       <button class="btn-section" onclick="document.getElementById('categorias').scrollIntoView({behavior:'smooth'})">CATEGORÍAS</button>
-      <button class="btn-section" onclick="document.getElementById('catalogo').scrollIntoView({behavior:'smooth'})">CATÁLOGO</button>
+      <button class="btn-section" onclick="window.location.href='{{ url_for('catalogo') }}'">CATÁLOGO</button>
+
       <button class="btn-section" onclick="document.getElementById('ofertas').scrollIntoView({behavior:'smooth'})">OFERTAS</button>
       <button class="btn-section" onclick="document.getElementById('garantias').scrollIntoView({behavior:'smooth'})">GARANTÍAS</button>
-      <button class="btn-section" onclick="document.getElementById('instalaciones').scrollIntoView({behavior:'smooth'})">INSTALACIONES</button>
+      <button class="btn-section" onclick="window.location.href='{{ url_for('cliente.agendar_instalacion') }}'">INSTALACIONES</button>
+
     </div>
   </div>
 </section>
 
+
+
+<!-- Carrusel de novedades -->
+<div class="container py-5">
+  <h1 class="mb-4"><b>NOVEDADES</b></h1>
+  <div id="multiCardCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <div class="row">
+          <div class="col-md-6 col-lg-4">
+            <div class="card">
+              <img src="{{ url_for('static', filename='img/salacarrusel.png') }}" class="card-img-top" alt="Sala moderna" />
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4 d-none d-md-block">
+            <div class="card">
+              <img src="{{ url_for('static', filename='img/armariocarrusel.png') }}" class="card-img-top" alt="Armario moderno" />
+            </div>
+          </div>
+          <div class="col-lg-4 d-none d-lg-block">
+            <div class="card">
+              <img src="{{ url_for('static', filename='img/bañocarrusel.png') }}" class="card-img-top" alt="Mueble para baño" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <div class="row">
+          <div class="col-md-6 col-lg-4">
+            <div class="card">
+              <img src="{{ url_for('static', filename='img/cocinacarrusel.png') }}" class="card-img-top" alt="Cocina moderna" />
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4 d-none d-md-block">
+            <div class="card">
+              <img src="{{ url_for('static', filename='img/espejocarrusel.png') }}" class="card-img-top" alt="Espejo decorativo" />
+            </div>
+          </div>
+          <div class="col-lg-4 d-none d-lg-block">
+            <div class="card">
+              <img src="{{ url_for('static', filename='img/pinturacarrusel.png') }}" class="card-img-top" alt="Pintura decorativa" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#multiCardCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#multiCardCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+</div>
+
+
+<section id="bienvenida" class="py-5" style="background: #f0fdf4;">
+  <div class="container">
+    <div class="row align-items-center g-4">
+
+ 
+      <div class="col-md-5 text-center text-md-start">
+        <div class="shadow rounded overflow-hidden">
+          <img src="{{ url_for('static', filename='img/espejo.png') }}" 
+               class="img-fluid" alt="Casa en el Árbol" style="transition: transform 0.3s ease;">
+        </div>
+      </div>
+
+     
+      <div class="col-md-7">
+        <h2 class="h4 fw-bold text-success mb-2">Bienvenido a Casa en el Árbol</h2>
+        <p class="text-muted mb-3" style="line-height: 1.6;">
+          Explora nuestra colección de muebles y accesorios para tu hogar.  
+          Calidad, diseño y confort en un solo lugar. Descubre categorías, ofertas y novedades pensadas para ti.
+        </p>
+        <a href="{{ url_for('catalogo') }}" class="btn btn-success btn-sm px-4 py-2 shadow-sm">Ver Catálogo</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Hover sutil en la imagen */
+  #bienvenida img:hover {
+    transform: scale(1.05);
+  }
+
+  /* Botón con sombra suave */
+  #bienvenida .btn-success {
+    transition: all 0.3s ease;
+  }
+  #bienvenida .btn-success:hover {
+    box-shadow: 0 5px 15px rgba(87, 167, 115, 0.4);
+    transform: translateY(-2px);
+  }
+</style>
+
+
+
+
+
 {% if mostrar_bienvenida %}
 <style>
-
+  /* Fondo borroso cuando el modal está abierto */
   body.modal-open::before {
     content: "";
     position: fixed;
@@ -229,8 +334,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    backdrop-filter: blur(5px); 
-    z-index: 1040;
+    backdrop-filter: blur(5px); /* borroso */
+    z-index: 1040; /* por debajo del modal */
   }
 </style>
 
@@ -272,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
     clearInterval(confettiInterval);
   });
 
- 
+  // Efecto máquina de escribir
   const text = "¡Bienvenido, {{ nombre_completo }}!";
   const container = document.getElementById('bienvenidaTexto');
   let i = 0;
@@ -299,3 +404,5 @@ document.addEventListener('DOMContentLoaded', () => {
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
 {% endblock %}
+
+

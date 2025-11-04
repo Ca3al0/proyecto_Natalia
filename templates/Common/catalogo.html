@@ -2,7 +2,6 @@
 
 {% block navbar %}
 {% include "common/partials/navbar_cliente.html" %}
-{% include "common/partials/navbar_secundario2.html" %}
 {% endblock %}
 
 {% block content %}
@@ -32,7 +31,7 @@
 </a>
 
 <div class="container mt-5">
-  <h2 class="mb-4 text-center text-success">Catálogo de Productos</h2>
+  <h2 class="mb-4 text-center text-success"><b>Catálogo de Productos</b></h2>
   <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
     {% for producto in productos %}
     <div class="col">
