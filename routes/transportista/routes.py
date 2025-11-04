@@ -9,6 +9,7 @@ from flask import Blueprint, render_template, request, jsonify
 from flask_login import login_required
 from datetime import datetime
 from flask import current_app
+from flask_login import current_user
 from basedatos.models import db, Usuario,Pedido, RegistroFotografico,Calendario
 from basedatos.decoradores import role_required
 from werkzeug.utils import secure_filename
@@ -99,3 +100,41 @@ def calendario():
     return render_template("transportista/calendario.html")
 
 
+@transportista.route('/registro_fotografico', methods=['POST'])
+@login_required
+def registrar_fotografia_transportista():
+    if current_user.Rol != 'transportista':
+        return jsonify({'status': 'danger', 'message': 'No autorizado.'})
+
+    try:
+        pedido_id = request.form.get('pedido_id')
+        tipo = request.form.get('tipo', '').strip()
+        descripcion = request.form.get('descripcion', '').strip()
+        imagen = request.files.get('imagen')
+
+        if not pedido_id or not imagen:
+            return jsonify({'status': 'warning', 'message': 'Pedido e imagen son obligatorios.'})
+
+        # Guardar imagen en carpeta estática
+        carpeta = os.path.join('static', 'uploads', 'registros')
+        os.makedirs(carpeta, exist_ok=True)
+        nombre_archivo = secure_filename(imagen.filename)
+        ruta_guardado = os.path.join(carpeta, nombre_archivo)
+        imagen.save(ruta_guardado)
+
+        # Crear registro en la DB
+        registro = RegistroFotografico(
+            pedido_id=int(pedido_id),
+            usuario_id=current_user.ID_Usuario,  # transportista que sube la foto
+            tipo=tipo,
+            descripcion=descripcion,
+            imagen_url=ruta_guardado
+        )
+        db.session.add(registro)
+        db.session.commit()
+
+        return jsonify({'status': 'success', 'message': 'Foto registrada correctamente.'})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'status': 'danger', 'message': f'Error: {str(e)}'})
