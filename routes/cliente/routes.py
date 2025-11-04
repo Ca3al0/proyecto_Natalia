@@ -513,22 +513,3 @@ def eliminar_pedido(pedido_id):
     flash('Pedido eliminado correctamente.', 'success')
     return redirect(url_for('cliente.historial'))
 
-@cliente.route('/recibo/<int:pedido_id>')
-def ver_recibo_cliente(pedido_id):
-    user_id = session.get('user_id')
-    pedido = Pedido.query.get_or_404(pedido_id)
-
-    # Verificar que el pedido pertenece al cliente
-    if pedido.ID_Usuario != user_id:
-        abort(403)  # acceso denegado
-
-    # Renderizar HTML del recibo
-    html = render_template('cliente/recibo_cliente.html', pedido=pedido)
-    
-    # Convertir a PDF en memoria
-    pdf_file = io.BytesIO()
-    HTML(string=html).write_pdf(pdf_file)
-    pdf_file.seek(0)
-    
-    # Descargar PDF
-    return send_file(pdf_file, download_name=f'recibo_{pedido.ID_Pedido}.pdf', as_attachment=True)
