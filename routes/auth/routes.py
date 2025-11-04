@@ -2,6 +2,7 @@ from flask import render_template, request, redirect, url_for, flash, session, j
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from flask_login import login_required, login_user, logout_user
+from sqlalchemy import func
 from basedatos.models import db, Usuario
 from basedatos.decoradores import validar_password, validar_email, send_reset_email
 from basedatos.notificaciones import crear_notificacion
@@ -14,10 +15,11 @@ s = URLSafeTimedSerializer("mi_clave_super_secreta_y_unica")
 @auth.route('/register', methods=['POST'])
 def register():
     nombre_completo = request.form.get('name', '').strip()
-    correo = request.form.get('email', '').strip()
+    correo = request.form.get('email', '').strip().lower()
     telefono = request.form.get('phone', '').strip()
     password = request.form.get('password', '').strip()
 
+    # Validaciones básicas
     if not nombre_completo or not correo or not password:
         return jsonify({'status': 'warning', 'message': 'Nombre, correo y contraseña son obligatorios.'})
 
@@ -28,7 +30,9 @@ def register():
     if error:
         return jsonify({'status': 'danger', 'message': error})
 
-    if Usuario.query.filter_by(Correo=correo).first():
+    # Evita falsos duplicados
+    usuario_existente = Usuario.query.filter(func.lower(Usuario.Correo) == correo).first()
+    if usuario_existente:
         return jsonify({'status': 'danger', 'message': 'Este correo ya está registrado. Usa otro o inicia sesión.'})
 
     nombre, apellido = (nombre_completo.split(" ", 1) + [""])[:2]
@@ -40,7 +44,8 @@ def register():
             Telefono=telefono,
             Correo=correo,
             Contraseña=generate_password_hash(password),
-            Rol="cliente"
+            Rol="cliente",
+            Activo=1
         )
         db.session.add(nuevo_usuario)
         db.session.commit()
@@ -51,37 +56,33 @@ def register():
             mensaje="Tu cuenta se ha creado correctamente."
         )
 
-        # Mensaje y apertura del modal de login
+        # ✅ Muestra mensaje y abre modal de login tras 3 segundos
         return jsonify({
             'status': 'success',
             'message': 'Cuenta creada correctamente. Redirigiendo al login...',
-            'redirect': url_for('index')
+            'redirect': url_for('index'),
+            'delay': 3000  # milisegundos
         })
 
     except Exception as e:
         db.session.rollback()
 
-        # Detección de duplicado
         if 'Duplicate entry' in str(e):
-            return jsonify({
-                'status': 'danger',
-                'message': 'El correo ya está registrado. Intenta con otro.'
-            })
+            return jsonify({'status': 'danger', 'message': 'El correo ya está registrado. Intenta con otro.'})
 
-        # Cualquier otro error
-        return jsonify({
-            'status': 'danger',
-            'message': 'Error al registrar. Intenta nuevamente.'
-        })
+        return jsonify({'status': 'danger', 'message': f'Error al registrar: {str(e)}'})
 
 
 # ------------------ LOGIN ------------------ #
 @auth.route('/login', methods=['POST'])
 def login():
-    correo = request.form.get('correo', '').strip()
+    correo = request.form.get('correo', '').strip().lower()
     password = request.form.get('password', '').strip()
 
-    usuario = Usuario.query.filter_by(Correo=correo).first()
+    if not correo or not password:
+        return jsonify({'status': 'warning', 'message': 'Debes ingresar correo y contraseña.'})
+
+    usuario = Usuario.query.filter(func.lower(Usuario.Correo) == correo).first()
 
     if usuario and check_password_hash(usuario.Contraseña, password):
         login_user(usuario)
@@ -112,8 +113,8 @@ def logout():
 # ------------------ OLVIDÉ CONTRASEÑA ------------------ #
 @auth.route('/forgot_password', methods=['POST'])
 def forgot_password():
-    email = request.form.get("email")
-    user = Usuario.query.filter_by(Correo=email).first()
+    email = request.form.get("email", "").strip().lower()
+    user = Usuario.query.filter(func.lower(Usuario.Correo) == email).first()
 
     if not user:
         return jsonify({'status': 'warning', 'message': 'Correo no registrado.'})
@@ -121,7 +122,6 @@ def forgot_password():
     try:
         token = s.dumps(email, salt='password-recovery')
         send_reset_email(user_email=email, user_name=user.Nombre, token=token)
-        # Mensaje para interfaz + borrado del campo vía JS
         return jsonify({'status': 'success', 'message': 'Correo enviado para restablecer contraseña. El campo se limpiará.'})
     except Exception as e:
         return jsonify({'status': 'danger', 'message': f'Error al enviar correo: {str(e)}'})
@@ -137,14 +137,14 @@ def reset_password(token):
         except (SignatureExpired, BadSignature):
             return render_template('common/index.html', mostrar_modal_reset=False, token_expirado=True, token=None)
 
-    # Si el método es POST
+    # Si es POST (actualiza la contraseña)
     try:
         email = s.loads(token, salt='password-recovery', max_age=3600)
     except (SignatureExpired, BadSignature):
         return jsonify({'status': 'danger', 'message': 'Enlace inválido o expirado.'})
 
-    new_password = request.form.get('password')
-    confirm_password = request.form.get('confirm_password')
+    new_password = request.form.get('password', '').strip()
+    confirm_password = request.form.get('confirm_password', '').strip()
 
     if not new_password or not confirm_password:
         return jsonify({'status': 'warning', 'message': 'Completa ambos campos.'})
@@ -155,7 +155,7 @@ def reset_password(token):
     if error:
         return jsonify({'status': 'warning', 'message': error})
 
-    user = Usuario.query.filter_by(Correo=email).first()
+    user = Usuario.query.filter(func.lower(Usuario.Correo) == email).first()
     if not user:
         return jsonify({'status': 'danger', 'message': 'Usuario no encontrado.'})
 
@@ -168,6 +168,5 @@ def reset_password(token):
         mensaje="Tu contraseña ha sido cambiada exitosamente."
     )
 
-    # Redirige con mensaje flash
     flash('Contraseña restablecida correctamente. Ahora puedes iniciar sesión.', 'success')
     return jsonify({'status': 'success', 'redirect': url_for('index')})
