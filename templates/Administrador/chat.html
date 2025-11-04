@@ -1,114 +1,59 @@
-<!-- templates/admin/chat.html -->
 {% extends "common/base.html" %}
 
-{% block navbar %}
-  {% include "common/partials/navbar_admin.html" %}
-{% endblock %}
-
 {% block content %}
-<div class="chat-container">
-    <h2>Chat con Clientes</h2>
-    <div id="chatBox" class="chat-box"></div>
-    <form id="formChat" class="chat-form">
-        <input type="hidden" id="cliente_id" value="1"> <!-- ejemplo -->
-        <input type="text" id="mensajeInput" placeholder="Escribe un mensaje..." required>
-        <button type="submit">Enviar</button>
-    </form>
+<h2>Chat con Clientes</h2>
+
+<div id="chatContainer" style="max-width:600px; margin:auto; border:1px solid #ddd; border-radius:10px; padding:10px;">
+    <div id="chatBody" style="height:400px; overflow-y:auto;">
+        {% for msg in mensajes %}
+            <div class="{{ 'admin-msg' if msg.enviado_admin else 'cliente-msg' }}">
+                <strong>{{ 'Admin' if msg.enviado_admin else msg.cliente.Nombre }}:</strong> {{ msg.contenido }}
+            </div>
+        {% endfor %}
+    </div>
+    <div style="margin-top:10px; display:flex;">
+        <select id="clienteSelect" style="flex:1; margin-right:5px;">
+            {% for user in usuarios %}
+                <option value="{{ user.ID_Usuario }}">{{ user.Nombre }}</option>
+            {% endfor %}
+        </select>
+        <input type="text" id="chatInput" placeholder="Escribe un mensaje..." style="flex:3; margin-right:5px;">
+        <button id="sendChat">Enviar</button>
+    </div>
 </div>
 
 <style>
-.chat-container {
-    max-width: 600px;
-    margin: 30px auto;
-    background-color: #f8f6f0;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-.chat-box {
-    height: 400px;
-    overflow-y: scroll;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
-    background-color: #fff;
-    border-radius: 5px;
-}
-.chat-message {
-    margin-bottom: 10px;
-}
-.chat-message.admin {
-    text-align: right;
-    color: #fff;
-    background-color: #4e7b33;
-    padding: 5px 10px;
-    border-radius: 10px;
-    display: inline-block;
-}
-.chat-message.cliente {
-    text-align: left;
-    color: #333;
-    background-color: #d1faff;
-    padding: 5px 10px;
-    border-radius: 10px;
-    display: inline-block;
-}
-.chat-form {
-    display: flex;
-    gap: 10px;
-}
-.chat-form input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 25px;
-    border: 1px solid #ccc;
-}
-.chat-form button {
-    padding: 10px 20px;
-    border-radius: 25px;
-    border: none;
-    background-color: #4e7b33;
-    color: #fff;
-}
+.cliente-msg { text-align: left; margin-bottom:5px; background:#d1faff; padding:5px 10px; border-radius:10px; }
+.admin-msg { text-align: right; margin-bottom:5px; background:#57a773; color:white; padding:5px 10px; border-radius:10px; }
 </style>
 
 <script>
-const chatBox = document.getElementById('chatBox');
-const formChat = document.getElementById('formChat');
-const mensajeInput = document.getElementById('mensajeInput');
-const cliente_id = document.getElementById('cliente_id').value;
+const sendBtn = document.getElementById('sendChat');
+const chatInput = document.getElementById('chatInput');
+const chatBody = document.getElementById('chatBody');
+const clienteSelect = document.getElementById('clienteSelect');
 
-// Cargar mensajes
-async function cargarMensajes(){
-    const res = await fetch('/admin/api/mensajes');
-    const data = await res.json();
-    chatBox.innerHTML = '';
-    data.forEach(m => {
-        const div = document.createElement('div');
-        div.className = 'chat-message ' + (m.enviado_por_admin ? 'admin' : 'cliente');
-        div.textContent = m.contenido;
-        chatBox.appendChild(div);
-    });
-    chatBox.scrollTop = chatBox.scrollHeight;
-}
+sendBtn.addEventListener('click', async () => {
+    const contenido = chatInput.value.trim();
+    const cliente_id = clienteSelect.value;
 
-// Enviar mensaje
-formChat.addEventListener('submit', async e => {
-    e.preventDefault();
-    const contenido = mensajeInput.value.trim();
     if(!contenido) return;
 
-    await fetch('/admin/api/mensajes', {
+    const response = await fetch('{{ url_for("admin.enviar_mensaje_admin") }}', {
         method:'POST',
-        headers: {'Content-Type':'application/json'},
+        headers:{'Content-Type':'application/json'},
         body: JSON.stringify({contenido, cliente_id})
     });
-    mensajeInput.value = '';
-    cargarMensajes();
-});
 
-// Polling cada 2 segundos
-setInterval(cargarMensajes, 2000);
-cargarMensajes();
+    const data = await response.json();
+    if(data.status === 'ok'){
+        const div = document.createElement('div');
+        div.className = 'admin-msg';
+        div.innerHTML = `<strong>Admin:</strong> ${contenido}`;
+        chatBody.appendChild(div);
+        chatInput.value = '';
+        chatBody.scrollTop = chatBody.scrollHeight;
+    }
+});
 </script>
 {% endblock %}

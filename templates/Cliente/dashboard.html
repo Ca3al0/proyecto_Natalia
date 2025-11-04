@@ -354,6 +354,7 @@
   </div>
 </div>
 
+
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -393,11 +394,103 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 {% endif %}
 
+<!-- Botón flotante -->
+<button id="chatbotButton" title="Chat con soporte">
+  <i class="bi bi-chat-dots-fill"></i>
+</button>
 
+<!-- Ventana de chat -->
+<div id="chatbotModal" class="chat-modal">
+  <div class="chat-header">
+    <span>Chat con soporte</span>
+    <button id="closeChat">&times;</button>
+  </div>
+  <div class="chat-body" id="chatBody">
+    {% for msg in mensajes %}
+      <div class="{{ 'admin-msg' if msg.enviado_admin else 'cliente-msg' }}">
+        <strong>{{ 'Admin' if msg.enviado_admin else 'Tú' }}:</strong> {{ msg.contenido }}
+      </div>
+    {% endfor %}
+  </div>
+  <div class="chat-footer">
+    <input type="text" id="chatInput" placeholder="Escribe un mensaje...">
+    <button id="sendChat">Enviar</button>
+  </div>
+</div>
 
+<style>
+/* Botón flotante */
+#chatbotButton {
+  position: fixed; bottom: 20px; right: 20px;
+  background-color: #57a773; color: white; border: none;
+  border-radius: 50%; width: 60px; height: 60px; font-size: 24px;
+  cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000;
+}
 
+/* Modal del chat */
+#chatbotModal {
+  display: none; position: fixed; bottom: 90px; right: 20px;
+  width: 320px; max-height: 400px; background-color: white;
+  border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  z-index: 1000; flex-direction: column; display: flex;
+}
 
+.chat-header {
+  background-color: #57a773; color: white; padding: 10px;
+  border-top-left-radius: 12px; border-top-right-radius: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+}
 
+.chat-body {
+  padding: 10px; flex: 1; overflow-y: auto; background-color: #f8f8f8;
+}
+
+.chat-footer { display: flex; border-top: 1px solid #ddd; }
+#chatInput { flex: 1; padding: 8px; border: none; border-radius: 0 0 0 12px; }
+#sendChat { padding: 8px 12px; background-color: #57a773; color: white; border: none; cursor: pointer; border-radius: 0 0 12px 0; }
+
+.cliente-msg { text-align: right; margin-bottom: 5px; background-color: #d1faff; padding: 5px 10px; border-radius: 10px; }
+.admin-msg { text-align: left; margin-bottom: 5px; background-color: #f1f1f1; padding: 5px 10px; border-radius: 10px; }
+</style>
+
+<script>
+const chatbotButton = document.getElementById('chatbotButton');
+const chatbotModal = document.getElementById('chatbotModal');
+const closeChat = document.getElementById('closeChat');
+const sendBtn = document.getElementById('sendChat');
+const chatInput = document.getElementById('chatInput');
+const chatBody = document.getElementById('chatBody');
+
+chatbotButton.addEventListener('click', () => {
+  chatbotModal.style.display = 'flex';
+  chatBody.scrollTop = chatBody.scrollHeight;
+});
+
+closeChat.addEventListener('click', () => {
+  chatbotModal.style.display = 'none';
+});
+
+sendBtn.addEventListener('click', async () => {
+  const mensaje = chatInput.value.trim();
+  if (!mensaje) return;
+
+  const response = await fetch('{{ url_for("cliente.enviar_mensaje") }}', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ contenido: mensaje })
+  });
+
+  const data = await response.json();
+  if (data.status === 'ok') {
+    const div = document.createElement('div');
+    div.className = 'cliente-msg';
+    div.innerHTML = `<strong>Tú:</strong> ${mensaje}`;
+    chatBody.appendChild(div);
+    chatInput.value = '';
+    chatBody.scrollTop = chatBody.scrollHeight;
+  }
+});
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url_for('static', filename='js/actualizacion.js') }}"></script>

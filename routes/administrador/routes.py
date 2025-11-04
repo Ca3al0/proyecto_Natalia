@@ -680,32 +680,24 @@ def reporte_entregas():
     return render_template('administrador/reportes_entregas.html',
                            pedidos_entregados=pedidos_entregados)
 
-@admin.route('/admin/chat')
+@admin.route('/chat', methods=['GET'])
+@login_required
 def chat_admin():
-    return render_template('admin/chat.html')
+    # Traer todos los mensajes ordenados por fecha
+    mensajes = Mensaje.query.order_by(Mensaje.fecha).all()
+    return render_template('admin_chat.html', mensajes=mensajes)
 
-@admin.route('/admin/api/mensajes', methods=['GET', 'POST'])
-def api_mensajes():
-    if request.method == 'GET':
-        
-        mensajes = Mensaje.query.order_by(Mensaje.fecha.asc()).limit(50).all()
-        return jsonify([
-            {
-                'id': m.id,
-                'cliente_id': m.cliente_id,
-                'contenido': m.contenido,
-                'enviado_por_admin': m.enviado_por_admin,
-                'fecha': m.fecha.strftime('%Y-%m-%d %H:%M:%S')
-            } for m in mensajes
-        ])
-    else:
-        # Enviar mensaje
-        data = request.json
-        mensaje = Mensaje(
-            cliente_id=data.get('cliente_id'),
-            contenido=data.get('contenido'),
-            enviado_por_admin=True
-        )
-        db.session.add(mensaje)
-        db.session.commit()
-        return jsonify({'status':'ok', 'mensaje':'Mensaje enviado'})
+@admin.route('/chat/enviar_mensaje', methods=['POST'])
+@login_required
+def enviar_mensaje_admin():
+    data = request.get_json()
+    contenido = data.get('contenido')
+    cliente_id = data.get('cliente_id')
+
+    if not contenido or not cliente_id:
+        return jsonify({'status': 'error', 'message': 'Faltan datos'})
+
+    msg = Mensaje(cliente_id=cliente_id, contenido=contenido, enviado_admin=True)
+    db.session.add(msg)
+    db.session.commit()
+    return jsonify({'status': 'ok'})

@@ -2,7 +2,7 @@ from flask_login import current_user
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Calendario,Pedido, Producto, Resena, Detalle_Pedido, Pagos
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Calendario,Pedido, Producto, Resena, Detalle_Pedido, Pagos,Mensaje
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
 from datetime import date,datetime
@@ -352,3 +352,22 @@ def get_direcciones():
         })
     return jsonify(data)
 
+
+@cliente.route('/', methods=['GET'])
+@login_required
+def chat_cliente():
+    mensajes = Mensaje.query.order_by(Mensaje.fecha).all()
+    return render_template('cliente.html', mensajes=mensajes)
+
+@cliente.route('/enviar_mensaje', methods=['POST'])
+@login_required
+def enviar_mensaje():
+    data = request.get_json()
+    contenido = data.get('contenido')
+    if not contenido:
+        return jsonify({'status': 'error', 'message': 'Mensaje vacío'})
+    
+    msg = Mensaje(cliente_id=current_user.ID_Usuario, contenido=contenido, enviado_admin=False)
+    db.session.add(msg)
+    db.session.commit()
+    return jsonify({'status': 'ok'})
