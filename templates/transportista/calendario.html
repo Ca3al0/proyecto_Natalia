@@ -90,6 +90,47 @@
         </div>
     </div>
 </div>
+<script>
+function abrirRegistro(pedidoId){
+    document.getElementById('pedido_id').value = pedidoId;
+    document.getElementById('registroFotograficoForm').reset();
+    document.getElementById('registroPreview').style.display = 'none';
+    document.getElementById('registroFotograficoModal').style.display = 'block';
+}
+
+function cerrarRegistro(){
+    document.getElementById('registroFotograficoModal').style.display = 'none';
+}
+
+// Cerrar modal al hacer clic fuera
+window.onclick = function(event){
+    const modal = document.getElementById('registroFotograficoModal');
+    if(event.target == modal) cerrarRegistro();
+}
+
+// Guardar registro via AJAX
+document.getElementById('registroFotograficoForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch('{{ url_for("transportista.guardar_registro") }}', {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+
+        if(result.status === 'success'){
+            alert('Registro guardado correctamente');
+            abrirRegistro(document.getElementById('pedido_id').value); // recarga preview si quieres
+        } else {
+            alert('Error al guardar: ' + (result.message || 'Error desconocido'));
+        }
+    } catch(err){
+        alert('Error de red: ' + err.message);
+    }
+});
+</script>
 
 <!-- FullCalendar -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet" />
