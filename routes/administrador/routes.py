@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from datetime import date,datetime, timedelta
 from flask import current_app
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido, Mensaje
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido, Mensaje, RegistroFotografico
 from werkzeug.security import generate_password_hash
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
@@ -727,4 +727,5 @@ def mensajes_cliente(cliente_id):
         } for m in mensajes
     ]
     return jsonify(mensajes_list)
+
 

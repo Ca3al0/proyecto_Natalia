@@ -279,3 +279,14 @@ class Mensaje(db.Model):
     def __repr__(self):
         remitente = "Admin" if self.enviado_admin else self.cliente.Nombre
         return f'<Mensaje de {remitente} a las {self.fecha}>'
+
+class RegistroFotografico(db.Model):
+    ID = db.Column(db.Integer, primary_key=True)
+    ID_Usuario = db.Column(db.Integer, db.ForeignKey('usuario.ID_Usuario'))
+    fotos_antes = db.Column(db.Text)   
+    fotos_despues = db.Column(db.Text)
+    desc_antes = db.Column(db.Text)
+    desc_despues = db.Column(db.Text)
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
+
+    usuario = db.relationship('Usuario')

@@ -2,7 +2,7 @@ from flask_login import current_user
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
 from werkzeug.security import generate_password_hash
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Calendario,Pedido, Producto, Resena, Detalle_Pedido, Pagos,Mensaje
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Calendario,Pedido, Producto, Resena, Detalle_Pedido, Pagos,Mensaje, RegistroFotografico
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
 from datetime import date,datetime
@@ -462,8 +462,17 @@ def finalizar_compra():
     numero_tarjeta = request.form.get('numero-tarjeta')
     numero_celular = request.form.get('numero-celular')
 
-    # Aquí podrías agregar lógica de simulación de pago
-    # Por ejemplo: aprobar siempre si no termina en '0000' o '1234'
 
     flash(f'✅ Pago con {metodo_pago} realizado correctamente', 'success')
     return redirect(url_for('catalogo'))
+
+
+@cliente.route('/registro_pedido/<int:pedido_id>')
+@login_required
+def ver_registro_pedido(pedido_id):
+    registro = RegistroFotografico.query.filter_by(ID_Pedido=pedido_id).first()
+    if not registro:
+        flash("No hay registro fotográfico para este pedido", "warning")
+        return redirect(url_for('cliente.ver_pedidos'))
+
+    return render_template('cliente/ver_registro_pedido.html', registro=registro)
