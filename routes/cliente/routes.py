@@ -486,6 +486,14 @@ def seguimiento_cliente(id_pedido):
 
     return render_template('cliente/seguimiento.html', pedido=pedido)
 
+
+@cliente.route("/confirmar_entrega/<int:pedido_id>")
+def confirmar_entrega(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    pedido.Estado = "entregado"
+    db.session.commit()
+    return "✅ Entrega confirmada. Gracias por tu compra."
+
 # ---------- HISTORIAL_TRANSACCIONES ----------
 
 @cliente.route('/historial')

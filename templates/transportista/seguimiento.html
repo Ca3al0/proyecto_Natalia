@@ -117,8 +117,7 @@ button:hover {
 
     <form id="estadoForm" 
           action="{{ url_for('transportista.actualizar_estado', id_pedido=pedido.ID_Pedido) }}" 
-          method="POST"
-          onsubmit="return validarAvance()">
+          method="POST">
 
       <select name="estado" id="estado">
         <option value="pendiente" {% if pedido.Estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
@@ -127,7 +126,14 @@ button:hover {
         <option value="entregado" {% if pedido.Estado == 'entregado' %}selected{% endif %}>Entregado</option>
       </select>
 
-      <!-- Firma solo para pedidos contra entrega -->
+      <!-- Sección de confirmación al marcar entregado -->
+      <div id="entregadoOpciones" style="display: none; margin-top: 15px;">
+        <p><strong>Confirmar entrega:</strong></p>
+        <button type="button" onclick="mostrarFirma()">🖊 Capturar firma del cliente</button>
+        <button type="button" onclick="enviarCorreo()">📧 Enviar correo de confirmación</button>
+      </div>
+
+      <!-- Firma del cliente -->
       <div id="firmaSection" style="display: none; margin-top: 15px;">
         <p><strong>Firma del cliente:</strong></p>
         <canvas id="firmaCanvas"></canvas>
@@ -137,7 +143,7 @@ button:hover {
         </div>
       </div>
 
-      <button type="submit" style="margin-top: 15px;">Actualizar</button>
+      <button id="btnActualizar" type="submit" style="margin-top: 15px;">Actualizar</button>
     </form>
 
     <div class="info">
@@ -151,56 +157,61 @@ button:hover {
         class="btn btn-outline-primary btn-sm">
         📷 Ver registro fotográfico
         </a>
-
     </div>
   </div>
 </div>
 
 <script>
-const estadoActual = "{{ pedido.Estado }}";
+const estadoSelect = document.getElementById("estado");
+const entregadoOpciones = document.getElementById("entregadoOpciones");
+const firmaSection = document.getElementById("firmaSection");
 const tipoPago = "{{ pedido.TipoPago|lower }}";
-const ordenEstados = ["pendiente", "en proceso", "en reparto", "entregado"];
-
-function validarAvance() {
-  const nuevoEstado = document.getElementById("estado").value;
-  const indiceActual = ordenEstados.indexOf(estadoActual);
-  const indiceNuevo = ordenEstados.indexOf(nuevoEstado);
-
-  if (indiceNuevo < indiceActual) {
-    alert("⚠️ No puedes regresar a un estado anterior.");
-    return false;
-  }
-
-  if (nuevoEstado === "entregado" && tipoPago === "contra entrega") {
-    const firmaInput = document.getElementById("firmaInput").value;
-    if (!firmaInput) {
-      alert("Por favor, solicita la firma del cliente antes de finalizar la entrega.");
-      return false;
-    }
-  }
-  return true;
-}
-
-// Canvas firma
 const canvas = document.getElementById("firmaCanvas");
 const ctx = canvas.getContext("2d");
 let dibujando = false;
 
+// Mostrar opciones al seleccionar "Entregado"
+estadoSelect.addEventListener("change", () => {
+  if (estadoSelect.value === "entregado") {
+    entregadoOpciones.style.display = "block";
+  } else {
+    entregadoOpciones.style.display = "none";
+    firmaSection.style.display = "none";
+  }
+});
+
+// Mostrar sección de firma
+function mostrarFirma() {
+  firmaSection.style.display = "block";
+  entregadoOpciones.style.display = "none";
+}
+
+// Enviar correo AJAX
+function enviarCorreo() {
+  fetch(`/transportista/enviar_confirmacion/{{ pedido.ID_Pedido }}`, {
+    method: "POST"
+  })
+  .then(r => r.json())
+  .then(data => alert(data.message))
+  .catch(err => alert("Error al enviar correo."));
+}
+
+// Firma
 canvas.addEventListener("mousedown", () => dibujando = true);
 canvas.addEventListener("mouseup", () => dibujando = false);
 canvas.addEventListener("mouseout", () => dibujando = false);
 canvas.addEventListener("mousemove", dibujar);
 
-function dibujar(event) {
+function dibujar(e) {
   if (!dibujando) return;
   const rect = canvas.getBoundingClientRect();
   ctx.lineWidth = 2;
   ctx.lineCap = "round";
   ctx.strokeStyle = "#157145";
-  ctx.lineTo(event.clientX - rect.left, event.clientY - rect.top);
+  ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
   ctx.stroke();
   ctx.beginPath();
-  ctx.moveTo(event.clientX - rect.left, event.clientY - rect.top);
+  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
   document.getElementById("firmaInput").value = canvas.toDataURL();
 }
 
@@ -208,22 +219,5 @@ function limpiarFirma() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   document.getElementById("firmaInput").value = "";
 }
-
-// Mostrar sección de firma solo si aplica
-document.addEventListener("DOMContentLoaded", () => {
-  const estadoSelect = document.getElementById("estado");
-  const firmaSection = document.getElementById("firmaSection");
-  
-  function toggleFirma() {
-    if (estadoSelect.value === "entregado" && tipoPago === "contra entrega") {
-      firmaSection.style.display = "block";
-    } else {
-      firmaSection.style.display = "none";
-    }
-  }
-
-  estadoSelect.addEventListener("change", toggleFirma);
-  toggleFirma();
-});
 </script>
 {% endblock %}

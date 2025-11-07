@@ -274,6 +274,27 @@ def actualizar_estado(id_pedido):
 
     return redirect(url_for("transportista.seguimiento_pedido", pedido_id=id_pedido))
 
+@transportista.route("/enviar_confirmacion/<int:pedido_id>", methods=["POST"])
+@login_required
+@role_required('transportista')
+def enviar_confirmacion(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    correo_cliente = pedido.usuario.Correo
+
+    # Lógica para enviar el correo (ejemplo con Flask-Mail)
+    enlace_confirmacion = url_for("cliente.confirmar_entrega", pedido_id=pedido_id, _external=True)
+
+    mensaje = f"""
+    Hola {pedido.usuario.Nombre},
+    Tu pedido #{pedido.ID_Pedido} ha llegado.
+    Confirma haciendo clic aquí: {enlace_confirmacion}
+    """
+
+    # mail.send_message("Confirmación de entrega", sender="tuapp@gmail.com", recipients=[correo_cliente], body=mensaje)
+
+    return jsonify({"message": "📧 Correo de confirmación enviado al cliente."})
+
+
 
 # ---------- ACTUALIZACION_DATOS ----------
 @transportista.route("/actualizacion_datos", methods=["GET", "POST"])
