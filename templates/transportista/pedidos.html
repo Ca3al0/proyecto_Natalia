@@ -143,7 +143,7 @@ table.table tbody tr:hover {
               <td data-label="Cliente">{{ pedido.usuario.Nombre }} {{ pedido.usuario.Apellido }}</td>
               <td data-label="Estado">{{ pedido.Estado }}</td>
               <td data-label="Acciones">
-                  <a href="{{ url_for('transportista.seguimiento_pedido', pedido_id=pedido.ID_Pedido) }}" class="btn">Hacer seguimiento</a>
+                 <a href="{{ url_for('transportista.seguimiento_pedido', pedido_id=pedido.ID_Pedido) }}">Hacer seguimiento</a>
               </td>
           </tr>
           {% endfor %}

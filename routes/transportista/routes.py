@@ -205,6 +205,15 @@ def ver_pedidos_transportista():
 
 # ---------- SEGUIMIENTO ----------
 
+
+@transportista.route("/seguimiento/<int:pedido_id>")
+@login_required
+@role_required('transportista')
+def seguimiento_pedido(pedido_id):
+    pedido = Pedido.query.get_or_404(pedido_id)
+    return render_template("transportista/seguimiento.html", pedido=pedido)
+
+
 @transportista.route("/actualizar_estado/<int:id_pedido>", methods=["POST"])
 @login_required
 @role_required('transportista')

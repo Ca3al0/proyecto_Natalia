@@ -99,7 +99,7 @@ button:hover {
 {% endblock %}
 
 {% block navbar %}
-  {% include "common/partials/navbar_transportista.html" %}
+  {% include "common/partials/navbar_transpoinsta.html" %}
 {% endblock %}
 
 {% block content %}
@@ -147,10 +147,11 @@ button:hover {
     <hr>
 
     <div style="text-align:center;">
-      <a href="{{ url_for('transportista.registro_fotografico', pedido_id=pedido.ID_Pedido) }}"
-         class="btn btn-outline-success">
-         📷 Registrar evidencia fotográfica
-      </a>
+      <a href="{{ url_for('transportista.get_registro_fotografico', pedido_id=pedido.ID_Pedido) }}" 
+        class="btn btn-outline-primary btn-sm">
+        📷 Ver registro fotográfico
+        </a>
+
     </div>
   </div>
 </div>
