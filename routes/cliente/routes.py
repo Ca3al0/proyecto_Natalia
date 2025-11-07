@@ -65,7 +65,7 @@ def actualizacion_datos():
         ID_Usuario=usuario.ID_Usuario
     ).order_by(Notificaciones.Fecha.desc()).all()
 
-    # 🔹 Traemos todos los pedidos del usuario actual
+    
     pedidos = Pedido.query.filter_by(ID_Usuario=usuario.ID_Usuario).order_by(Pedido.FechaPedido.desc()).all()
 
     if request.method == "POST":
@@ -159,6 +159,8 @@ def borrar_direccion(id_direccion):
 def perfil():
     return redirect(url_for('cliente.actualizacion_datos'))
 
+# ---------- DETALLE_PEDIDO ----------
+
 
 @cliente.route("/pedido/<int:id_pedido>/detalle")
 @login_required
@@ -166,7 +168,7 @@ def ver_detalle_pedido(id_pedido):
     pedido = Pedido.query.get_or_404(id_pedido)
 
     try:
-        detalles = pedido.detalles_pedido  # Relación definida en el modelo
+        detalles = pedido.detalles_pedido  
     except Exception as e:
         print("Error detalles pedido:", e)
         detalles = []
@@ -239,7 +241,7 @@ def detalle_producto_catalogo(id):
     producto = Producto.query.get_or_404(id)
     return render_template('cliente/detalle_producto_catalogo.html', producto=producto)
 
-
+# ---------- RESEÑA ----------
 
 @cliente.route('/productos/<int:id>/resena', methods=['GET'])
 @login_required
@@ -274,9 +276,11 @@ def guardar_resena(id):
     flash('Reseña creada exitosamente.', 'success')
     return redirect(url_for('cliente.detalle_producto', id=id))  
 
+# ---------- COMPARAR ----------
+
 @cliente.route('/comparar')
 def comparar():
-    productos = Producto.query.all()  # o la consulta que tengas
+    productos = Producto.query.all()  
     return render_template('cliente/comparar.html', productos=productos)
 
 @cliente.route('/api/comprar', methods=['POST'])
@@ -288,17 +292,16 @@ def comprar_producto():
         id_direccion = int(data.get('ID_Direccion'))
         metodo_pago = data.get('MetodoPago')
 
-        # Verificar que la dirección pertenece al usuario
+       
         direccion = Direccion.query.filter_by(ID_Direccion=id_direccion, ID_Usuario=current_user.ID_Usuario).first()
         if not direccion:
             return jsonify({"mensaje":"Dirección no válida"}), 400
 
-        # Obtener producto
         producto = Producto.query.get(id_producto)
         if not producto:
             return jsonify({"mensaje":"Producto no encontrado"}), 404
 
-        # Crear pedido
+
         pedido = Pedido(
             NombreComprador=current_user.Nombre,
             Estado='pendiente',
@@ -308,9 +311,9 @@ def comprar_producto():
             ID_Usuario=current_user.ID_Usuario
         )
         db.session.add(pedido)
-        db.session.commit()  # Guardamos para obtener ID_Pedido
+        db.session.commit()  
 
-        # Crear detalle del pedido
+       
         detalle = Detalle_Pedido(
             ID_Pedido=pedido.ID_Pedido,
             ID_Producto=producto.ID_Producto,
@@ -319,7 +322,7 @@ def comprar_producto():
         )
         db.session.add(detalle)
 
-        # Registrar pago
+
         pago = Pagos(
             MetodoPago=metodo_pago,
             FechaPago=datetime.today().date(),
@@ -354,6 +357,7 @@ def get_direcciones():
         })
     return jsonify(data)
 
+# ---------- CHAT_EN_TIEMPO_REAL ----------
 
 @cliente.route('/chat', methods=['GET'])
 @login_required
@@ -389,6 +393,7 @@ def mensajes_cliente_ajax():
         } for m in mensajes
     ])
 
+# ---------- CARRITO ----------
 
 @cliente.route('/carrito')
 @login_required
@@ -440,7 +445,7 @@ def checkout():
                 )
                 db.session.add(detalle)
 
-                # Restar stock
+              
                 producto.Stock -= item['cantidad']
 
             db.session.commit()
@@ -467,6 +472,8 @@ def finalizar_compra():
     flash(f'✅ Pago con {metodo_pago} realizado correctamente', 'success')
     return redirect(url_for('catalogo'))
 
+# ---------- SEGUIMIENTO ----------
+
 @cliente.route('/seguimiento/<int:id_pedido>')
 @login_required
 def seguimiento_cliente(id_pedido):
@@ -479,7 +486,7 @@ def seguimiento_cliente(id_pedido):
 
     return render_template('cliente/seguimiento.html', pedido=pedido)
 
-
+# ---------- HISTORIAL_TRANSACCIONES ----------
 
 @cliente.route('/historial')
 @login_required
@@ -512,6 +519,8 @@ def eliminar_pedido(pedido_id):
     db.session.commit()
     flash('Pedido eliminado correctamente.', 'success')
     return redirect(url_for('cliente.historial'))
+
+# ---------- GARANTIAS ----------
 
 @cliente.route('/crear/<int:pedido_id>', methods=['GET', 'POST'])
 @login_required

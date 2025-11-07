@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // Referencias a los menús y secciones
+  
   const menuPerfil = document.getElementById('menu-perfil');
   const menuDirecciones = document.getElementById('menu-direcciones');
   const menuPedidos = document.getElementById('menu-pedidos');

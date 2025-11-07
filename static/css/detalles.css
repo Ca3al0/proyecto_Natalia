@@ -14,7 +14,7 @@ body {
     transition: none;
 }
 
-/* ---------- Imagen ---------- */
+
 .img-fluid {
     border-radius: 20px;
     box-shadow: 0 10px 35px rgba(0,0,0,0.08);
@@ -25,7 +25,7 @@ body {
     padding: 10px;
 }
 
-/* ---------- Títulos ---------- */
+
 h2.fw-bold {
     color: #157145;
     font-weight: 800;
@@ -38,14 +38,14 @@ h4.text-success {
     margin-bottom: 20px;
 }
 
-/* ---------- Lista de detalles ---------- */
+
 ul.list-unstyled li {
     font-size: 1rem;
     margin-bottom: 8px;
     color: #555;
 }
 
-/* ---------- Descripción ---------- */
+
 p {
     font-size: 1rem;
     color: #555;
@@ -53,7 +53,7 @@ p {
     margin-bottom: 25px;
 }
 
-/* ---------- Botones ---------- */
+
 .btn-success,
 .btn-verde {
     background-color: #57a773;
@@ -76,13 +76,12 @@ p {
     transition: none;
 }
 
-/* Iconos de botones */
 .btn i {
     vertical-align: middle;
     margin-right: 6px;
 }
 
-/* ---------- Modal de compra ---------- */
+
 .modal-content {
     border-radius: 25px;
     padding: 30px;
@@ -121,7 +120,7 @@ p {
     font-weight: 700;
 }
 
-/* ---------- Flash messages ---------- */
+
 .alert {
     border-radius: 20px;
     font-weight: 600;
@@ -136,12 +135,12 @@ p {
     font-size: 1.2rem;
 }
 
-/* ---------- Separación entre imagen y detalles ---------- */
+
 .row > .col-md-6 {
     margin-bottom: 20px;
 }
 
-/* ---------- Responsivo ---------- */
+
 @media (max-width: 768px) {
     .img-fluid {
         max-height: 300px;

@@ -70,7 +70,7 @@
     border: 1px solid #b3e5fc;
 }
 
-/* Animaciones al aparecer/desaparecer */
+
 .flash-small.show {
     opacity: 1;
     transform: translateY(0);
@@ -81,7 +81,7 @@
     transform: translateY(-10px);
 }
 
-/* Botón de cerrar opcional */
+
 .flash-small button.close-alert {
     background: none;
     border: none;

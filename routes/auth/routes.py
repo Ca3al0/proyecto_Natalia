@@ -30,7 +30,7 @@ def register():
     if error:
         return jsonify({'status': 'danger', 'message': error})
 
-    # Evita falsos duplicados
+    
     usuario_existente = Usuario.query.filter(func.lower(Usuario.Correo) == correo).first()
     if usuario_existente:
         return jsonify({'status': 'danger', 'message': 'Este correo ya está registrado. Usa otro por favor.'})
@@ -149,7 +149,7 @@ def reset_password(token):
         except (SignatureExpired, BadSignature):
             return render_template('common/index.html', mostrar_modal_reset=False, token_expirado=True, token=None)
 
-    # Si es POST (actualiza la contraseña)
+  
     try:
         email = s.loads(token, salt='password-recovery', max_age=3600)
     except (SignatureExpired, BadSignature):

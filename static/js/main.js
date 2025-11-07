@@ -1,4 +1,3 @@
-// Cerrar flashes automáticamente después de 3 segundos
 setTimeout(() => {
   document.querySelectorAll('.flash-small, .alert').forEach(alert => {
     alert.style.opacity = '0';

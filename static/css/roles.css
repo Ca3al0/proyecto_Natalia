@@ -33,7 +33,7 @@ h2::after {
   border-radius: 2px;
 }
 
-/* Card */
+
 .card {
   background: #fff;
   border-radius: 20px;
@@ -44,7 +44,7 @@ h2::after {
   box-shadow: 0 5px 20px var(--shadow-light);
 }
 
-/* Tabla */
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -67,7 +67,7 @@ tr:last-child td {
   border-bottom: none;
 }
 
-/* Select dentro de tabla */
+
 .card table select {
   border-radius: 10px;
   padding: 6px 10px;
@@ -83,7 +83,7 @@ tr:last-child td {
   box-shadow: 0 0 5px rgba(124, 179, 66, 0.5);
 }
 
-/* Botones generales */
+
 button {
   padding: 10px 20px;
   border-radius: 50px;
@@ -95,7 +95,7 @@ button {
   letter-spacing: 0.5px;
 }
 
-/* Botón principal de acción */
+
 button.btn-success {
   background: linear-gradient(135deg, #4CAF50, #81C784);
   color: #fff;
@@ -113,7 +113,7 @@ button.btn-success:active {
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
 }
 
-/* Dropdown */
+
 .dropdown {
   position: relative;
   display: inline-block;
@@ -135,7 +135,7 @@ button.btn-success:active {
   box-shadow: 0 6px 18px rgba(95, 143, 63, 0.4);
 }
 
-/* Botones dentro del dropdown */
+
 .dropdown-content {
   display: none;
   position: absolute;
@@ -170,13 +170,13 @@ button.btn-success:active {
   display: block;
 }
 
-/* Animaciones */
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   table, thead, tbody, th, td, tr {
     display: block;
@@ -208,14 +208,14 @@ button.btn-success:active {
   }
 }
 
-/* Contenedor de formulario dentro de la celda para alinear select + botón */
+
 .card table td form {
   display: flex;
   align-items: center;
-  gap: 8px; /* espacio entre select y botón */
+  gap: 8px; 
 }
 
-/* Select */
+
 .card table select {
   border-radius: 12px;
   padding: 6px 12px;
@@ -232,7 +232,7 @@ button.btn-success:active {
   box-shadow: 0 0 5px rgba(124, 179, 66, 0.5);
 }
 
-/* Botón */
+
 .card table button.btn-success {
   padding: 6px 14px;
   border-radius: 12px;

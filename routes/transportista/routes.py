@@ -27,6 +27,7 @@ from . import transportista
 def dashboard():
     return render_template("transportista/transportista_dashboard.html")
 
+# ---------- CALENDARIO ----------
 
 @transportista.route('/api/calendario')
 @login_required
@@ -68,14 +69,14 @@ def api_calendario():
             usuario = Usuario.query.get(p.ID_Usuario)
             nombre_usuario = f"{usuario.Nombre} {usuario.Apellido or ''}".strip() if usuario else "Desconocido"
 
-            # Fecha y hora del evento
+          
             fecha_evento = p.FechaEntrega or (p.HoraLlegada.date() if p.HoraLlegada else None)
             hora_evento = p.HoraLlegada.time() if p.HoraLlegada else time(12, 0)
 
             if fecha_evento:
                 start = datetime.combine(fecha_evento, hora_evento).isoformat()
             else:
-                continue  # saltar si no hay fecha
+                continue  
 
             tipo_evento = "Instalación" if getattr(p, "Instalacion", 0) == 1 else "Entrega"
 
@@ -101,6 +102,7 @@ def api_calendario():
 def calendario():
     return render_template("transportista/calendario.html")
 
+# ---------- REGISTRO_FOTOGRAFICO ----------
 
 @transportista.route('/registro_fotografico', methods=['POST'])
 @login_required
@@ -124,10 +126,10 @@ def registrar_fotografia_transportista():
         ruta_guardado = os.path.join(carpeta, nombre_archivo)
         imagen.save(ruta_guardado)
 
-        # Crear registro en la DB
+        
         registro = RegistroFotografico(
             pedido_id=int(pedido_id),
-            usuario_id=current_user.ID_Usuario,  # transportista que sube la foto
+            usuario_id=current_user.ID_Usuario,  
             tipo=tipo,
             descripcion=descripcion,
             imagen_url=ruta_guardado
@@ -191,6 +193,8 @@ def get_registro_fotografico(pedido_id):
     } for r in registros]
     return jsonify(data)
 
+# ---------- PEDIDOS ----------
+
 @transportista.route('/pedidos')
 @login_required
 @role_required('transportista')  
@@ -198,6 +202,8 @@ def ver_pedidos_transportista():
    
     pedidos = Pedido.query.filter_by(ID_Empleado=current_user.ID_Usuario).all()
     return render_template('transportista/pedidos.html', pedidos=pedidos)
+
+# ---------- SEGUIMIENTO ----------
 
 @transportista.route("/seguimiento/<int:pedido_id>")
 @login_required
@@ -226,7 +232,7 @@ def actualizar_estado(id_pedido):
     db.session.commit()
     flash("✅ Estado actualizado correctamente.", "success")
 
-    # Redirige correctamente al seguimiento del pedido
+   
     return redirect(url_for("transportista.seguimiento_pedido", pedido_id=id_pedido))
 
 

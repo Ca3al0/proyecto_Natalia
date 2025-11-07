@@ -208,6 +208,8 @@ def borrar_direccion(id_direccion):
 
     return redirect(url_for("admin.actualizacion_datos"))
 
+# ---------- VER_PEDIDOS ----------
+
 
 def get_pedidos_pendientes_usuario(usuario_id):
     pedidos = Pedido.query.filter_by(Estado='pendiente', ID_Usuario=usuario_id).all()
@@ -350,6 +352,8 @@ def agregar_producto():
     return render_template('administrador/agregar_producto.html', proveedores=proveedores, categorias=categorias)
 
 
+# ---------- RESEÑAS ----------
+
 
 @admin.route('/resenas')
 @login_required
@@ -357,6 +361,7 @@ def ver_resenas():
     productos = db.session.query(Producto).all()
     return render_template('administrador/ver_reseñas.html', productos=productos)
 
+# ---------- ESTADISTICAS ----------
 
 @admin.route('/estadisticas')
 @login_required
@@ -461,7 +466,7 @@ def estadisticas_reseñas():
         resolucion_json=json.dumps(resolucion_por_mes)
     )
 
-
+# ---------- PROVEEDORES ----------
 
 @admin.route('/proveedores', methods=['GET'])
 @login_required
@@ -609,6 +614,7 @@ def agregar_compra():
         print("Error al registrar compra:", e)
         return jsonify({"mensaje": "Error al registrar compra ❌"}), 500
     
+# ---------- ASIGNAR_TRANSPORTISTA ----------
 
 @admin.route('/asignar_transportista/<int:id_pedido>', methods=['POST'])
 def asignar_transportista(id_pedido):
@@ -650,37 +656,36 @@ def asignar_transportista(id_pedido):
     flash(f'Transportista {transportista.Nombre} asignado al pedido #{id_pedido} correctamente.', 'success')
     return redirect(url_for('admin.ver_pedidos'))
 
+# ---------- REPORTES ----------
 
 @admin.route('/reportes')
 def reporte_entregas():
     pedidos_entregados = Pedido.query.filter_by(Estado='entregado').all()
 
-    # Ya no es necesario modificar TransportistaNombre aquí
+   
 
     return render_template(
         'administrador/reportes_entregas.html',
         pedidos_entregados=pedidos_entregados
     )
 
+# ---------- CHAT_EN_TIEMPO_REAL ----------
 
 @admin.route('/chat', methods=['GET'])
 @login_required
 def chat_admin():
-    # Traer todos los clientes que han enviado mensajes
+    
     clientes = (
         db.session.query(Usuario)
         .join(Mensaje, Usuario.ID_Usuario == Mensaje.cliente_id)
-        .filter(Mensaje.enviado_admin == False)  # solo clientes
+        .filter(Mensaje.enviado_admin == False)  
         .distinct()
         .all()
     )
 
-    # Traer los mensajes (puedes dejar vacío al inicio)
     mensajes = []
 
     return render_template('Administrador/chat.html', clientes=clientes, mensajes=mensajes)
-
-
 
 
 @admin.route('/chat/enviar_mensaje', methods=['POST'])
@@ -710,6 +715,8 @@ def mensajes_cliente(cliente_id):
         } for m in mensajes
     ]
     return jsonify(mensajes_list)
+
+# ---------- GARANTIA ----------
 
 @admin.route('/lista_garantia')
 @login_required

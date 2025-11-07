@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function(){
     calendar.render();
 });
 
-// Preview Registro Fotográfico con validación
+
 document.getElementById('registroFotograficoForm').addEventListener('submit', function(e){
     e.preventDefault();
     const form = e.target;
