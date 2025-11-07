@@ -6,7 +6,7 @@
 
 {% block head %}
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://kit.fontawesome.com/a2e0f1f6d7.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
   :root {
@@ -21,7 +21,7 @@
   }
 
   body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Arial', sans-serif;
     background-color: var(--bg-cream);
     margin: 0;
     color: var(--text-dark);
@@ -29,18 +29,16 @@
 
   .container {
     background-color: #fff;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px var(--shadow-light);
-    margin-top: 40px;
-    animation: fadeIn 0.6s ease-in-out;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px var(--shadow-light);
   }
 
   h2 {
     text-align: center;
     color: var(--primary-green);
     margin-bottom: 30px;
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 700;
     position: relative;
   }
@@ -48,68 +46,60 @@
   h2::after {
     content: '';
     position: absolute;
-    bottom: -10px;
+    bottom: -8px;
     left: 50%;
     transform: translateX(-50%);
-    width: 120px;
+    width: 100px;
     height: 4px;
     background: linear-gradient(90deg, var(--accent-green), var(--primary-green));
-    border-radius: 3px;
+    border-radius: 2px;
   }
 
-  .btn-exportar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #4CAF50, #81C784);
-    color: #fff;
-    font-weight: 600;
-    border: none;
-    border-radius: 30px;
-    padding: 10px 18px;
-    transition: all 0.3s ease;
-    margin-bottom: 20px;
-  }
-
-  .btn-exportar:hover {
-    background: linear-gradient(135deg, #81C784, #4CAF50);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
-  }
-
-  table.table {
+  .table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 2px 12px var(--shadow-light);
   }
 
   th, td {
-    padding: 16px;
+    padding: 14px;
     font-size: 15px;
-    vertical-align: middle;
   }
 
   th {
     background-color: var(--primary-green);
-    color: #fff;
+    color: white;
+    font-weight: 600;
     text-align: center;
   }
 
   td {
-    background-color: #ffffff;
-    text-align: left;
+    background-color: #fdfdfd;
   }
 
   tr:nth-child(even) td {
     background-color: #f8f8f8;
   }
 
-  td ul {
-    margin: 0;
-    padding-left: 20px;
+  .btn-exportar {
+    display: inline-block;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #4CAF50, #81C784);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 20px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s;
+  }
+
+  .btn-exportar:hover {
+    background: linear-gradient(135deg, #81C784, #4CAF50);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
   }
 
   .alert-info {
@@ -120,11 +110,6 @@
     font-weight: 500;
     margin-top: 20px;
   }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
 </style>
 {% endblock %}
 
@@ -132,14 +117,12 @@
 <div class="container my-4">
   <h2>Reporte de Entregas Realizadas</h2>
 
-  <div class="text-end">
-    <a href="{{ url_for('admin.exportar_reporte_entregas') }}" class="btn-exportar">
-      <i class="fa-solid fa-file-pdf"></i> Exportar a PDF
-    </a>
-  </div>
-
   {% if pedidos_entregados %}
-    <table class="table table-striped table-hover align-middle">
+    <button class="btn-exportar" id="btnExportarPDF">
+      <i class="fa-solid fa-file-pdf"></i> Exportar a PDF
+    </button>
+
+    <table class="table" id="tablaEntregas">
       <thead>
         <tr>
           <th>Pedido #</th>
@@ -154,11 +137,9 @@
             <td>{{ pedido.ID_Pedido }}</td>
             <td>{{ pedido.NombreComprador }}</td>
             <td>
-              <ul>
-                {% for detalle in pedido.detalles_pedido %}
-                  <li>{{ detalle.producto.NombreProducto }} (x{{ detalle.Cantidad }})</li>
-                {% endfor %}
-              </ul>
+              {% for detalle in pedido.detalles_pedido %}
+                {{ detalle.producto.NombreProducto }} (x{{ detalle.Cantidad }})<br>
+              {% endfor %}
             </td>
             <td>{{ pedido.TransportistaNombre or 'No asignado' }}</td>
           </tr>
@@ -166,7 +147,58 @@
       </tbody>
     </table>
   {% else %}
-    <div class="alert alert-info text-center">No hay entregas registradas.</div>
+    <div class="alert alert-info">No hay entregas registradas.</div>
   {% endif %}
 </div>
+
+<script>
+  document.getElementById("btnExportarPDF").addEventListener("click", function () {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+    // Encabezado del PDF
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(95, 143, 63);
+    doc.text("Reporte de Entregas Realizadas", 105, 20, { align: "center" });
+
+    doc.setFontSize(11);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Fecha de generación: ${new Date().toLocaleDateString()}`, 15, 30);
+
+    // Línea decorativa
+    doc.setDrawColor(124, 179, 66);
+    doc.setLineWidth(0.7);
+    doc.line(15, 33, 195, 33);
+
+    // Extrae la tabla HTML y la convierte a PDF
+    const tabla = document.getElementById("tablaEntregas");
+    doc.autoTable({
+      html: tabla,
+      startY: 40,
+      styles: {
+        fontSize: 10,
+        cellPadding: 3,
+        lineColor: [230, 230, 230],
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fillColor: [95, 143, 63],
+        textColor: 255,
+        halign: "center",
+      },
+      alternateRowStyles: {
+        fillColor: [245, 247, 244],
+      },
+      margin: { left: 15, right: 15 },
+    });
+
+    // Guardar archivo
+    doc.save("Reporte_Entregas.pdf");
+  });
+</script>
+
+<!-- Librería AutoTable -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.0/jspdf.plugin.autotable.min.js"></script>
 {% endblock %}
