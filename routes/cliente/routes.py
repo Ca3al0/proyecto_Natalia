@@ -274,7 +274,7 @@ def guardar_resena(id):
     db.session.add(nueva_resena)
     db.session.commit()
     flash('Reseña creada exitosamente.', 'success')
-    return redirect(url_for('cliente.detalle_producto', id=id))  
+    return redirect(url_for('cliente.detalle_producto_catalogo', id=id))  
 
 # ---------- COMPARAR ----------
 
