@@ -205,19 +205,17 @@ def ver_pedidos_transportista():
 
 # ---------- SEGUIMIENTO ----------
 
-@transportista.route("/seguimiento/<int:pedido_id>")
-@login_required
-@role_required('transportista')
-def seguimiento_pedido(pedido_id):
-    pedido = Pedido.query.get_or_404(pedido_id)
-    return render_template("transportista/seguimiento.html", pedido=pedido)
-
-
 @transportista.route("/actualizar_estado/<int:id_pedido>", methods=["POST"])
 @login_required
+@role_required('transportista')
 def actualizar_estado(id_pedido):
+    from flask_mail import Message
+    from datetime import datetime
+    from app import mail
+
     pedido = Pedido.query.get_or_404(id_pedido)
     nuevo_estado = request.form.get("estado")
+    firma = request.form.get("firma")
 
     orden_estados = ["pendiente", "en proceso", "en reparto", "entregado"]
 
@@ -229,10 +227,42 @@ def actualizar_estado(id_pedido):
         return redirect(url_for("transportista.seguimiento_pedido", pedido_id=id_pedido))
 
     pedido.Estado = nuevo_estado
+    pedido.UltimaActualizacion = datetime.now()
+
+    # Si llega a entregado
+    if nuevo_estado == "entregado":
+        # Si el pedido es contra entrega → guardar firma
+        if hasattr(pedido, "TipoPago") and pedido.TipoPago.lower() == "contra entrega":
+            if firma:
+                pedido.FirmaCliente = firma
+        else:
+            # Si no es contra entrega → enviar correo
+            cliente = pedido.usuario
+            try:
+                msg = Message(
+                    subject="Confirmación de Entrega - Casa en el Árbol",
+                    sender="noreply@casaenelarbol.com",
+                    recipients=[cliente.Correo]
+                )
+                msg.html = f"""
+                    <h3>Hola, {cliente.Nombre} 👋</h3>
+                    <p>Tu pedido <strong>#{pedido.ID_Pedido}</strong> ha sido entregado por nuestro transportista.</p>
+                    <p>Por favor confirma la recepción haciendo clic en el siguiente botón:</p>
+                    <p>
+                      <a href="{url_for('cliente.confirmar_entrega', id_pedido=pedido.ID_Pedido, _external=True)}"
+                         style="background:#28a745;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;">
+                         ✅ Confirmar que recibí mi pedido
+                      </a>
+                    </p>
+                    <p>Gracias por confiar en <strong>Casa en el Árbol</strong>.</p>
+                """
+                mail.send(msg)
+            except Exception as e:
+                print(f"Error al enviar correo: {e}")
+
     db.session.commit()
     flash("✅ Estado actualizado correctamente.", "success")
 
-   
     return redirect(url_for("transportista.seguimiento_pedido", pedido_id=id_pedido))
 
 

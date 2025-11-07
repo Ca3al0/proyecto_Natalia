@@ -1,5 +1,4 @@
 {% extends "common/base.html" %}
-
 {% block title %}Seguimiento de Pedido{% endblock %}
 
 {% block extra_css %}
@@ -12,7 +11,6 @@
   --verde-oscuro: #157145;
 }
 
-/* Contenedor principal */
 .tracking-container {
   display: flex;
   justify-content: center;
@@ -25,21 +23,17 @@
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   padding: 2rem;
   width: 100%;
-  max-width: 600px;
-  position: relative;
-  z-index: 1;
+  max-width: 650px;
   border: 2px solid var(--verde);
 }
 
 .tracking-panel h2 {
-  margin-top: 0;
   color: var(--verde-oscuro);
   font-size: 1.6rem;
   text-align: center;
   margin-bottom: 1.5rem;
 }
 
-/* Bloque de información del pedido */
 .tracking-data-block {
   background-color: var(--celeste);
   border-radius: 8px;
@@ -53,15 +47,8 @@
   color: #333;
 }
 
-/* Formulario de actualización */
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-select {
+select, textarea {
+  width: 100%;
   padding: 8px;
   border-radius: 6px;
   border: 1px solid var(--verde);
@@ -84,7 +71,6 @@ button:hover {
   background-color: var(--verde-oscuro);
 }
 
-/* Mensaje informativo */
 .info {
   background-color: var(--azul-gris);
   padding: 10px;
@@ -93,11 +79,27 @@ button:hover {
   color: #333;
   text-align: center;
 }
+
+/* Firma */
+#firmaCanvas {
+  border: 2px dashed var(--verde);
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
+  background-color: #fff;
+  cursor: crosshair;
+}
+
+.firma-btns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
 </style>
 {% endblock %}
 
 {% block navbar %}
-  {% include "common/partials/navbar_transpoinsta.html" %}
+  {% include "common/partials/navbar_transportista.html" %}
 {% endblock %}
 
 {% block content %}
@@ -109,45 +111,118 @@ button:hover {
       <p><strong>ID Pedido:</strong> #{{ pedido.ID_Pedido }}</p>
       <p><strong>Cliente:</strong> {{ pedido.usuario.Nombre }} {{ pedido.usuario.Apellido }}</p>
       <p><strong>Dirección:</strong> {{ pedido.usuario.Direccion }}</p>
-      <p><strong>Artículo:</strong> {{ pedido.NomArticulo }}</p>
+      <p><strong>Producto:</strong> {{ pedido.NomArticulo }}</p>
+      <p><strong>Tipo de pago:</strong> {{ pedido.TipoPago }}</p>
     </div>
 
-    <form 
-        action="{{ url_for('transportista.actualizar_estado', id_pedido=pedido.ID_Pedido) }}" 
-        method="POST"
-        onsubmit="return validarAvance()">
-        
-        <select name="estado" id="estado">
-            <option value="pendiente" {% if pedido.Estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
-            <option value="en proceso" {% if pedido.Estado == 'en proceso' %}selected{% endif %}>En proceso</option>
-            <option value="en reparto" {% if pedido.Estado == 'en reparto' %}selected{% endif %}>En reparto</option>
-            <option value="entregado" {% if pedido.Estado == 'entregado' %}selected{% endif %}>Entregado</option>
-        </select>
-        
-        <button type="submit">Actualizar</button>
+    <form id="estadoForm" 
+          action="{{ url_for('transportista.actualizar_estado', id_pedido=pedido.ID_Pedido) }}" 
+          method="POST"
+          onsubmit="return validarAvance()">
+
+      <select name="estado" id="estado">
+        <option value="pendiente" {% if pedido.Estado == 'pendiente' %}selected{% endif %}>Pendiente</option>
+        <option value="en proceso" {% if pedido.Estado == 'en proceso' %}selected{% endif %}>En proceso</option>
+        <option value="en reparto" {% if pedido.Estado == 'en reparto' %}selected{% endif %}>En reparto</option>
+        <option value="entregado" {% if pedido.Estado == 'entregado' %}selected{% endif %}>Entregado</option>
+      </select>
+
+      <!-- Firma solo para pedidos contra entrega -->
+      <div id="firmaSection" style="display: none; margin-top: 15px;">
+        <p><strong>Firma del cliente:</strong></p>
+        <canvas id="firmaCanvas"></canvas>
+        <input type="hidden" name="firma" id="firmaInput">
+        <div class="firma-btns">
+          <button type="button" onclick="limpiarFirma()">🧹 Limpiar</button>
+        </div>
+      </div>
+
+      <button type="submit" style="margin-top: 15px;">Actualizar</button>
     </form>
 
     <div class="info">
       Cambia el estado actual solo para avanzar en el proceso. No se puede volver atrás.
     </div>
+
+    <hr>
+
+    <div style="text-align:center;">
+      <a href="{{ url_for('transportista.registro_fotografico', pedido_id=pedido.ID_Pedido) }}"
+         class="btn btn-outline-success">
+         📷 Registrar evidencia fotográfica
+      </a>
+    </div>
   </div>
 </div>
 
 <script>
-  const estadoActual = "{{ pedido.Estado }}";
-  const ordenEstados = ["pendiente", "en proceso", "en reparto", "entregado"];
+const estadoActual = "{{ pedido.Estado }}";
+const tipoPago = "{{ pedido.TipoPago|lower }}";
+const ordenEstados = ["pendiente", "en proceso", "en reparto", "entregado"];
 
-  function validarAvance() {
-    const nuevoEstado = document.getElementById("estado").value;
-    const indiceActual = ordenEstados.indexOf(estadoActual);
-    const indiceNuevo = ordenEstados.indexOf(nuevoEstado);
+function validarAvance() {
+  const nuevoEstado = document.getElementById("estado").value;
+  const indiceActual = ordenEstados.indexOf(estadoActual);
+  const indiceNuevo = ordenEstados.indexOf(nuevoEstado);
 
-    if (indiceNuevo < indiceActual) {
-      alert("⚠️ No puedes regresar a un estado anterior.");
+  if (indiceNuevo < indiceActual) {
+    alert("⚠️ No puedes regresar a un estado anterior.");
+    return false;
+  }
+
+  if (nuevoEstado === "entregado" && tipoPago === "contra entrega") {
+    const firmaInput = document.getElementById("firmaInput").value;
+    if (!firmaInput) {
+      alert("Por favor, solicita la firma del cliente antes de finalizar la entrega.");
       return false;
     }
-
-    return true;
   }
+  return true;
+}
+
+// Canvas firma
+const canvas = document.getElementById("firmaCanvas");
+const ctx = canvas.getContext("2d");
+let dibujando = false;
+
+canvas.addEventListener("mousedown", () => dibujando = true);
+canvas.addEventListener("mouseup", () => dibujando = false);
+canvas.addEventListener("mouseout", () => dibujando = false);
+canvas.addEventListener("mousemove", dibujar);
+
+function dibujar(event) {
+  if (!dibujando) return;
+  const rect = canvas.getBoundingClientRect();
+  ctx.lineWidth = 2;
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#157145";
+  ctx.lineTo(event.clientX - rect.left, event.clientY - rect.top);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(event.clientX - rect.left, event.clientY - rect.top);
+  document.getElementById("firmaInput").value = canvas.toDataURL();
+}
+
+function limpiarFirma() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  document.getElementById("firmaInput").value = "";
+}
+
+// Mostrar sección de firma solo si aplica
+document.addEventListener("DOMContentLoaded", () => {
+  const estadoSelect = document.getElementById("estado");
+  const firmaSection = document.getElementById("firmaSection");
+  
+  function toggleFirma() {
+    if (estadoSelect.value === "entregado" && tipoPago === "contra entrega") {
+      firmaSection.style.display = "block";
+    } else {
+      firmaSection.style.display = "none";
+    }
+  }
+
+  estadoSelect.addEventListener("change", toggleFirma);
+  toggleFirma();
+});
 </script>
 {% endblock %}

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmación de Entrega - Casa en el Árbol</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f6f6f6;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      background-color: white;
+      max-width: 600px;
+      margin: 40px auto;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    h3 { color: #157145; }
+    p { color: #333; line-height: 1.6; }
+    .btn {
+      display: inline-block;
+      background: #57a773;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #777;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h3>Hola, {{ nombre_cliente }} 👋</h3>
+    <p>Tu pedido <strong>#{{ id_pedido }}</strong> ha sido entregado por nuestro transportista.</p>
+    <p>Por favor confirma que lo recibiste haciendo clic en el botón siguiente:</p>
+
+    <a href="{{ url_confirmacion }}" class="btn">✅ Confirmar que recibí mi pedido</a>
+
+    <p class="footer">Gracias por confiar en <strong>Casa en el Árbol</strong> 🌿</p>
+  </div>
+</body>
+</html>
