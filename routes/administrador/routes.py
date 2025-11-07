@@ -669,6 +669,7 @@ def reporte_entregas():
         pedidos_entregados=pedidos_entregados
     )
 
+
 # ---------- CHAT_EN_TIEMPO_REAL ----------
 
 @admin.route('/chat', methods=['GET'])
