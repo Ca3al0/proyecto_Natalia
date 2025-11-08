@@ -16,9 +16,9 @@
   ul.info-general { list-style: none; padding-left: 0; margin-bottom: 2rem; }
   ul.info-general li { background: #d1faff; padding: 0.6rem 1rem; margin-bottom: 0.5rem; border-radius: 10px; font-weight: 500; }
 
-  table.table { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-  table.table th { background: #28a745; color: white; text-align: center; }
-  table.table td { text-align: center; vertical-align: middle; }
+  table.table { width: 100%; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-top: 1rem; }
+  table.table th { background: #28a745; color: white; text-align: center; padding: 0.5rem; }
+  table.table td { text-align: center; vertical-align: middle; padding: 0.5rem; }
 
   .btn-secondary, .btn-primary { margin-top: 1rem; padding: 0.6rem 1.2rem; border-radius: 50px; font-weight: 600; transition: 0.3s; }
   .btn-secondary:hover { background: #157145; color: white; transform: scale(1.05); }
@@ -40,9 +40,38 @@
         <li><strong>Rol:</strong> {{ empleado.Rol }}</li>
     </ul>
 
+    <h4>Pedidos realizados</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID Pedido</th>
+                <th>Estado</th>
+                <th>Hora Llegada</th>
+                <th>Fecha Entrega</th>
+                <th>Productos</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pedido in pedidos %}
+                <tr>
+                    <td>{{ pedido.ID_Pedido }}</td>
+                    <td>{{ pedido.Estado }}</td>
+                    <td>{{ pedido.HoraLlegada.strftime("%Y-%m-%d %H:%M") if pedido.HoraLlegada else '-' }}</td>
+                    <td>{{ pedido.FechaEntrega.strftime("%Y-%m-%d %H:%M") if pedido.FechaEntrega else '-' }}</td>
+                    <td>
+                        <ul style="list-style:none; padding-left:0;">
+                            {% for detalle in pedido.detalles_pedido %}
+                                <li>{{ detalle.Cantidad }} x {{ detalle.producto.NombreProducto if detalle.producto else 'Producto eliminado' }}</li>
+                            {% endfor %}
+                        </ul>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
     <h4>Horas trabajadas</h4>
-    {% set total_horas_calculadas = (horas_diurnas or 0) + (horas_nocturnas or 0) + (total_horas_extra or 0) %}
-    <p><strong>Total Horas:</strong> {{ total_horas_calculadas }} h</p> 
+    <p><strong>Total Horas:</strong> 48 h</p> 
     <p><strong>Horas Extra:</strong> {{ total_horas_extra }} h</p>
 
     <h4>Ingresar horas diurnas y nocturnas</h4>
