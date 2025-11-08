@@ -764,27 +764,36 @@ def detalle_empleado(id_empleado):
     empleado = Usuario.query.get_or_404(id_empleado)
     pedidos = Pedido.query.filter_by(ID_Empleado=id_empleado).all()
 
-    total_horas = 0
-    total_horas_extra = 0
-    instalaciones = []
+    # Recuperar horas existentes en DB o inicializar
+    horas_diurnas = getattr(empleado, 'horas_diurnas', 0) or 0
+    horas_nocturnas = getattr(empleado, 'horas_nocturnas', 0) or 0
+    total_horas_extra = getattr(empleado, 'horas_extra', 0) or 0
 
-    # Recuperar horas diurnas y nocturnas existentes en DB o inicializar
-    horas_diurnas = getattr(empleado, 'horas_diurnas', 0)
-    horas_nocturnas = getattr(empleado, 'horas_nocturnas', 0)
+    instalaciones = []
 
     # Procesar POST si se envían horas manualmente
     if request.method == 'POST':
-        horas_diurnas = float(request.form.get('horas_diurnas', 0))
-        horas_nocturnas = float(request.form.get('horas_nocturnas', 0))
+        try:
+            horas_diurnas = float(request.form.get('horas_diurnas', 0))
+            horas_nocturnas = float(request.form.get('horas_nocturnas', 0))
+        except ValueError:
+            flash("Horas inválidas, ingrese números válidos.", "danger")
+            return redirect(url_for('admin.detalle_empleado', id_empleado=id_empleado))
 
-        # Guardar horas diurnas y nocturnas en la base de datos
+        # Guardar horas en el empleado
         empleado.horas_diurnas = horas_diurnas
         empleado.horas_nocturnas = horas_nocturnas
 
-    # Calcular horas de pedidos y horas extra automáticamente
+        db.session.commit()
+        flash("Horas actualizadas correctamente.", "success")
+        return redirect(url_for('admin.detalle_empleado', id_empleado=id_empleado))
+
+    # Calcular horas extra a partir de los pedidos
+    total_horas = 0
+    total_horas_extra = 0
     for pedido in pedidos:
         if pedido.HoraLlegada and pedido.FechaEntrega:
-            # Asegurarse de que FechaEntrega sea datetime
+            # Convertir FechaEntrega a datetime si es solo date
             if isinstance(pedido.FechaEntrega, date) and not isinstance(pedido.FechaEntrega, datetime):
                 fecha_entrega_dt = datetime.combine(pedido.FechaEntrega, datetime.min.time())
             else:
@@ -792,17 +801,17 @@ def detalle_empleado(id_empleado):
 
             horas = (fecha_entrega_dt - pedido.HoraLlegada).total_seconds() / 3600
             total_horas += horas
-            if horas > 8:
+            if horas > 8:  # jornada estándar
                 total_horas_extra += horas - 8
 
         # Obtener instalaciones del pedido
         eventos_instalacion = [c for c in pedido.calendario if c.Tipo and c.Tipo.lower() == 'instalacion']
         instalaciones.extend(eventos_instalacion)
 
-    # Actualizar horas totales sumando horas extras calculadas
+    # Guardar las horas calculadas para que persistan
     empleado.horas_totales = total_horas
     empleado.horas_extra = total_horas_extra
-    db.session.commit()  # Guardamos todo junto: diurnas, nocturnas, totales, extra
+    db.session.commit()
 
     # Calcular pagos por mes
     pagos = Pagos.query.join(Pedido).filter(Pedido.ID_Empleado == id_empleado).all()
