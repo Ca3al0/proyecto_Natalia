@@ -205,8 +205,6 @@ def ver_pedidos_transportista():
     pedidos = Pedido.query.filter_by(ID_Empleado=current_user.ID_Usuario).all()
     return render_template('transportista/pedidos.html', pedidos=pedidos)
 
-# ---------- SEGUIMIENTO ----------
-
 @transportista.route("/seguimiento/<int:pedido_id>")
 @login_required
 @role_required('transportista')
@@ -215,15 +213,10 @@ def seguimiento_pedido(pedido_id):
     return render_template("transportista/seguimiento.html", pedido=pedido)
 
 
-
 @transportista.route("/actualizar_estado/<int:id_pedido>", methods=["POST"])
 @login_required
 @role_required('transportista')
 def actualizar_estado(id_pedido):
-    from flask_mail import Message
-    from datetime import datetime
-    from app import mail
-
     pedido = Pedido.query.get_or_404(id_pedido)
     nuevo_estado = request.form.get("estado")
     firma = request.form.get("firma")
@@ -239,58 +232,75 @@ def actualizar_estado(id_pedido):
     pedido.Estado = nuevo_estado
     pedido.UltimaActualizacion = datetime.now()
 
-   
+    # ✅ Si el pedido se marca como entregado
     if nuevo_estado == "entregado":
-        
         if hasattr(pedido, "TipoPago") and pedido.TipoPago.lower() == "contra entrega":
             if firma:
                 pedido.FirmaCliente = firma
         else:
-           
-            cliente = pedido.usuario
-            link_confirmar = f"{request.host_url}confirmar_entrega/{pedido.ID_Pedido}?respuesta=si"
-
-            msg = Message(
-                subject=f"Confirmación de entrega - Pedido #{pedido.ID_Pedido}",
-                sender="casaenelarbol236@gmail.com",
-                recipients=[cliente.Correo]
-            )
-
-            msg.html = f"""
-            <div style="font-family: Arial, sans-serif; color:#333; padding:20px;">
-                <h2 style="color:#157145;">¡Hola {cliente.Nombre}! 🌿</h2>
-                <p>Tu pedido <b>#{pedido.ID_Pedido}</b> ha sido marcado como <b>ENTREGADO</b> por el transportista.</p>
-
-                <p>Por favor, confirma si ya lo recibiste haciendo clic en el siguiente botón:</p>
-
-                <p style="text-align:center; margin:25px 0;">
-                    <a href="{link_confirmar}" 
-                       style="background-color:#157145; color:white; padding:12px 25px; text-decoration:none; border-radius:6px; font-weight:bold;">
-                       ✅ Sí recibí mi pedido
-                    </a>
-                </p>
-
-                <p style="font-size:0.95rem; color:#555;">
-                    Si aún <b>no has recibido</b> el pedido, simplemente ignora este mensaje.
-                </p>
-
-                <hr style="margin-top:25px;">
-                <p style="font-size:0.85rem; color:#999;">Gracias por comprar en <b>Casa en el Árbol</b> 💚</p>
-            </div>
-            """
-
-            try:
-                mail.send(msg)
-                flash("✅ Correo de confirmación enviado correctamente al cliente.", "success")
-            except Exception as e:
-                print(f"Error al enviar correo: {e}")
-                flash("⚠️ Hubo un problema enviando el correo, pero el estado fue actualizado.", "warning")
+            # Enviar correo de confirmación
+            return redirect(url_for("transportista.enviar_confirmacion", id_pedido=id_pedido))
 
     db.session.commit()
     flash("✅ Estado actualizado correctamente.", "success")
     return redirect(url_for("transportista.seguimiento_pedido", pedido_id=id_pedido))
 
 
+# ---------- Enviar confirmación por correo ----------
+
+@transportista.route("/enviar_confirmacion/<int:id_pedido>", methods=["GET", "POST"])
+@login_required
+@role_required('transportista')
+def enviar_confirmacion(id_pedido):
+    pedido = Pedido.query.get_or_404(id_pedido)
+    cliente = pedido.usuario
+
+    # Enlace para confirmar entrega
+    link_confirmar = url_for(
+        "transportista.confirmar_entrega",
+        id_pedido=pedido.ID_Pedido,
+        respuesta="si",
+        _external=True
+    )
+
+    # Construcción del correo
+    msg = Message(
+        subject=f"Confirmación de entrega - Pedido #{pedido.ID_Pedido}",
+        sender="casaenelarbol236@gmail.com",
+        recipients=[cliente.Correo]
+    )
+
+    msg.html = f"""
+    <div style="font-family: Arial, sans-serif; color:#333; padding:20px;">
+        <h2 style="color:#157145;">¡Hola {cliente.Nombre}! 🌿</h2>
+        <p>Tu pedido <b>#{pedido.ID_Pedido}</b> ha sido marcado como <b>ENTREGADO</b> por el transportista.</p>
+
+        <p>Por favor, confirma si ya lo recibiste haciendo clic en el siguiente botón:</p>
+
+        <p style="text-align:center; margin:25px 0;">
+            <a href="{link_confirmar}" 
+               style="background-color:#157145; color:white; padding:12px 25px; text-decoration:none; border-radius:6px; font-weight:bold;">
+               ✅ Sí recibí mi pedido
+            </a>
+        </p>
+
+        <p style="font-size:0.95rem; color:#555;">
+            Si aún <b>no has recibido</b> el pedido, simplemente ignora este mensaje.
+        </p>
+
+        <hr style="margin-top:25px;">
+        <p style="font-size:0.85rem; color:#999;">Gracias por comprar en <b>Casa en el Árbol</b> 💚</p>
+    </div>
+    """
+
+    mail.send(msg)
+    flash("✅ Correo de confirmación enviado correctamente al cliente.", "success")
+
+    return redirect(url_for("transportista.ver_pedidos_transportista"))
+
+
+
+# ---------- Confirmar entrega desde el correo ----------
 
 @transportista.route('/confirmar_entrega/<int:id_pedido>')
 def confirmar_entrega(id_pedido):
