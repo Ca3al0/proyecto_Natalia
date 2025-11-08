@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from flask_login import login_required, current_user
 from datetime import date,datetime, timedelta
 from flask import current_app
-from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido, Mensaje, Garantia
+from basedatos.models import db, Usuario, Notificaciones, Direccion, Producto, Proveedor,Categorias,Resena,Compra,Pedido, Mensaje, Garantia ,Pagos
 from werkzeug.security import generate_password_hash
 from basedatos.decoradores import role_required
 from basedatos.notificaciones import crear_notificacion
@@ -740,3 +740,43 @@ def editar_garantia(id):
         flash("Garantía actualizada correctamente", "success")
         return redirect(url_for('admin_garantia.listar_garantias'))
     return render_template('administrador/editar.html', garantia=garantia)
+
+@admin.route('/recursos-humanos')
+@login_required
+def lista_empleados():
+    
+    empleados = Usuario.query.filter(Usuario.Rol.in_(['instalador', 'transportista'])).all()
+    return render_template('recursos_humanos/lista_empleados.html', empleados=empleados)
+
+@admin.route('/recursos-humanos/<int:id_empleado>')
+@login_required
+def detalle_empleado(id_empleado):
+    empleado = Usuario.query.get_or_404(id_empleado)
+
+  
+    pedidos = Pedido.query.filter_by(ID_Empleado=id_empleado).all()
+
+    
+    total_horas = 0
+    total_horas_extra = 0
+    for pedido in pedidos:
+        if pedido.HoraLlegada:
+           
+            horas = (pedido.FechaEntrega - pedido.HoraLlegada.date()).days * 8  
+            total_horas += horas
+            if horas > 8:
+                total_horas_extra += horas - 8
+
+ 
+    pagos = Pagos.query.join(Pedido).filter(Pedido.ID_Empleado == id_empleado).all()
+    pagos_por_mes = {}
+    for pago in pagos:
+        mes = pago.FechaPago.strftime('%Y-%m')
+        pagos_por_mes[mes] = pagos_por_mes.get(mes, 0) + pago.Monto
+
+    return render_template('recursos_humanos/detalle_empleado.html',
+                           empleado=empleado,
+                           pedidos=pedidos,
+                           total_horas=total_horas,
+                           total_horas_extra=total_horas_extra,
+                           pagos_por_mes=pagos_por_mes)

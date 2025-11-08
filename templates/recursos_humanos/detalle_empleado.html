@@ -1,0 +1,58 @@
+{% extends "common/base.html" %}
+
+{% block content %}
+<h2>Detalle de {{ empleado.Nombre }} {{ empleado.Apellido }}</h2>
+
+<h4>Información General</h4>
+<ul>
+    <li>Correo: {{ empleado.Correo }}</li>
+    <li>Teléfono: {{ empleado.Telefono }}</li>
+    <li>Rol: {{ empleado.Rol }}</li>
+</ul>
+
+<h4>Pedidos asignados</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID Pedido</th>
+            <th>Estado</th>
+            <th>Fecha Pedido</th>
+            <th>Destino</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pedido in pedidos %}
+        <tr>
+            <td>{{ pedido.ID_Pedido }}</td>
+            <td>{{ pedido.Estado }}</td>
+            <td>{{ pedido.FechaPedido }}</td>
+            <td>{{ pedido.Destino }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h4>Horas trabajadas</h4>
+<p>Total Horas: {{ total_horas }} h</p>
+<p>Horas Extra: {{ total_horas_extra }} h</p>
+
+<h4>Pagos por mes</h4>
+<table class="table table-sm">
+    <thead>
+        <tr>
+            <th>Mes</th>
+            <th>Total Pagos</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for mes, monto in pagos_por_mes.items() %}
+        <tr>
+            <td>{{ mes }}</td>
+            <td>${{ monto }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('recursos_humanos.lista_empleados') }}" class="btn btn-secondary">Volver</a>
+{% endblock %}

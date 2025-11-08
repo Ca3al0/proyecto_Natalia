@@ -1,0 +1,27 @@
+{% extends "common/base.html" %}
+
+{% block content %}
+<h2>Lista de Empleados</h2>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for empleado in empleados %}
+        <tr>
+            <td>{{ empleado.Nombre }} {{ empleado.Apellido }}</td>
+            <td>{{ empleado.Correo }}</td>
+            <td>{{ empleado.Rol }}</td>
+            <td>
+                <a href="{{ url_for('recursos_humanos.detalle_empleado', id_empleado=empleado.ID_Usuario) }}" class="btn btn-primary btn-sm">Ver Detalles</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
