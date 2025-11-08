@@ -278,34 +278,51 @@ def actualizar_estado(id_pedido):
 
 @transportista.route('/enviar_confirmacion/<int:id_pedido>', methods=['POST'])
 @login_required
-@role_required('transportista')
 def enviar_confirmacion(id_pedido):
     pedido = Pedido.query.get_or_404(id_pedido)
     correo_cliente = pedido.usuario.Correo
 
     try:
+        # ✅ Cuerpo del mensaje con solo un botón y un texto informativo
         msg = Message(
             subject=f"Confirmación de entrega - Pedido #{pedido.ID_Pedido}",
             sender="casaenelarbol236@gmail.com",
             recipients=[correo_cliente]
         )
-        msg.body = f"""
-        Hola {pedido.usuario.Nombre},
 
-        Tu pedido #{pedido.ID_Pedido} ha sido marcado como ENTREGADO por el transportista.
+        link_confirmar = f"{request.host_url}confirmar_entrega/{pedido.ID_Pedido}?respuesta=si"
 
-        Por favor confirma si realmente lo recibiste:
+        msg.html = f"""
+        <div style="font-family: Arial, sans-serif; color:#333; padding:20px;">
+            <h2 style="color:#157145;">¡Hola {pedido.usuario.Nombre}! 🌿</h2>
+            <p>Tu pedido <b>#{pedido.ID_Pedido}</b> ha sido marcado como <b>ENTREGADO</b> por el transportista.</p>
 
-        ✅ Sí recibí: {request.host_url}confirmar_entrega/{pedido.ID_Pedido}?respuesta=si  
-        ❌ No recibí: {request.host_url}confirmar_entrega/{pedido.ID_Pedido}?respuesta=no  
+            <p>Por favor, confirma si ya lo recibiste haciendo clic en el siguiente botón:</p>
 
-        Gracias por tu compra 💚
+            <p style="text-align:center; margin:25px 0;">
+                <a href="{link_confirmar}" 
+                   style="background-color:#157145; color:white; padding:12px 25px; text-decoration:none; border-radius:6px; font-weight:bold;">
+                   ✅ Sí recibí mi pedido
+                </a>
+            </p>
+
+            <p style="font-size:0.95rem; color:#555;">
+                Si aún <b>no has recibido</b> el pedido, simplemente ignora este mensaje.
+            </p>
+
+            <hr style="margin-top:25px;">
+            <p style="font-size:0.85rem; color:#999;">Gracias por comprar en <b>Casa en el Árbol</b> 💚</p>
+        </div>
         """
+
         mail.send(msg)
-        return jsonify({'status': 'success', 'message': '📩 Correo de confirmación enviado correctamente al cliente.'}), 200
+        flash("✅ Correo de confirmación enviado correctamente al cliente.", "success")
 
     except Exception as e:
-        return jsonify({'status': 'error', 'message': f'⚠️ Error al enviar el correo: {str(e)}'}), 500
+        flash(f"⚠️ Error al enviar el correo: {e}", "danger")
+
+    return redirect(url_for('transportista.seguimiento_pedido', pedido_id=id_pedido))
+
 
 @transportista.route('/confirmar_entrega/<int:id_pedido>')
 def confirmar_entrega(id_pedido):
