@@ -1,8 +1,11 @@
 {% extends "common/base.html" %}
 
+{% block navbar %}
+  {% include "common/partials/navbar_admin.html" %}
+{% endblock %}
+
 {% block content %}
 <style>
-  /* Contenedor principal */
   .detalle-empleado {
       background: #f9f9f9;
       padding: 2rem;
@@ -11,70 +14,24 @@
       margin-bottom: 2rem;
   }
 
-  h2 {
-      color: #28a745;
-      font-weight: bold;
-      margin-bottom: 1.5rem;
-  }
+  h2 { color: #28a745; font-weight: bold; margin-bottom: 1.5rem; }
+  h4 { color: #157145; margin-top: 2rem; margin-bottom: 1rem; }
 
-  h4 {
-      color: #157145;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-  }
+  ul.info-general { list-style: none; padding-left: 0; margin-bottom: 2rem; }
+  ul.info-general li { background: #d1faff; padding: 0.6rem 1rem; margin-bottom: 0.5rem; border-radius: 10px; font-weight: 500; }
 
-  ul.info-general {
-      list-style: none;
-      padding-left: 0;
-      margin-bottom: 2rem;
-  }
+  table.table { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+  table.table th { background: #28a745; color: white; text-align: center; }
+  table.table td { text-align: center; vertical-align: middle; }
 
-  ul.info-general li {
-      background: #d1faff;
-      padding: 0.6rem 1rem;
-      margin-bottom: 0.5rem;
-      border-radius: 10px;
-      font-weight: 500;
-      display: flex;
-      gap: 10px;
-  }
+  .btn-secondary { margin-top: 1.5rem; padding: 0.6rem 1.2rem; border-radius: 50px; font-weight: 600; transition: 0.3s; }
+  .btn-secondary:hover { background: #157145; color: white; transform: scale(1.05); }
 
-  table.table {
-      background: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-  }
+  .resumen-mes { background: #e6f7f1; padding: 1rem; border-radius: 10px; margin-top: 1rem; }
+  .resumen-mes p { margin-bottom: 0.5rem; font-weight: 500; font-size: 1.1rem; }
 
-  table.table th {
-      background: #28a745;
-      color: white;
-      text-align: center;
-  }
-
-  table.table td {
-      text-align: center;
-      vertical-align: middle;
-  }
-
-  p {
-      font-size: 1.1rem;
-      margin-bottom: 0.5rem;
-  }
-
-  .btn-secondary {
-      margin-top: 1.5rem;
-      padding: 0.6rem 1.2rem;
-      border-radius: 50px;
-      font-weight: 600;
-      transition: 0.3s;
-  }
-
-  .btn-secondary:hover {
-      background: #157145;
-      color: white;
-      transform: scale(1.05);
-  }
+  .productos-entregados { margin-top: 2rem; }
+  .productos-entregados table th { background: #157145; }
 </style>
 
 <div class="detalle-empleado">
@@ -109,27 +66,52 @@
         </tbody>
     </table>
 
+    <h4>Productos entregados</h4>
+    <div class="productos-entregados">
+        <table class="table table-sm table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Pedido ID</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unidad</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for pedido in pedidos %}
+                    {% for detalle in pedido.detalles_pedido %}
+                    <tr>
+                        <td>{{ pedido.ID_Pedido }}</td>
+                        <td>{{ detalle.producto.NombreProducto }}</td>
+                        <td>{{ detalle.Cantidad }}</td>
+                        <td>${{ "{:,.0f}".format(detalle.PrecioUnidad) }}</td>
+                        <td>${{ "{:,.0f}".format(detalle.subtotal) }}</td>
+                    </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
     <h4>Horas trabajadas</h4>
     <p><strong>Total Horas:</strong> {{ total_horas }} h</p>
     <p><strong>Horas Extra:</strong> {{ total_horas_extra }} h</p>
 
-    <h4>Pagos por mes</h4>
-    <table class="table table-sm table-hover">
-        <thead>
-            <tr>
-                <th>Mes</th>
-                <th>Total Pagos</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for mes, monto in pagos_por_mes.items() %}
-            <tr>
-                <td>{{ mes }}</td>
-                <td>${{ monto }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h4>Pagos y Resumen Mensual</h4>
+    <div class="resumen-mes">
+        {% set pago_base = 1423500 %}
+        {% set auxilio_transporte = 200000 %}
+        {% set valor_hora_extra = 15000 %}
+        {% set total_horas_extra_valor = total_horas_extra * valor_hora_extra %}
+        {% set total_mes = pago_base + auxilio_transporte + total_horas_extra_valor %}
+
+        <p>Pago base del mes: ${{ "{:,.0f}".format(pago_base) }} COP</p>
+        <p>Auxilio de transporte: ${{ "{:,.0f}".format(auxilio_transporte) }} COP</p>
+        <p>Pago por horas extra: ${{ "{:,.0f}".format(total_horas_extra_valor) }} COP</p>
+        <hr>
+        <p><strong>Total estimado a recibir este mes: ${{ "{:,.0f}".format(total_mes) }} COP</strong></p>
+    </div>
 
     <a href="{{ url_for('admin.lista_empleados') }}" class="btn btn-secondary">Volver</a>
 </div>

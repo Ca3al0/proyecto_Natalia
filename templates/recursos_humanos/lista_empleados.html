@@ -1,27 +1,106 @@
 {% extends "common/base.html" %}
 
+{% block navbar %}
+  {% include "common/partials/navbar_admin.html" %}
+{% endblock %}
+
 {% block content %}
-<h2>Lista de Empleados</h2>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Correo</th>
-            <th>Rol</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for empleado in empleados %}
-        <tr>
-            <td>{{ empleado.Nombre }} {{ empleado.Apellido }}</td>
-            <td>{{ empleado.Correo }}</td>
-            <td>{{ empleado.Rol }}</td>
-            <td>
-                <a href="{{ url_for('admin.detalle_empleado', id_empleado=empleado.ID_Usuario) }}" class="btn btn-primary btn-sm">Ver Detalles</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<style>
+  h2 {
+      color: #28a745;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+      text-align: center;
+  }
+
+  .tabla-empleados {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+      padding: 1rem;
+  }
+
+  table.table {
+      width: 100%;
+      border-collapse: collapse;
+  }
+
+  table.table thead th {
+      background: #28a745;
+      color: white;
+      text-align: center;
+      padding: 0.8rem;
+  }
+
+  table.table tbody td {
+      text-align: center;
+      padding: 0.7rem;
+      vertical-align: middle;
+  }
+
+  table.table tbody tr:nth-child(even) {
+      background: #f0fdf4;
+  }
+
+  table.table tbody tr:hover {
+      background: #d1faff;
+      transform: scale(1.01);
+      transition: 0.2s;
+  }
+
+  .btn-ver-detalles {
+      background: #157145;
+      color: white;
+      font-weight: 600;
+      border-radius: 50px;
+      padding: 0.4rem 1rem;
+      transition: 0.3s;
+  }
+
+  .btn-ver-detalles:hover {
+      background: #28a745;
+      transform: scale(1.05);
+      color: white;
+  }
+
+  @media(max-width:768px) {
+      table.table thead th, table.table tbody td {
+          font-size: 0.85rem;
+          padding: 0.5rem;
+      }
+      .btn-ver-detalles {
+          font-size: 0.75rem;
+          padding: 0.3rem 0.8rem;
+      }
+  }
+</style>
+
+<div class="container my-5">
+    <div class="tabla-empleados">
+        <h2>Lista de Empleados</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for empleado in empleados %}
+                <tr>
+                    <td>{{ empleado.Nombre }} {{ empleado.Apellido }}</td>
+                    <td>{{ empleado.Correo }}</td>
+                    <td>{{ empleado.Rol }}</td>
+                    <td>
+                        <a href="{{ url_for('admin.detalle_empleado', id_empleado=empleado.ID_Usuario) }}" class="btn btn-ver-detalles btn-sm">Ver Detalles</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 {% endblock %}
