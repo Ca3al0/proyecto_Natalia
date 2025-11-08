@@ -792,3 +792,20 @@ def detalle_empleado(id_empleado):
                            instalaciones=instalaciones,
                            pagos_por_mes=pagos_por_mes)
 
+@admin.route('/empleado/<int:id_empleado>/actualizar_horas', methods=['POST'])
+@login_required
+def actualizar_horas(id_empleado):
+    empleado = Usuario.query.get_or_404(id_empleado)
+
+    # Obtener valores del formulario
+    horas_diurnas = int(request.form.get('horas_diurnas', 0))
+    horas_nocturnas = int(request.form.get('horas_nocturnas', 0))
+
+    # Guardar en la base de datos si quieres
+    empleado.horas_diurnas = horas_diurnas
+    empleado.horas_nocturnas = horas_nocturnas
+    db.session.commit()
+
+    flash("Horas actualizadas correctamente", "success")
+    return redirect(url_for('admin.detalle_empleado', id_empleado=id_empleado))
+

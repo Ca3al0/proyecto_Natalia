@@ -20,14 +20,14 @@
   table.table th { background: #28a745; color: white; text-align: center; }
   table.table td { text-align: center; vertical-align: middle; }
 
-  .btn-secondary { margin-top: 1.5rem; padding: 0.6rem 1.2rem; border-radius: 50px; font-weight: 600; transition: 0.3s; }
+  .btn-secondary, .btn-primary { margin-top: 1rem; padding: 0.6rem 1.2rem; border-radius: 50px; font-weight: 600; transition: 0.3s; }
   .btn-secondary:hover { background: #157145; color: white; transform: scale(1.05); }
+  .btn-primary:hover { background: #28a745; color: white; transform: scale(1.05); }
 
   .resumen-mes { background: #e6f7f1; padding: 1rem; border-radius: 10px; margin-top: 1rem; }
   .resumen-mes p { margin-bottom: 0.5rem; font-weight: 500; font-size: 1.1rem; }
 
-  .productos-entregados { margin-top: 2rem; }
-  .productos-entregados table th { background: #157145; }
+  input[type=number] { width: 80px; padding: 0.3rem; border-radius: 5px; border: 1px solid #ccc; text-align: center; }
 </style>
 
 <div class="detalle-empleado">
@@ -40,71 +40,37 @@
         <li><strong>Rol:</strong> {{ empleado.Rol }}</li>
     </ul>
 
-    <h4>Pedidos asignados</h4>
-    <table class="table table-bordered table-hover">
-        <thead>
-            <tr>
-                <th>ID Pedido</th>
-                <th>Estado</th>
-                <th>Fecha Pedido</th>
-                <th>Destino</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pedido in pedidos %}
-            <tr>
-                <td>{{ pedido.ID_Pedido }}</td>
-                <td>{{ pedido.Estado }}</td>
-                <td>{{ pedido.FechaPedido or "Pendiente" }}</td>
-                <td>{{ pedido.Destino }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <h4>Productos entregados</h4>
-    <div class="productos-entregados">
-        <table class="table table-sm table-bordered table-hover">
-            <thead>
-                <tr>
-                    <th>Pedido ID</th>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Precio Unidad</th>
-                    <th>Subtotal</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for pedido in pedidos %}
-                    {% for detalle in pedido.detalles_pedido %}
-                    <tr>
-                        <td>{{ pedido.ID_Pedido }}</td>
-                        <td>{{ detalle.producto.NombreProducto }}</td>
-                        <td>{{ detalle.Cantidad }}</td>
-                        <td>${{ "{:,.0f}".format(detalle.PrecioUnidad) }}</td>
-                        <td>${{ "{:,.0f}".format(detalle.subtotal) }}</td>
-                    </tr>
-                    {% endfor %}
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
     <h4>Horas trabajadas</h4>
-    <p><strong>Total Horas:</strong> 48 h</p> <!-- Fijo en 48 horas -->
+    <p><strong>Total Horas:</strong> 48 h</p> 
     <p><strong>Horas Extra:</strong> {{ total_horas_extra }} h</p>
+
+    <h4>Ingresar horas diurnas y nocturnas</h4>
+    <form method="POST" action="{{ url_for('admin.actualizar_horas', id_empleado=empleado.ID_Usuario) }}">
+        <label>Horas Diurnas: <input type="number" name="horas_diurnas" value="{{ horas_diurnas or 0 }}" min="0"></label>
+        &nbsp;&nbsp;
+        <label>Horas Nocturnas: <input type="number" name="horas_nocturnas" value="{{ horas_nocturnas or 0 }}" min="0"></label>
+        &nbsp;&nbsp;
+        <button type="submit" class="btn btn-primary">Actualizar</button>
+    </form>
 
     <h4>Pagos y Resumen Mensual</h4>
     <div class="resumen-mes">
         {% set pago_base = 1423500 %}
         {% set auxilio_transporte = 200000 %}
         {% set valor_hora_extra = 15000 %}
+        {% set pago_hora_diurna = 8088 %}
+        {% set pago_hora_nocturna = 11323 %}
+
+        {% set total_diurnas = (horas_diurnas or 0) * pago_hora_diurna %}
+        {% set total_nocturnas = (horas_nocturnas or 0) * pago_hora_nocturna %}
         {% set total_horas_extra_valor = total_horas_extra * valor_hora_extra %}
-        {% set total_mes = pago_base + auxilio_transporte + total_horas_extra_valor %}
+        {% set total_mes = pago_base + auxilio_transporte + total_horas_extra_valor + total_diurnas + total_nocturnas %}
 
         <p>Pago base del mes: ${{ "{:,.0f}".format(pago_base) }} COP</p>
         <p>Auxilio de transporte: ${{ "{:,.0f}".format(auxilio_transporte) }} COP</p>
         <p>Pago por horas extra: ${{ "{:,.0f}".format(total_horas_extra_valor) }} COP</p>
+        <p>Pago por horas diurnas: ${{ "{:,.0f}".format(total_diurnas) }} COP</p>
+        <p>Pago por horas nocturnas: ${{ "{:,.0f}".format(total_nocturnas) }} COP</p>
         <hr>
         <p><strong>Total estimado a recibir este mes: ${{ "{:,.0f}".format(total_mes) }} COP</strong></p>
     </div>
