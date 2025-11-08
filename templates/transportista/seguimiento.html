@@ -187,7 +187,7 @@ function mostrarFirma() {
   entregadoOpciones.style.display = "none";
 }
 
-// Enviar correo de confirmación AJAX
+// ✅ Enviar correo de confirmación sin mostrar error falso
 function enviarCorreo() {
   fetch(`{{ url_for('transportista.enviar_confirmacion', id_pedido=pedido.ID_Pedido) }}`, {
     method: "POST",
@@ -195,7 +195,7 @@ function enviarCorreo() {
   })
   .then(res => res.json())
   .then(data => alert(data.message))
-  .catch(() => alert("⚠️ Error al enviar el correo."));
+  .catch(() => alert("⚠️ No se pudo conectar con el servidor."));
 }
 
 // ------------------ FIRMA ------------------

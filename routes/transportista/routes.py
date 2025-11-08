@@ -248,14 +248,13 @@ def actualizar_estado(id_pedido):
 
 # ---------- Enviar confirmación por correo ----------
 
-@transportista.route("/enviar_confirmacion/<int:id_pedido>", methods=["GET", "POST"])
+@transportista.route("/enviar_confirmacion/<int:id_pedido>", methods=["POST"])
 @login_required
 @role_required('transportista')
 def enviar_confirmacion(id_pedido):
     pedido = Pedido.query.get_or_404(id_pedido)
     cliente = pedido.usuario
 
-    # Enlace para confirmar entrega
     link_confirmar = url_for(
         "transportista.confirmar_entrega",
         id_pedido=pedido.ID_Pedido,
@@ -263,7 +262,6 @@ def enviar_confirmacion(id_pedido):
         _external=True
     )
 
-    # Construcción del correo
     msg = Message(
         subject=f"Confirmación de entrega - Pedido #{pedido.ID_Pedido}",
         sender="casaenelarbol236@gmail.com",
@@ -274,29 +272,24 @@ def enviar_confirmacion(id_pedido):
     <div style="font-family: Arial, sans-serif; color:#333; padding:20px;">
         <h2 style="color:#157145;">¡Hola {cliente.Nombre}! 🌿</h2>
         <p>Tu pedido <b>#{pedido.ID_Pedido}</b> ha sido marcado como <b>ENTREGADO</b> por el transportista.</p>
-
         <p>Por favor, confirma si ya lo recibiste haciendo clic en el siguiente botón:</p>
-
         <p style="text-align:center; margin:25px 0;">
             <a href="{link_confirmar}" 
                style="background-color:#157145; color:white; padding:12px 25px; text-decoration:none; border-radius:6px; font-weight:bold;">
                ✅ Sí recibí mi pedido
             </a>
         </p>
-
         <p style="font-size:0.95rem; color:#555;">
             Si aún <b>no has recibido</b> el pedido, simplemente ignora este mensaje.
         </p>
-
         <hr style="margin-top:25px;">
         <p style="font-size:0.85rem; color:#999;">Gracias por comprar en <b>Casa en el Árbol</b> 💚</p>
     </div>
     """
 
     mail.send(msg)
-    flash("✅ Correo de confirmación enviado correctamente al cliente.", "success")
+    return jsonify({"message": "✅ Correo de confirmación enviado correctamente al cliente."})
 
-    return redirect(url_for("transportista.ver_pedidos_transportista"))
 
 
 
