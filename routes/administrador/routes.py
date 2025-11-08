@@ -753,30 +753,42 @@ def lista_empleados():
 def detalle_empleado(id_empleado):
     empleado = Usuario.query.get_or_404(id_empleado)
 
-  
     pedidos = Pedido.query.filter_by(ID_Empleado=id_empleado).all()
 
-    
     total_horas = 0
     total_horas_extra = 0
+    instalaciones = []
+
     for pedido in pedidos:
-        if pedido.HoraLlegada:
-           
-            horas = (pedido.FechaEntrega - pedido.HoraLlegada.date()).days * 8  
+        if pedido.HoraLlegada and pedido.FechaEntrega:
+            # Asegurarse que FechaEntrega sea datetime
+            if isinstance(pedido.FechaEntrega, date) and not isinstance(pedido.FechaEntrega, datetime):
+                fecha_entrega_dt = datetime.combine(pedido.FechaEntrega, datetime.min.time())
+            else:
+                fecha_entrega_dt = pedido.FechaEntrega
+
+            horas = (fecha_entrega_dt - pedido.HoraLlegada).total_seconds() / 3600
             total_horas += horas
             if horas > 8:
                 total_horas_extra += horas - 8
 
- 
+        # Instalaciones
+        eventos_instalacion = [c for c in pedido.calendario if c.Tipo and c.Tipo.lower() == 'instalacion']
+        instalaciones.extend(eventos_instalacion)
+
+    # Pagos por mes
     pagos = Pagos.query.join(Pedido).filter(Pedido.ID_Empleado == id_empleado).all()
     pagos_por_mes = {}
     for pago in pagos:
-        mes = pago.FechaPago.strftime('%Y-%m')
-        pagos_por_mes[mes] = pagos_por_mes.get(mes, 0) + pago.Monto
+        if pago.FechaPago:
+            mes = pago.FechaPago.strftime('%Y-%m')
+            pagos_por_mes[mes] = pagos_por_mes.get(mes, 0) + pago.Monto
 
     return render_template('recursos_humanos/detalle_empleado.html',
                            empleado=empleado,
                            pedidos=pedidos,
-                           total_horas=total_horas,
-                           total_horas_extra=total_horas_extra,
+                           total_horas=round(total_horas, 2),
+                           total_horas_extra=round(total_horas_extra, 2),
+                           instalaciones=instalaciones,
                            pagos_por_mes=pagos_por_mes)
+

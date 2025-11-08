@@ -18,7 +18,7 @@
             <td>{{ empleado.Correo }}</td>
             <td>{{ empleado.Rol }}</td>
             <td>
-                <a href="{{ url_for('recursos_humanos.detalle_empleado', id_empleado=empleado.ID_Usuario) }}" class="btn btn-primary btn-sm">Ver Detalles</a>
+                <a href="{{ url_for('admin.detalle_empleado', id_empleado=empleado.ID_Usuario) }}" class="btn btn-primary btn-sm">Ver Detalles</a>
             </td>
         </tr>
         {% endfor %}
