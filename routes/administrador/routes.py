@@ -741,16 +741,26 @@ def editar_garantia(id):
         return redirect(url_for('admin_garantia.listar_garantias'))
     return render_template('administrador/editar.html', garantia=garantia)
 
+# ---------- RECURSOS HUMANOS ----------
+
 @admin.route('/recursos-humanos')
 @login_required
 def lista_empleados():
-    
+    """
+    Lista todos los empleados que son instaladores o transportistas
+    """
     empleados = Usuario.query.filter(Usuario.Rol.in_(['instalador', 'transportista'])).all()
     return render_template('recursos_humanos/lista_empleados.html', empleados=empleados)
+
 
 @admin.route('/recursos-humanos/<int:id_empleado>', methods=['GET', 'POST'])
 @login_required
 def detalle_empleado(id_empleado):
+    """
+    Muestra detalle de un empleado, incluyendo pedidos, instalaciones,
+    pagos y horas trabajadas. Permite actualizar horas diurnas y nocturnas
+    y calcula automáticamente horas extra desde los pedidos.
+    """
     empleado = Usuario.query.get_or_404(id_empleado)
     pedidos = Pedido.query.filter_by(ID_Empleado=id_empleado).all()
 
@@ -758,18 +768,23 @@ def detalle_empleado(id_empleado):
     total_horas_extra = 0
     instalaciones = []
 
-    # Inicializamos horas diurnas y nocturnas
-    horas_diurnas = 0
-    horas_nocturnas = 0
+    # Recuperar horas diurnas y nocturnas existentes en DB o inicializar
+    horas_diurnas = getattr(empleado, 'horas_diurnas', 0)
+    horas_nocturnas = getattr(empleado, 'horas_nocturnas', 0)
 
-    # Procesamos POST si el admin envía horas manualmente
+    # Procesar POST si se envían horas manualmente
     if request.method == 'POST':
         horas_diurnas = float(request.form.get('horas_diurnas', 0))
         horas_nocturnas = float(request.form.get('horas_nocturnas', 0))
 
-    # Calcular horas de pedidos
+        # Guardar horas diurnas y nocturnas en la base de datos
+        empleado.horas_diurnas = horas_diurnas
+        empleado.horas_nocturnas = horas_nocturnas
+
+    # Calcular horas de pedidos y horas extra automáticamente
     for pedido in pedidos:
         if pedido.HoraLlegada and pedido.FechaEntrega:
+            # Asegurarse de que FechaEntrega sea datetime
             if isinstance(pedido.FechaEntrega, date) and not isinstance(pedido.FechaEntrega, datetime):
                 fecha_entrega_dt = datetime.combine(pedido.FechaEntrega, datetime.min.time())
             else:
@@ -780,11 +795,16 @@ def detalle_empleado(id_empleado):
             if horas > 8:
                 total_horas_extra += horas - 8
 
-        # Instalaciones
+        # Obtener instalaciones del pedido
         eventos_instalacion = [c for c in pedido.calendario if c.Tipo and c.Tipo.lower() == 'instalacion']
         instalaciones.extend(eventos_instalacion)
 
-    # Pagos por mes
+    # Actualizar horas totales sumando horas extras calculadas
+    empleado.horas_totales = total_horas
+    empleado.horas_extra = total_horas_extra
+    db.session.commit()  # Guardamos todo junto: diurnas, nocturnas, totales, extra
+
+    # Calcular pagos por mes
     pagos = Pagos.query.join(Pedido).filter(Pedido.ID_Empleado == id_empleado).all()
     pagos_por_mes = {}
     for pago in pagos:
@@ -792,31 +812,14 @@ def detalle_empleado(id_empleado):
             mes = pago.FechaPago.strftime('%Y-%m')
             pagos_por_mes[mes] = pagos_por_mes.get(mes, 0) + pago.Monto
 
-    # Enviamos todo al template
-    return render_template('recursos_humanos/detalle_empleado.html',
-                           empleado=empleado,
-                           pedidos=pedidos,
-                           total_horas=round(total_horas, 2),
-                           total_horas_extra=round(total_horas_extra, 2),
-                           instalaciones=instalaciones,
-                           pagos_por_mes=pagos_por_mes,
-                           horas_diurnas=horas_diurnas,
-                           horas_nocturnas=horas_nocturnas)
-
-@admin.route('/empleado/<int:id_empleado>/actualizar_horas', methods=['POST'])
-@login_required
-def actualizar_horas(id_empleado):
-    empleado = Usuario.query.get_or_404(id_empleado)
-
-    # Obtener valores del formulario
-    horas_diurnas = int(request.form.get('horas_diurnas', 0))
-    horas_nocturnas = int(request.form.get('horas_nocturnas', 0))
-
-    # Guardar en la base de datos si quieres
-    empleado.horas_diurnas = horas_diurnas
-    empleado.horas_nocturnas = horas_nocturnas
-    db.session.commit()
-
-    flash("Horas actualizadas correctamente", "success")
-    return redirect(url_for('admin.detalle_empleado', id_empleado=id_empleado))
-
+    return render_template(
+        'recursos_humanos/detalle_empleado.html',
+        empleado=empleado,
+        pedidos=pedidos,
+        total_horas=round(total_horas, 2),
+        total_horas_extra=round(total_horas_extra, 2),
+        instalaciones=instalaciones,
+        pagos_por_mes=pagos_por_mes,
+        horas_diurnas=horas_diurnas,
+        horas_nocturnas=horas_nocturnas
+    )

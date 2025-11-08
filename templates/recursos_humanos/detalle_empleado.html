@@ -41,11 +41,12 @@
     </ul>
 
     <h4>Horas trabajadas</h4>
-    <p><strong>Total Horas:</strong> 48 h</p> 
+    {% set total_horas_calculadas = (horas_diurnas or 0) + (horas_nocturnas or 0) + (total_horas_extra or 0) %}
+    <p><strong>Total Horas:</strong> {{ total_horas_calculadas }} h</p> 
     <p><strong>Horas Extra:</strong> {{ total_horas_extra }} h</p>
 
     <h4>Ingresar horas diurnas y nocturnas</h4>
-    <form method="POST" action="{{ url_for('admin.actualizar_horas', id_empleado=empleado.ID_Usuario) }}">
+    <form method="POST" action="{{ url_for('admin.detalle_empleado', id_empleado=empleado.ID_Usuario) }}">
         <label>Horas Diurnas: <input type="number" name="horas_diurnas" value="{{ horas_diurnas or 0 }}" min="0"></label>
         &nbsp;&nbsp;
         <label>Horas Nocturnas: <input type="number" name="horas_nocturnas" value="{{ horas_nocturnas or 0 }}" min="0"></label>
@@ -63,7 +64,7 @@
 
         {% set total_diurnas = (horas_diurnas or 0) * pago_hora_diurna %}
         {% set total_nocturnas = (horas_nocturnas or 0) * pago_hora_nocturna %}
-        {% set total_horas_extra_valor = total_horas_extra * valor_hora_extra %}
+        {% set total_horas_extra_valor = (total_horas_extra or 0) * valor_hora_extra %}
         {% set total_mes = pago_base + auxilio_transporte + total_horas_extra_valor + total_diurnas + total_nocturnas %}
 
         <p>Pago base del mes: ${{ "{:,.0f}".format(pago_base) }} COP</p>
