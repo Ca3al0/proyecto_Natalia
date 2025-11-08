@@ -80,7 +80,6 @@ button:hover {
   text-align: center;
 }
 
-/* Firma */
 #firmaCanvas {
   border: 2px dashed var(--verde);
   width: 100%;
@@ -115,8 +114,8 @@ button:hover {
       <p><strong>Tipo de pago:</strong> {{ pedido.TipoPago }}</p>
     </div>
 
-    <form id="estadoForm" 
-          action="{{ url_for('transportista.actualizar_estado', id_pedido=pedido.ID_Pedido) }}" 
+    <form id="estadoForm"
+          action="{{ url_for('transportista.actualizar_estado', id_pedido=pedido.ID_Pedido) }}"
           method="POST">
 
       <select name="estado" id="estado">
@@ -126,7 +125,7 @@ button:hover {
         <option value="entregado" {% if pedido.Estado == 'entregado' %}selected{% endif %}>Entregado</option>
       </select>
 
-      <!-- Sección de confirmación al marcar entregado -->
+      <!-- Opciones al marcar "entregado" -->
       <div id="entregadoOpciones" style="display: none; margin-top: 15px;">
         <p><strong>Confirmar entrega:</strong></p>
         <button type="button" onclick="mostrarFirma()">🖊 Capturar firma del cliente</button>
@@ -146,31 +145,33 @@ button:hover {
       <button id="btnActualizar" type="submit" style="margin-top: 15px;">Actualizar</button>
     </form>
 
-    <div class="info">
+    <div class="info mt-3">
       Cambia el estado actual solo para avanzar en el proceso. No se puede volver atrás.
     </div>
 
     <hr>
 
     <div style="text-align:center;">
-      <a href="{{ url_for('transportista.get_registro_fotografico', pedido_id=pedido.ID_Pedido) }}" 
-        class="btn btn-outline-primary btn-sm">
+      <a href="{{ url_for('transportista.get_registro_fotografico', pedido_id=pedido.ID_Pedido) }}"
+         class="btn btn-outline-primary btn-sm">
         📷 Ver registro fotográfico
-        </a>
+      </a>
     </div>
   </div>
 </div>
 
 <script>
+// ------------------ VARIABLES ------------------
 const estadoSelect = document.getElementById("estado");
 const entregadoOpciones = document.getElementById("entregadoOpciones");
 const firmaSection = document.getElementById("firmaSection");
-const tipoPago = "{{ pedido.TipoPago|lower }}";
 const canvas = document.getElementById("firmaCanvas");
 const ctx = canvas.getContext("2d");
 let dibujando = false;
 
-// Mostrar opciones al seleccionar "Entregado"
+// ------------------ EVENTOS ------------------
+
+// Mostrar opciones cuando se selecciona "Entregado"
 estadoSelect.addEventListener("change", () => {
   if (estadoSelect.value === "entregado") {
     entregadoOpciones.style.display = "block";
@@ -180,23 +181,24 @@ estadoSelect.addEventListener("change", () => {
   }
 });
 
-// Mostrar sección de firma
+// Mostrar la sección de firma
 function mostrarFirma() {
   firmaSection.style.display = "block";
   entregadoOpciones.style.display = "none";
 }
 
-// Enviar correo AJAX
+// Enviar correo de confirmación AJAX
 function enviarCorreo() {
-  fetch(`/transportista/enviar_confirmacion/{{ pedido.ID_Pedido }}`, {
-    method: "POST"
+  fetch(`{{ url_for('transportista.enviar_confirmacion', id_pedido=pedido.ID_Pedido) }}`, {
+    method: "POST",
+    headers: { "X-Requested-With": "XMLHttpRequest" }
   })
-  .then(r => r.json())
+  .then(res => res.json())
   .then(data => alert(data.message))
-  .catch(err => alert("Error al enviar correo."));
+  .catch(() => alert("⚠️ Error al enviar el correo."));
 }
 
-// Firma
+// ------------------ FIRMA ------------------
 canvas.addEventListener("mousedown", () => dibujando = true);
 canvas.addEventListener("mouseup", () => dibujando = false);
 canvas.addEventListener("mouseout", () => dibujando = false);

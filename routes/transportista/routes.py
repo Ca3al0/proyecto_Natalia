@@ -16,6 +16,8 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash
 from sqlalchemy import func
 from basedatos.notificaciones import crear_notificacion
+from basedatos.decoradores import mail
+from flask_mail import Message
 
 
 from . import transportista
@@ -274,26 +276,51 @@ def actualizar_estado(id_pedido):
 
     return redirect(url_for("transportista.seguimiento_pedido", pedido_id=id_pedido))
 
-@transportista.route("/enviar_confirmacion/<int:pedido_id>", methods=["POST"])
+@transportista.route('/enviar_confirmacion/<int:id_pedido>', methods=['POST'])
 @login_required
 @role_required('transportista')
-def enviar_confirmacion(pedido_id):
-    pedido = Pedido.query.get_or_404(pedido_id)
+def enviar_confirmacion(id_pedido):
+    pedido = Pedido.query.get_or_404(id_pedido)
     correo_cliente = pedido.usuario.Correo
 
-    # Lógica para enviar el correo (ejemplo con Flask-Mail)
-    enlace_confirmacion = url_for("cliente.confirmar_entrega", pedido_id=pedido_id, _external=True)
+    try:
+        msg = Message(
+            subject=f"Confirmación de entrega - Pedido #{pedido.ID_Pedido}",
+            sender="casaenelarbol236@gmail.com",
+            recipients=[correo_cliente]
+        )
+        msg.body = f"""
+        Hola {pedido.usuario.Nombre},
 
-    mensaje = f"""
-    Hola {pedido.usuario.Nombre},
-    Tu pedido #{pedido.ID_Pedido} ha llegado.
-    Confirma haciendo clic aquí: {enlace_confirmacion}
-    """
+        Tu pedido #{pedido.ID_Pedido} ha sido marcado como ENTREGADO por el transportista.
 
-    # mail.send_message("Confirmación de entrega", sender="tuapp@gmail.com", recipients=[correo_cliente], body=mensaje)
+        Por favor confirma si realmente lo recibiste:
 
-    return jsonify({"message": "📧 Correo de confirmación enviado al cliente."})
+        ✅ Sí recibí: {request.host_url}confirmar_entrega/{pedido.ID_Pedido}?respuesta=si  
+        ❌ No recibí: {request.host_url}confirmar_entrega/{pedido.ID_Pedido}?respuesta=no  
 
+        Gracias por tu compra 💚
+        """
+        mail.send(msg)
+        return jsonify({'status': 'success', 'message': '📩 Correo de confirmación enviado correctamente al cliente.'}), 200
+
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': f'⚠️ Error al enviar el correo: {str(e)}'}), 500
+
+@transportista.route('/confirmar_entrega/<int:id_pedido>')
+def confirmar_entrega(id_pedido):
+    respuesta = request.args.get('respuesta')
+    pedido = Pedido.query.get_or_404(id_pedido)
+
+    if respuesta == 'si':
+        pedido.Estado = 'entregado'
+        db.session.commit()
+        return "✅ Gracias por confirmar. Tu pedido ha sido marcado como ENTREGADO."
+
+    elif respuesta == 'no':
+        return "⚠️ Gracias por responder. Hemos notificado al transportista que el pedido no fue entregado."
+
+    return "Respuesta inválida."
 
 
 # ---------- ACTUALIZACION_DATOS ----------
