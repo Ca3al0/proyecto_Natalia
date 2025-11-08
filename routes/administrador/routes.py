@@ -748,20 +748,28 @@ def lista_empleados():
     empleados = Usuario.query.filter(Usuario.Rol.in_(['instalador', 'transportista'])).all()
     return render_template('recursos_humanos/lista_empleados.html', empleados=empleados)
 
-@admin.route('/recursos-humanos/<int:id_empleado>')
+@admin.route('/recursos-humanos/<int:id_empleado>', methods=['GET', 'POST'])
 @login_required
 def detalle_empleado(id_empleado):
     empleado = Usuario.query.get_or_404(id_empleado)
-
     pedidos = Pedido.query.filter_by(ID_Empleado=id_empleado).all()
 
     total_horas = 0
     total_horas_extra = 0
     instalaciones = []
 
+    # Inicializamos horas diurnas y nocturnas
+    horas_diurnas = 0
+    horas_nocturnas = 0
+
+    # Procesamos POST si el admin envía horas manualmente
+    if request.method == 'POST':
+        horas_diurnas = float(request.form.get('horas_diurnas', 0))
+        horas_nocturnas = float(request.form.get('horas_nocturnas', 0))
+
+    # Calcular horas de pedidos
     for pedido in pedidos:
         if pedido.HoraLlegada and pedido.FechaEntrega:
-            # Asegurarse que FechaEntrega sea datetime
             if isinstance(pedido.FechaEntrega, date) and not isinstance(pedido.FechaEntrega, datetime):
                 fecha_entrega_dt = datetime.combine(pedido.FechaEntrega, datetime.min.time())
             else:
@@ -784,13 +792,16 @@ def detalle_empleado(id_empleado):
             mes = pago.FechaPago.strftime('%Y-%m')
             pagos_por_mes[mes] = pagos_por_mes.get(mes, 0) + pago.Monto
 
+    # Enviamos todo al template
     return render_template('recursos_humanos/detalle_empleado.html',
                            empleado=empleado,
                            pedidos=pedidos,
                            total_horas=round(total_horas, 2),
                            total_horas_extra=round(total_horas_extra, 2),
                            instalaciones=instalaciones,
-                           pagos_por_mes=pagos_por_mes)
+                           pagos_por_mes=pagos_por_mes,
+                           horas_diurnas=horas_diurnas,
+                           horas_nocturnas=horas_nocturnas)
 
 @admin.route('/empleado/<int:id_empleado>/actualizar_horas', methods=['POST'])
 @login_required
