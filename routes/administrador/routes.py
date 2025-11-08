@@ -748,47 +748,53 @@ def lista_empleados():
     empleados = Usuario.query.filter(Usuario.Rol.in_(['instalador', 'transportista'])).all()
     return render_template('recursos_humanos/lista_empleados.html', empleados=empleados)
 
-@admin.route('/recursos-humanos/<int:id_empleado>')
-@login_required
+@admin.route('/empleado/<int:id_empleado>')
 def detalle_empleado(id_empleado):
     empleado = Usuario.query.get_or_404(id_empleado)
-
-    pedidos = Pedido.query.filter_by(ID_Empleado=id_empleado).all()
+    pedidos = Pedido.query.filter_by(ID_Empleado=empleado.ID_Usuario).all()
 
     total_horas = 0
     total_horas_extra = 0
-    instalaciones = []
+    jornada_estandar = 8  
+    pedidos_detalle = []
 
     for pedido in pedidos:
+      
         if pedido.HoraLlegada and pedido.FechaEntrega:
-            # Asegurarse que FechaEntrega sea datetime
-            if isinstance(pedido.FechaEntrega, date) and not isinstance(pedido.FechaEntrega, datetime):
-                fecha_entrega_dt = datetime.combine(pedido.FechaEntrega, datetime.min.time())
-            else:
-                fecha_entrega_dt = pedido.FechaEntrega
+            horas_trabajadas = (pedido.FechaEntrega - pedido.HoraLlegada).total_seconds() / 3600
+            total_horas += min(horas_trabajadas, jornada_estandar)
+            if horas_trabajadas > jornada_estandar:
+                total_horas_extra += horas_trabajadas - jornada_estandar
 
-            horas = (fecha_entrega_dt - pedido.HoraLlegada).total_seconds() / 3600
-            total_horas += horas
-            if horas > 8:
-                total_horas_extra += horas - 8
+        # Productos del pedido
+        productos = []
+        for detalle in pedido.detalles_pedido:
+            productos.append({
+                'nombre': detalle.producto.NombreProducto,
+                'cantidad': detalle.Cantidad,
+                'precio_unitario': detalle.PrecioUnidad,
+                'subtotal': detalle.subtotal
+            })
+        pedidos_detalle.append({
+            'pedido': pedido,
+            'productos': productos
+        })
 
-        # Instalaciones
-        eventos_instalacion = [c for c in pedido.calendario if c.Tipo and c.Tipo.lower() == 'instalacion']
-        instalaciones.extend(eventos_instalacion)
-
-    # Pagos por mes
-    pagos = Pagos.query.join(Pedido).filter(Pedido.ID_Empleado == id_empleado).all()
-    pagos_por_mes = {}
-    for pago in pagos:
-        if pago.FechaPago:
-            mes = pago.FechaPago.strftime('%Y-%m')
-            pagos_por_mes[mes] = pagos_por_mes.get(mes, 0) + pago.Monto
+  
+    pago_base = 1423500
+    auxilio_transporte = 200000
+    valor_hora_extra = 15000
+    total_horas_extra_valor = total_horas_extra * valor_hora_extra
+    total_mes = pago_base + auxilio_transporte + total_horas_extra_valor
 
     return render_template('recursos_humanos/detalle_empleado.html',
                            empleado=empleado,
-                           pedidos=pedidos,
+                           pedidos=pedidos_detalle,
                            total_horas=round(total_horas, 2),
                            total_horas_extra=round(total_horas_extra, 2),
-                           instalaciones=instalaciones,
-                           pagos_por_mes=pagos_por_mes)
+                           pago_base=pago_base,
+                           auxilio_transporte=auxilio_transporte,
+                           valor_hora_extra=valor_hora_extra,
+                           total_horas_extra_valor=total_horas_extra_valor,
+                           total_mes=total_mes)
 
