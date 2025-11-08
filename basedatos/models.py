@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from sqlalchemy import CheckConstraint, Enum
-from datetime import datetime, date
+from datetime import datetime, date, time
 
 db = SQLAlchemy()
 
@@ -18,15 +18,19 @@ class Usuario(UserMixin, db.Model):
     Contraseña = db.Column(db.String(200), nullable=False)
     Rol = db.Column(db.String(50), default='cliente')
     Activo = db.Column(db.Boolean, default=True)
+    horas_diurnas = db.Column(db.Float, default=0)
+    horas_nocturnas = db.Column(db.Float, default=0)
+    horas_extra = db.Column(db.Float, default=0)
 
     # Relaciones
     calendarios = db.relationship('Calendario', backref='usuario', lazy=True)
     notificaciones = db.relationship('Notificaciones', backref='usuario', lazy=True)
     novedades = db.relationship('Novedades', backref='usuario', lazy=True)
     pedidos = db.relationship('Pedido', backref='usuario', lazy=True, foreign_keys='Pedido.ID_Usuario')
-    pedidos_asignados = db.relationship('Pedido', foreign_keys='Pedido.ID_Empleado', lazy=True)
+    pedidos_asignados = db.relationship('Pedido', backref='empleado_usuario', lazy=True, foreign_keys='Pedido.ID_Empleado')
     direcciones = db.relationship('Direccion', backref='usuario', lazy=True, cascade="all, delete-orphan")
     resenas = db.relationship('Resena', back_populates='usuario', lazy=True)
+    mensajes = db.relationship('Mensaje', backref='cliente', lazy=True)
 
     def get_id(self):
         return str(self.ID_Usuario)
@@ -52,7 +56,6 @@ class Direccion(db.Model):
     Barrio = db.Column(db.String(100))
     Destinatario = db.Column(db.String(100))
 
-
 # ------------------ Proveedor ------------------
 class Proveedor(db.Model):
     __tablename__ = 'Proveedor'
@@ -69,10 +72,6 @@ class Proveedor(db.Model):
     productos = db.relationship('Producto', back_populates='proveedor', lazy=True)
     compras = db.relationship('Compra', back_populates='proveedor', lazy=True)
 
-    def __repr__(self):
-        return f'<Proveedor {self.NombreEmpresa} - {self.Ciudad}>'
-
-
 # ------------------ Categorias ------------------
 class Categorias(db.Model):
     __tablename__ = 'Categorias'
@@ -82,7 +81,6 @@ class Categorias(db.Model):
     Descripcion = db.Column(db.Text)
 
     productos = db.relationship('Producto', back_populates='categoria', lazy=True)
-
 
 # ------------------ Producto ------------------
 class Producto(db.Model):
@@ -99,7 +97,6 @@ class Producto(db.Model):
     ID_Proveedor = db.Column(db.Integer, db.ForeignKey('Proveedor.ID_Proveedor'), nullable=False)
     ID_Categoria = db.Column(db.Integer, db.ForeignKey('Categorias.ID_Categoria'))
 
-    # Campos opcionales
     Comentario = db.Column(db.Text)
     Calificacion = db.Column(db.Integer)
 
@@ -110,7 +107,6 @@ class Producto(db.Model):
     detalles_pedido = db.relationship('Detalle_Pedido', back_populates='producto', lazy=True)
     resenas = db.relationship('Resena', back_populates='producto', lazy=True)
 
-
 # ------------------ ImagenProducto ------------------
 class ImagenProducto(db.Model):
     __tablename__ = 'ImagenProducto'
@@ -118,9 +114,6 @@ class ImagenProducto(db.Model):
     ID_Imagen = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ruta = db.Column(db.String(200), nullable=False)
     ID_Producto = db.Column(db.Integer, db.ForeignKey('Producto.ID_Producto'), nullable=False)
-
-
-
 
 # ------------------ Pedido ------------------
 class Pedido(db.Model):
@@ -142,26 +135,11 @@ class Pedido(db.Model):
     firmas = db.relationship('Firmas', backref='pedido', lazy=True)
     comentarios = db.relationship('Comentarios', backref='pedido', lazy=True)
     calendario = db.relationship('Calendario', backref='pedido', lazy=True)
+    garantias = db.relationship('Garantia', backref='pedido', lazy=True)
 
-    # Relación con empleado (transportista)
     empleado = db.relationship('Usuario', foreign_keys=[ID_Empleado])
 
-    @property
-    def ImagenProducto(self):
-        """Devuelve la ImagenPrincipal del primer producto del pedido."""
-        if self.detalles_pedido and len(self.detalles_pedido) > 0:
-            return self.detalles_pedido[0].producto.ImagenPrincipal
-        return None
-    
-    @property
-    def TransportistaNombre(self):
-        return f"{self.empleado.Nombre} {self.empleado.Apellido}" if self.empleado else "No asignado"
-
-
-
-
-
-# ------------------ Detalle Pedido ------------------
+# ------------------ Detalle_Pedido ------------------
 class Detalle_Pedido(db.Model):
     __tablename__ = 'Detalle_Pedido'
 
@@ -176,7 +154,6 @@ class Detalle_Pedido(db.Model):
     def subtotal(self):
         return self.Cantidad * self.PrecioUnidad
 
-
 # ------------------ Pagos ------------------
 class Pagos(db.Model):
     __tablename__ = 'Pagos'
@@ -187,7 +164,6 @@ class Pagos(db.Model):
     Monto = db.Column(db.Float)
     ID_Pedido = db.Column(db.Integer, db.ForeignKey('Pedido.ID_Pedido'), nullable=False)
 
-
 # ------------------ Firmas ------------------
 class Firmas(db.Model):
     __tablename__ = 'Firmas'
@@ -196,8 +172,7 @@ class Firmas(db.Model):
     pedido_id = db.Column(db.Integer, db.ForeignKey('Pedido.ID_Pedido'), nullable=False)
     nombre_cliente = db.Column(db.String(100), nullable=False)
     firma = db.Column(db.Text, nullable=False)
-    fecha_firma = db.Column(db.DateTime, default=db.func.current_timestamp())
-
+    fecha_firma = db.Column(db.DateTime, default=datetime.utcnow)
 
 # ------------------ Comentarios ------------------
 class Comentarios(db.Model):
@@ -206,8 +181,7 @@ class Comentarios(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     pedido_id = db.Column(db.Integer, db.ForeignKey('Pedido.ID_Pedido', ondelete="CASCADE"), nullable=False)
     texto = db.Column(db.Text, nullable=False)
-    fecha = db.Column(db.DateTime, default=db.func.current_timestamp())
-
+    fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
 # ------------------ Calendario ------------------
 class Calendario(db.Model):
@@ -218,10 +192,8 @@ class Calendario(db.Model):
     Hora = db.Column(db.Time, nullable=False)
     Ubicacion = db.Column(db.String(255), nullable=False)
     Tipo = db.Column(db.String(50), nullable=False)
-
     ID_Usuario = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
     ID_Pedido = db.Column(db.Integer, db.ForeignKey('Pedido.ID_Pedido'))
-
 
 # ------------------ Notificaciones ------------------
 class Notificaciones(db.Model):
@@ -230,10 +202,9 @@ class Notificaciones(db.Model):
     ID_Notificacion = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Titulo = db.Column(db.String(200), nullable=False)
     Mensaje = db.Column(db.Text, nullable=False)
-    Fecha = db.Column(db.DateTime, default=db.func.current_timestamp())
+    Fecha = db.Column(db.DateTime, default=datetime.utcnow)
     Leida = db.Column(db.Boolean, default=False)
     ID_Usuario = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
-
 
 # ------------------ Novedades ------------------
 class Novedades(db.Model):
@@ -246,8 +217,7 @@ class Novedades(db.Model):
     ID_Usuario = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
     ID_Producto = db.Column(db.Integer, db.ForeignKey('Producto.ID_Producto'), nullable=False)
 
-
-# ------------------ Reseñas ------------------
+# ------------------ Resena ------------------
 class Resena(db.Model):
     __tablename__ = 'Resena'
 
@@ -256,7 +226,7 @@ class Resena(db.Model):
     ID_Usuario = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
     Calificacion = db.Column(db.Integer, nullable=False)
     Comentario = db.Column(db.Text, nullable=False)
-    Fecha = db.Column(db.DateTime(timezone=True), server_default=db.func.now())
+    Fecha = db.Column(db.DateTime, default=datetime.utcnow)
 
     producto = db.relationship('Producto', back_populates='resenas')
     usuario = db.relationship('Usuario', back_populates='resenas')
@@ -265,8 +235,7 @@ class Resena(db.Model):
         CheckConstraint('Calificacion >= 1 AND Calificacion <= 5', name='check_calificacion_range'),
     )
 
-
-# ------------------ Compras ------------------
+# ------------------ Compra ------------------
 class Compra(db.Model):
     __tablename__ = 'Compra'
 
@@ -278,26 +247,17 @@ class Compra(db.Model):
 
     proveedor = db.relationship('Proveedor', back_populates='compras')
 
-    def __repr__(self):
-        return f'<Compra {self.Producto} - {self.Cantidad} unidades>'
-
-# ------------------ Mensajes ------------------
+# ------------------ Mensaje ------------------
 class Mensaje(db.Model):
     __tablename__ = 'Mensajes'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    cliente_id = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    cliente_id = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario', ondelete='CASCADE'), nullable=False)
     contenido = db.Column(db.Text, nullable=False)
     enviado_admin = db.Column(db.Boolean, default=False, nullable=False)
     fecha = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    # Relación con el cliente
-    cliente = db.relationship('Usuario', backref=db.backref('mensajes', lazy=True))
-
-    def __repr__(self):
-        remitente = "Admin" if self.enviado_admin else self.cliente.Nombre
-        return f'<Mensaje de {remitente} a las {self.fecha}>'
-
+# ------------------ RegistroFotografico ------------------
 class RegistroFotografico(db.Model):
     __tablename__ = 'registro_fotografico'
 
@@ -309,10 +269,7 @@ class RegistroFotografico(db.Model):
     imagen_url = db.Column(db.Text, nullable=False)
     creado_en = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relaciones
-    usuario = db.relationship('Usuario', backref=db.backref('registros_fotograficos', lazy=True))
-    pedido = db.relationship('Pedido', backref=db.backref('registros_fotograficos', lazy=True))
-
+# ------------------ Garantia ------------------
 class Garantia(db.Model):
     __tablename__ = 'Garantia'
 
@@ -320,21 +277,14 @@ class Garantia(db.Model):
     ID_Pedido = db.Column(db.Integer, db.ForeignKey('Pedido.ID_Pedido'), nullable=False)
     ID_Usuario = db.Column(db.Integer, db.ForeignKey('Usuario.ID_Usuario'), nullable=False)
     FechaSolicitud = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    Estado = db.Column(Enum('pendiente', 'aprobada', 'rechazada', 'completada', name='estado_garantia'), default='pendiente', nullable=False)
+    Estado = db.Column(Enum('pendiente','aprobada','rechazada','completada'), default='pendiente', nullable=False)
     Motivo = db.Column(db.Text, nullable=False)
     ComentarioAdmin = db.Column(db.Text)
     FechaResolucion = db.Column(db.DateTime)
-    
-    # Archivos relacionados con la garantía
+
     archivos = db.relationship('GarantiaArchivo', backref='garantia', lazy=True, cascade="all, delete-orphan")
-    
-    # Relaciones
-    pedido = db.relationship('Pedido', backref=db.backref('garantias', lazy=True))
-    usuario = db.relationship('Usuario', backref=db.backref('garantias', lazy=True))
-    
-    def __repr__(self):
-        return f"<Garantia {self.ID_Garantia} - Estado: {self.Estado}>"
-    
+
+# ------------------ GarantiaArchivo ------------------
 class GarantiaArchivo(db.Model):
     __tablename__ = 'GarantiaArchivo'
 
@@ -343,6 +293,3 @@ class GarantiaArchivo(db.Model):
     NombreArchivo = db.Column(db.String(200))
     RutaArchivo = db.Column(db.String(500), nullable=False)
     FechaSubida = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def __repr__(self):
-        return f"<Archivo {self.NombreArchivo} para Garantia {self.ID_Garantia}>"
